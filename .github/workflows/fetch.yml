@@ -20,8 +20,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Fetch flows
+      - name: Fetch flows (full per-fund history pages)
         run: python scripts/fetch_flows.py
+      - name: Fetch flows (MCP endpoint, smaller assets)
+        run: python scripts/fetch_mcp.py
+        continue-on-error: true
       - name: Commit if changed
         run: |
           git config user.name "etf-flows-bot"
