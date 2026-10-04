@@ -20,7 +20,7 @@ OUT = os.path.join(ROOT, "data", "prices")
 
 def get(url, accept="*/*"):
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with urllib.request.urlopen(req, timeout=10) as r:
         return r.read().decode("utf-8", "replace")
 
 
@@ -52,15 +52,21 @@ def stooq(t):
 def main():
     os.makedirs(OUT, exist_ok=True)
     report = {"run_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "tickers": {}}
+    fails = {"yahoo": 0, "stooq": 0}
     for t in TICKERS:
         got, src, errs = {}, None, []
         for name, fn in (("yahoo", yahoo), ("stooq", stooq)):
+            if fails[name] >= 3:  # source looks blocked from this runner: stop trying it
+                continue
             try:
                 got = fn(t)
                 if got:
                     src = name
+                    fails[name] = 0
                     break
+                fails[name] += 1
             except Exception as e:
+                fails[name] += 1
                 errs.append(f"{name}: {type(e).__name__} {str(e)[:120]}")
             time.sleep(1)
         path = os.path.join(OUT, f"{t}.json")
