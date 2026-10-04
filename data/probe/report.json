@@ -1,0 +1,847 @@
+{
+ "robots": {
+  "https://cryptoetf.today/robots.txt": "User-Agent: GPTBot\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nUser-Agent: ClaudeBot\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nUser-Agent: anthropic-ai\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nUser-Agent: PerplexityBot\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nUser-Agent: Google-Extended\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nUser-Agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nDisallow: /*/api/\n\nSitemap: https://cryptoetf.today/sitemap.xml\n",
+  "https://www.strategy.com/robots.txt": "ERR HTTP Error 403: Forbidden"
+ },
+ "pages": {
+  "chainlink": {
+   "status": 200,
+   "bytes": 242461,
+   "date_like": 5,
+   "keys_before_arrays": [
+    "children",
+    "f",
+    "mainEntity"
+   ],
+   "rendered": {
+    "tables": 1,
+    "rows_in_tables": [
+     6
+    ],
+    "text_len": 6218
+   },
+   "network": [
+    {
+     "url": "https://cryptoetf.today/cdn-cgi/rum?",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "text/plain",
+     "len": 0
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/summary/prices",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 739
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/languages/public",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 2834
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-issuers/overview?days=400&funds=1",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 193654
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-candles/stats",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 21590
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/fund-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 11618
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/asset-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 4011
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=1b6ve",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 256
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/glnk-etf-price?_rsc=1b6ve",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 407
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/clnk-etf-price?_rsc=1b6ve",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 407
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=2pofr",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 4105
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/glnk-etf-price?_rsc=uw4r0",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 10267
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/clnk-etf-price?_rsc=5omsq",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 9812
+    },
+    {
+     "url": "https://mc.yandex.com/watch/106544100/1?wmode=7&page-url=https%3A%2F%2Fcryptoetf.today%2Fen%2Fchainlink-etf-flows&charset=utf-8&uah=chu%0A%22Chromium%22%3Bv%3D%22154%22%2C%22Google%20Chrome%22%3Bv%3D%22154%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299%22%0Acha%0Ax64%0Achb%0A64%0Achf%0A154.0.8037.57%0Achl%0A%22Chromium%22%3Bv%3D%22154.0.8037.57%22%2C%22Google%20Chrome%22%3Bv%3D%22154.0.8037.57%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299.0.0.0%22%0Achm%0A%3F0%0Achp%0ALinux&browser-info=pv%3A1%3Avf%3A1hkuu7q9oojr202mtyg5uinyhckcg63%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aen-US%3Av%3A2660%3Acn%3A1%3Adp%3A0%3Als%3A1609189747675%3Ahid%3A39034607%3Az%3A0%3Ai%3A20261004142727%3Aet%3A1791124048%3Ac%3A1%3Arn%3A187898431%3Arqn%3A1%3Au%3A1791124048995405497%3Aw%3A1366x900%3As%3A1366x900x24%3Ask%3A1%3Afp%3A1480%3Awv%3A2%3Ads%3A11%2C48%2C492%2C252%2C5%2C0%2C%2C208%2C18%2C1865%2C1865%2C0%2C1560%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1791124043412%3Agi%3AR0ExLjEuMTg1NTk2MzIyNS4xNzkxMTI0MDQ2%3Arqnl%3A1%3Ast%3A1791124049%3At%3AChainlink%20ETF%20Flows%20Today%3A%20Inflows%20%26%20Outflows%20%7C%20Crypto%20ETF&t=clt%281626%29clc%280-0-0%29rqnt%281%29rfs%281%29ufs%281%29aw%281%29rcm%281%29cdl%28na%29eco%2821137681%29ti%281%29&redirnss=1",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 751
+    }
+   ]
+  },
+  "dogecoin": {
+   "status": 200,
+   "bytes": 241825,
+   "date_like": 5,
+   "keys_before_arrays": [
+    "children",
+    "f",
+    "mainEntity"
+   ],
+   "rendered": {
+    "tables": 1,
+    "rows_in_tables": [
+     9
+    ],
+    "text_len": 6130
+   },
+   "network": [
+    {
+     "url": "https://cryptoetf.today/cdn-cgi/rum?",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "text/plain",
+     "len": 0
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/languages/public",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 2834
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/summary/prices",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 739
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-issuers/overview?days=400&funds=1",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 193654
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=r9j95",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 256
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/asset-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 4004
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-candles/stats",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 21590
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/fund-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 11619
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/bwow-etf-price?_rsc=r9j95",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 407
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=1fqvf",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 4105
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/tdog-etf-price?_rsc=1rgm7",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 10184
+    },
+    {
+     "url": "https://cryptoetf.today/en/etf/bwow-etf-price?_rsc=1b2wi",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 9806
+    },
+    {
+     "url": "https://mc.yandex.com/watch/106544100/1?wmode=7&page-url=https%3A%2F%2Fcryptoetf.today%2Fen%2Fdogecoin-etf-flows&charset=utf-8&uah=chu%0A%22Chromium%22%3Bv%3D%22154%22%2C%22Google%20Chrome%22%3Bv%3D%22154%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299%22%0Acha%0Ax64%0Achb%0A64%0Achf%0A154.0.8037.57%0Achl%0A%22Chromium%22%3Bv%3D%22154.0.8037.57%22%2C%22Google%20Chrome%22%3Bv%3D%22154.0.8037.57%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299.0.0.0%22%0Achm%0A%3F0%0Achp%0ALinux&browser-info=pv%3A1%3Avf%3A1hkuu7q9oojr202mtyg5uinyhckcg63%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aen-US%3Av%3A2660%3Acn%3A1%3Adp%3A0%3Als%3A387076598092%3Ahid%3A105836862%3Az%3A0%3Ai%3A20261004142748%3Aet%3A1791124068%3Ac%3A1%3Arn%3A719570253%3Arqn%3A1%3Au%3A1791124068213480160%3Aw%3A1366x900%3As%3A1366x900x24%3Ask%3A1%3Afp%3A672%3Awv%3A2%3Ads%3A1%2C33%2C494%2C267%2C1%2C0%2C%2C9%2C0%2C1035%2C1035%2C0%2C880%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1791124065976%3Agi%3AR0ExLjEuMTg3MTA3MzI1NS4xNzkxMTI0MDY3%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1791124069%3At%3ADogecoin%20ETF%20Flows%20Today%3A%20Inflows%20%26%20Outflows%20%7C%20Crypto%20ETF&t=clt%281126%29clc%280-0-0%29rqnt%281%29rfs%281%29ufs%281%29aw%281%29rcm%281%29cdl%28na%29eco%2821137681%29ti%281%29&redirnss=1",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 751
+    },
+    {
+     "url": "https://cryptoetf.today/en/hype-etf-flows?_rsc=r9j95",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 329
+    }
+   ]
+  },
+  "hedera": {
+   "status": 200,
+   "bytes": 241906,
+   "date_like": 5,
+   "keys_before_arrays": [
+    "children",
+    "f",
+    "mainEntity"
+   ],
+   "rendered": {
+    "tables": 1,
+    "rows_in_tables": [
+     3
+    ],
+    "text_len": 5954
+   },
+   "network": [
+    {
+     "url": "https://api.cryptoetf.today/api/languages/public",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 2834
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/summary/prices",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 739
+    },
+    {
+     "url": "https://cryptoetf.today/cdn-cgi/rum?",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "text/plain",
+     "len": 0
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-issuers/overview?days=400&funds=1",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 193654
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/asset-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 4004
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=1n0n1",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 256
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/etf-candles/stats",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 21590
+    },
+    {
+     "url": "https://api.cryptoetf.today/api/holdings/fund-cost-basis",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json; charset=utf-8",
+     "len": 11619
+    },
+    {
+     "url": "https://cryptoetf.today/en?_rsc=y6t84",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/x-component",
+     "len": 4105
+    },
+    {
+     "url": "https://mc.yandex.com/watch/106544100/1?wmode=7&page-url=https%3A%2F%2Fcryptoetf.today%2Fen%2Fhedera-etf-flows&charset=utf-8&uah=chu%0A%22Chromium%22%3Bv%3D%22154%22%2C%22Google%20Chrome%22%3Bv%3D%22154%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299%22%0Acha%0Ax64%0Achb%0A64%0Achf%0A154.0.8037.57%0Achl%0A%22Chromium%22%3Bv%3D%22154.0.8037.57%22%2C%22Google%20Chrome%22%3Bv%3D%22154.0.8037.57%22%2C%22Not%20A%28Brand%22%3Bv%3D%2299.0.0.0%22%0Achm%0A%3F0%0Achp%0ALinux&browser-info=pv%3A1%3Avf%3A1hkuu7q9oojr202mtyg5uinyhckcg63%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aen-US%3Av%3A2660%3Acn%3A1%3Adp%3A0%3Als%3A29448833743%3Ahid%3A855228595%3Az%3A0%3Ai%3A20261004142805%3Aet%3A1791124086%3Ac%3A1%3Arn%3A682733711%3Arqn%3A1%3Au%3A1791124086233186252%3Aw%3A1366x900%3As%3A1366x900x24%3Ask%3A1%3Afp%3A400%3Awv%3A2%3Ads%3A0%2C24%2C248%2C591%2C1%2C0%2C%2C8%2C0%2C1354%2C1354%2C0%2C953%3Aco%3A0%3Ahdl%3A1%3Acpf%3A1%3Ans%3A1791124083429%3Agi%3AR0ExLjEuMjU5NjU2MTQ2LjE3OTExMjQwODU%3D%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1791124086%3At%3AHedera%20ETF%20Flows%20Today%3A%20Inflows%20%26%20Outflows%20%7C%20Crypto%20ETF&t=clt%281075%29clc%280-0-0%29rqnt%281%29rfs%281%29ufs%281%29aw%281%29rcm%281%29cdl%28na%29eco%2821137681%29ti%281%29&redirnss=1",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 751
+    }
+   ]
+  },
+  "strategy": {
+   "error": "HTTP Error 403: Forbidden",
+   "render_error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\nnavigating to \"https://www.strategy.com/purchases\", waiting until \"networkidle\"\n",
+   "network": [
+    {
+     "url": "https://cdn.cookielaw.org/consent/0194d185-e245-744b-8471-1c630494a9dd/0194d185-e245-744b-8471-1c630494a9dd.json",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json",
+     "len": 4035
+    },
+    {
+     "url": "https://www.strategy.com/api/auth/token",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 23
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/mstr/vote.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 32202
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/company.json?page=company",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 15688
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/world27.json?page=world27",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 264553
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/hub.json?page=hub",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 32163
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/company/contact-us.json?page=company&page=contact-us",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 78487
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 40469
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/strd.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 33692
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/strk.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 33087
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/bitcoin.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 28092
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/charts.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 25879
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/shares.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 28877
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/media.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 700886
+    },
+    {
+     "url": "https://cdn.cookielaw.org/consent/0194d185-e245-744b-8471-1c630494a9dd/ddb36ea7-11bb-4edb-bf0b-088a680cfdfc/en.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 33071
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1976
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/investor-relations/executive-team.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 45643
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/stre.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 28589
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/credit/risk.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 31131
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/strc.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 35603
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/assets.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 25222
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/ledger.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 359833
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/strf.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 33693
+    },
+    {
+     "url": "https://www.strategy.com/_next/data/6ac0fc3b6296379f1eae6df7/en/debt.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 25830
+    },
+    {
+     "url": "https://cdn.cookielaw.org/scripttemplates/202501.1.0/assets/v2/otPcCenter.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 63855
+    },
+    {
+     "url": "https://cdn.cookielaw.org/scripttemplates/202501.1.0/assets/otCommonStyles.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css",
+     "len": 24897
+    },
+    {
+     "url": "https://cdn.cookielaw.org/scripttemplates/202501.1.0/assets/otFlat.json",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 13554
+    },
+    {
+     "url": "https://cdn.cookielaw.org/logos/static/ot_guard_logo.svg",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "image/svg+xml",
+     "len": 497
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/fa7a95ec87cda784.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 11230
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/fd61feb5aa9cd0e2.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 74842
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/73644ecfd1aba9ee.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 10732
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/5e789ad1eb2e0f1a.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 818
+    },
+    {
+     "url": "https://c.6sc.co/?m=1",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "text/plain",
+     "len": 47
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/bdb4c6279fe64229.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 23384
+    },
+    {
+     "url": "https://www.strategy.com/_next/static/css/b39fabe7d0183ec2.css",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/css; charset=UTF-8",
+     "len": 21297
+    },
+    {
+     "url": "https://ipv6.6sc.co/",
+     "status": 200,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "text/html",
+     "len": 4
+    },
+    {
+     "url": "https://n.clarity.ms/collect",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://epsilon.6sense.com/v3/company/details",
+     "status": 403,
+     "method": "GET",
+     "type": "xhr",
+     "ct": "application/json",
+     "len": 55
+    },
+    {
+     "url": "https://js.zi-scripts.com/unified/v1/master/getSubscriptions",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json; charset=utf-8",
+     "len": 513
+    },
+    {
+     "url": "https://ws.zoominfo.com/pixel/69cd87180be70bd30773b436/?iszitag=true",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "text/javascript",
+     "len": 3699
+    },
+    {
+     "url": "https://n.clarity.ms/collect",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://n.clarity.ms/collect",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://n.clarity.ms/collect",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1975
+    },
+    {
+     "url": "https://ws.zoominfo.com/pixel/collect",
+     "status": 200,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1976
+    },
+    {
+     "url": "https://ws.zoominfo.com/pixel/collect",
+     "status": 200,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1976
+    },
+    {
+     "url": "https://ws.zoominfo.com/pixel/collect",
+     "status": 200,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://n.clarity.ms/collect",
+     "status": 204,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1975
+    },
+    {
+     "url": "https://api.strategy.com/btc/mstrKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1007
+    },
+    {
+     "url": "https://api.strategy.com/btc/streKpiData",
+     "status": 200,
+     "method": "GET",
+     "type": "fetch",
+     "ct": "application/json",
+     "len": 1976
+    },
+    {
+     "url": "https://ws.zoominfo.com/pixel/collect",
+     "status": 200,
+     "method": "POST",
+     "type": "xhr",
+     "ct": "",
+     "len": 0
+    }
+   ]
+  }
+ }
+}

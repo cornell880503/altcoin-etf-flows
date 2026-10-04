@@ -1,0 +1,136 @@
+{
+ "run_at": "2026-10-04T14:29:53Z",
+ "sources": {
+  "coinmetrics": {
+   "ok": false,
+   "secs": 1.6,
+   "error": "ValueError: could not convert string to float: 'flash'",
+   "trace": "Traceback (most recent call last):\n  File \"/home/runner/work/altcoin-etf-flows/altcoin-etf-flows/research/fetch_factors.py\", line 72, in run\n    info = fn() or {}\n           ^^^^\n  File \"/home/runner/work/altcoin-etf-flows/altcoin-etf-flows/research/fetch_factors.py\", line 130, in coinmetrics\n    out[d] = {k: (float(v) if v not in (None, \"\") else None) for k, v in r.items() if k not in (\"asset\", \"time\")}\n                  ^^^^^^^^\nValueError: could not convert string to float: 'flash'\n"
+  },
+  "stablecoins": {
+   "ok": true,
+   "secs": 5.5,
+   "days": 1039,
+   "first": "2023-12-01",
+   "last": "2026-10-04"
+  },
+  "funding_hyperliquid": {
+   "ok": true,
+   "secs": 94.7,
+   "BTC": {
+    "rows": 24926,
+    "first": 1701388800034,
+    "last": 1791122400035
+   },
+   "ETH": {
+    "rows": 24926,
+    "first": 1701388800034,
+    "last": 1791122400035
+   }
+  },
+  "funding_bitmex": {
+   "ok": true,
+   "secs": 13.2,
+   "rows": 3062
+  },
+  "binance_vision": {
+   "ok": true,
+   "secs": 51.6,
+   "funding": 3105,
+   "k1d": 1005,
+   "k1h": 24120,
+   "missing": [
+    "1d 2026-09: HTTP Error 404: Not Found",
+    "1h 2026-09: HTTP Error 404: Not Found"
+   ],
+   "n_missing": 2
+  },
+  "coinbase": {
+   "ok": true,
+   "secs": 51.4,
+   "1d": 1039,
+   "1h": 24917
+  },
+  "deribit": {
+   "ok": true,
+   "secs": 4.1,
+   "instruments": 7,
+   "with_data": 7
+  },
+  "cftc_tff": {
+   "ok": true,
+   "secs": 6.0,
+   "gpe5-46if": {
+    "rows": 1035,
+    "markets": [
+     "BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+     "BITCOIN CASH PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "ETHER CASH SETTLED - CHICAGO MERCANTILE EXCHANGE",
+     "MICRO BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+     "MICRO ETHER  - CHICAGO MERCANTILE EXCHANGE",
+     "NANO BITCOIN PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "NANO ETHER - COINBASE DERIVATIVES, LLC",
+     "NANO ETHER - LMX LABS LLC",
+     "NANO ETHER PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "Nano Bitcoin  - COINBASE DERIVATIVES, LLC",
+     "Nano Bitcoin  - LMX LABS LLC"
+    ]
+   },
+   "yw9f-hn96": {
+    "rows": 1035,
+    "markets": [
+     "BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+     "BITCOIN CASH PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "ETHER CASH SETTLED - CHICAGO MERCANTILE EXCHANGE",
+     "MICRO BITCOIN - CHICAGO MERCANTILE EXCHANGE",
+     "MICRO ETHER  - CHICAGO MERCANTILE EXCHANGE",
+     "NANO BITCOIN PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "NANO ETHER - COINBASE DERIVATIVES, LLC",
+     "NANO ETHER - LMX LABS LLC",
+     "NANO ETHER PERP STYLE - COINBASE DERIVATIVES, LLC",
+     "Nano Bitcoin  - COINBASE DERIVATIVES, LLC",
+     "Nano Bitcoin  - LMX LABS LLC"
+    ]
+   }
+  },
+  "fred": {
+   "ok": true,
+   "secs": 19.6,
+   "DGS10": 708,
+   "DFII10": 708,
+   "DGS2": 708,
+   "T10YIE": 709,
+   "DTWEXBGS": 706,
+   "VIXCLS": 731,
+   "NASDAQCOM": 711,
+   "SP500": 711,
+   "BAMLH0A0HYM2": 743,
+   "WALCL": 148,
+   "WTREGEN": 148,
+   "RRPONTSYD": 708,
+   "DCOILWTICO": 704
+  },
+  "coingecko": {
+   "ok": true,
+   "secs": 326.4,
+   "assets": {
+    "BTC": 365,
+    "ETH": 365,
+    "SOL": 365,
+    "XRP": 365,
+    "HYPE": 365,
+    "DOGE": 365,
+    "LINK": 365,
+    "AVAX": 365,
+    "HBAR": 365,
+    "LTC": 365,
+    "BNB": 365,
+    "DOT": 365,
+    "SUI": 365,
+    "NEAR": 365,
+    "TRX": 365,
+    "ZEC": 365
+   }
+  }
+ }
+}
