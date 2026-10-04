@@ -1,0 +1,27 @@
+MCP error -32602: Input validation error: Invalid arguments for tool get_asset_flows: [
+  {
+    "code": "invalid_value",
+    "values": [
+      "btc",
+      "eth",
+      "sol",
+      "xrp",
+      "hyp",
+      "doge",
+      "link",
+      "avax",
+      "hbar",
+      "ltc",
+      "bnb",
+      "dot",
+      "sui",
+      "near",
+      "trx",
+      "zec"
+    ],
+    "path": [
+      "asset"
+    ],
+    "message": "Invalid option: expected one of \"btc\"|\"eth\"|\"sol\"|\"xrp\"|\"hyp\"|\"doge\"|\"link\"|\"avax\"|\"hbar\"|\"ltc\"|\"bnb\"|\"dot\"|\"sui\"|\"near\"|\"trx\"|\"zec\""
+  }
+]

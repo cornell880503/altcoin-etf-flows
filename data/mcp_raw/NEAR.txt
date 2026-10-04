@@ -1,0 +1,23 @@
+{
+  "symbol": "NEAR",
+  "windowDays": 30,
+  "days": [
+    {
+      "date": "2026-09-29",
+      "netFlowUsdM": 36
+    },
+    {
+      "date": "2026-09-30",
+      "netFlowUsdM": 14
+    },
+    {
+      "date": "2026-10-01",
+      "netFlowUsdM": 8.1
+    },
+    {
+      "date": "2026-10-02",
+      "netFlowUsdM": 0.2
+    }
+  ],
+  "updatedAt": "2026-10-04T12:40:53.934Z"
+}

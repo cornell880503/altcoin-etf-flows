@@ -1,0 +1,105 @@
+{
+  "today": "2026-10-04",
+  "referenceDate": "2026-10-02",
+  "referenceIsToday": false,
+  "assets": [
+    {
+      "symbol": "BTC",
+      "asset": "bitcoin",
+      "date": "2026-10-02",
+      "netFlowUsdM": 31.7
+    },
+    {
+      "symbol": "ETH",
+      "asset": "ethereum",
+      "date": "2026-10-02",
+      "netFlowUsdM": -17.3
+    },
+    {
+      "symbol": "SOL",
+      "asset": "solana",
+      "date": "2026-10-02",
+      "netFlowUsdM": 1.2
+    },
+    {
+      "symbol": "XRP",
+      "asset": "xrp",
+      "date": "2026-10-02",
+      "netFlowUsdM": -3.3
+    },
+    {
+      "symbol": "HYP",
+      "asset": "hyp",
+      "date": "2026-10-02",
+      "netFlowUsdM": 3.4
+    },
+    {
+      "symbol": "DOGE",
+      "asset": "doge",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "LINK",
+      "asset": "link",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "AVAX",
+      "asset": "avax",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "HBAR",
+      "asset": "hbar",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "LTC",
+      "asset": "ltc",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "BNB",
+      "asset": "bnb",
+      "date": "2026-10-01",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "DOT",
+      "asset": "dot",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "SUI",
+      "asset": "sui",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "NEAR",
+      "asset": "near",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0.2
+    },
+    {
+      "symbol": "TRX",
+      "asset": "trx",
+      "date": "2026-10-02",
+      "netFlowUsdM": 0
+    },
+    {
+      "symbol": "ZEC",
+      "asset": "zec",
+      "date": "2026-10-02",
+      "netFlowUsdM": -26.9
+    }
+  ],
+  "totalUsdM": -11,
+  "updatedAt": "2026-10-04T12:40:40.780Z"
+}

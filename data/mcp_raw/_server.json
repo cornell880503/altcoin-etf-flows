@@ -1,0 +1,139 @@
+{
+ "initialize": {
+  "result": {
+   "protocolVersion": "2025-06-18",
+   "capabilities": {
+    "tools": {
+     "listChanged": true
+    }
+   },
+   "serverInfo": {
+    "name": "cryptoetf",
+    "version": "1.0.0"
+   },
+   "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All flow values are net USD millions (positive = inflow, negative = outflow). Data sourced from SEC filings and official fund disclosures."
+  },
+  "jsonrpc": "2.0",
+  "id": 1
+ },
+ "tools": {
+  "result": {
+   "tools": [
+    {
+     "name": "get_flows_summary",
+     "title": "Latest Crypto ETF Flows",
+     "description": "Get the latest-day net ETF inflow/outflow (USD millions) for every tracked crypto asset: BTC (Bitcoin), ETH (Ethereum), SOL (Solana), XRP, HYP (Hyperliquid), DOGE (Dogecoin), LINK (Chainlink), AVAX (Avalanche), HBAR (Hedera), LTC (Litecoin), BNB, DOT (Polkadot), SUI, NEAR, TRX (TRON) and ZEC (Zcash). Positive = inflow, negative = outflow. Flows are published one business day in arrears, so `referenceIsToday` is normally false: the figures belong to `referenceDate`, the last trading day published, not to the current date. On Mondays the freshest data is Friday's. `totalUsdM` is the sum across all assets. Figures are asset-level totals with no per-fund breakdown; per-fund tables (IBIT, FBTC, ETHA and others) are published at https://cryptoetf.today/en/<slug>-etf-flows, slug = bitcoin, ethereum, solana, xrp, hype, dogecoin, chainlink, avalanche, hedera, litecoin, bnb, polkadot, sui, near, tron or zcash.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Latest Crypto ETF Flows",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_asset_flows",
+     "title": "Crypto ETF Flow History",
+     "description": "Get daily net ETF flow history for a single crypto asset over the last 30 days. Returns a time series of net USD millions per day (positive = inflow, negative = outflow). Figures are asset-level totals with no per-fund breakdown; per-fund tables (IBIT, FBTC, ETHA and others) are published at https://cryptoetf.today/en/<slug>-etf-flows, slug = bitcoin, ethereum, solana, xrp, hype, dogecoin, chainlink, avalanche, hedera, litecoin, bnb, polkadot, sui, near, tron or zcash.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ],
+        "description": "Asset to fetch: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec"
+       }
+      },
+      "required": [
+       "asset"
+      ]
+     },
+     "annotations": {
+      "title": "Crypto ETF Flow History",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_cefi_index",
+     "title": "CEFI Sentiment Index",
+     "description": "Returns the composite CEFI (Crypto ETF Flow Index): a 0\u2013100 index of money moving through US spot crypto ETFs on all 16 tracked assets. Net flows of all funds are added up in dollars, and three components are scored against the past year: flow (today's net flow, smoothed, 40%), trend (net flow over 20 trading days, 30%) and breadth (share of funds with inflows, 30%). 50 = zero net flow; a typical inflow day scores about 69, a typical outflow day about 31. Each component is on the same 0\u2013100 scale. Zones: 0\u201320 extreme fear, 20\u201340 fear, 40\u201360 neutral, 60\u201380 greed, 80\u2013100 extreme greed.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "CEFI Sentiment Index",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_prices",
+     "title": "Crypto Spot Prices",
+     "description": "Get current spot prices (USD) and 24-hour percentage change for all 16 tracked crypto assets: BTC, ETH, SOL, XRP, HYP, DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX, ZEC. Prices are sourced from major exchanges and refreshed frequently.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Crypto Spot Prices",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_weekly_analytics",
+     "title": "Weekly ETF Flow Analytics",
+     "description": "Get 7-day aggregated ETF flow analytics for all tracked assets. Returns total net flow, the number of trading days in the window, average flow per trading day, and count of positive vs negative days per asset. Weekends are excluded. A compact momentum summary without the full daily series.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Weekly ETF Flow Analytics",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    }
+   ]
+  },
+  "jsonrpc": "2.0",
+  "id": 2
+ }
+}
