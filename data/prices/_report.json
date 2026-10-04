@@ -1,0 +1,107 @@
+{
+ "run_at": "2026-10-04T13:16:40Z",
+ "tickers": {
+  "IBIT": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": [
+    "yahoo: HTTPError HTTP Error 429: Too Many Requests"
+   ]
+  },
+  "ETHA": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": [
+    "yahoo: HTTPError HTTP Error 429: Too Many Requests"
+   ]
+  },
+  "BSOL": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": [
+    "yahoo: HTTPError HTTP Error 429: Too Many Requests"
+   ]
+  },
+  "XRPC": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "THYP": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "LTCC": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "HBR": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "TRXS": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "GSUI": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "GLNK": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "GDOG": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "VAVX": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "TDOT": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "NRR": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "ZCSH": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  },
+  "VBNB": {
+   "source": null,
+   "n": 0,
+   "last": null,
+   "errors": []
+  }
+ }
+}
