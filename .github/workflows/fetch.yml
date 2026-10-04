@@ -2,7 +2,7 @@ name: fetch-etf-flows
 on:
   schedule:
     - cron: "17 */3 * * *"
-    - cron: "47 14 * * 1-6"  # extra run shortly before the dashboard's daily job (15:47 UTC)
+    - cron: "47 14 * * *"  # extra run shortly before the dashboard's daily job (15:47 UTC)
   workflow_dispatch:
   push:
     branches: [main]
