@@ -211,10 +211,13 @@ def build_issuers(sym, cfg, pub):
 
 
 def load_mcp(sym):
-    src = load_json(P("data", "flows_mcp", f"{sym}.json"))
-    if not src:
-        return {}
-    return {r["date"][:10]: float(r["flow"]) for r in src.get("rows", [])}
+    """Asset totals: MCP endpoint history, overlaid by the REST API (same source, keyed)."""
+    out = {}
+    for folder in ("flows_mcp", "flows_api"):
+        src = load_json(P("data", folder, f"{sym}.json"))
+        for r in (src or {}).get("rows", []):
+            out[r["date"][:10]] = float(r["flow"])
+    return out
 
 
 def build_canary_only(sym, cfg, pub):

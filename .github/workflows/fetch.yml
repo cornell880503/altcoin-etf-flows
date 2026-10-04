@@ -26,6 +26,12 @@ jobs:
       - name: Fetch flows (MCP endpoint, smaller assets)
         run: python scripts/fetch_mcp.py
         continue-on-error: true
+      - name: Fetch flows (REST API with key, once a day)
+        run: python scripts/fetch_api.py
+        env:
+          CRYPTOETF_API_KEY: ${{ secrets.CRYPTOETF_API_KEY }}
+        continue-on-error: true
+        timeout-minutes: 4
       - name: Fetch Canary primary data (shares outstanding x NAV)
         run: python scripts/fetch_canary.py
         continue-on-error: true
