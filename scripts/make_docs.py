@@ -5,11 +5,12 @@
 Usage
   python3 scripts/make_docs.py --out OUT [--days 8 | --all] [--ibkr DIR] [--db DIR]
 
-  --ibkr DIR  optional closes from Interactive Brokers, one <TICKER>.json per ETF holding
-              the get_price_history reply ({"time": [...], "close": [...]}); they override
-              the repo's closes for the same dates.
-  --db DIR    optional export of the existing documents (ArtifactData list with out_dir);
-              unchanged documents are skipped and existing ones are listed for if_version.
+  --ibkr DIR  closes from Interactive Brokers, one <TICKER>.json per ETF holding the
+              get_price_history reply ({"time": [...], "close": [...]}); they override
+              stored closes for the same dates.
+  --db DIR    export of the existing documents (ArtifactData list with out_dir): supplies
+              the closes history for the statistics; unchanged documents are skipped and
+              existing ones are flagged "needs_if_version".
 
 Outputs (in OUT)
   docs/<date>.json   document bodies
@@ -38,7 +39,23 @@ REFS = ["BTC", "ETH"]
 WEEK = "一二三四五六日"
 
 
-def load_closes(daily, ibkr_dir=None):
+def db_export(db_dir):
+    """{date: document} from an ArtifactData export (list/query with out_dir)."""
+    out = {}
+    if not db_dir:
+        return out
+    for f in glob.glob(os.path.join(db_dir, "**", "*.json"), recursive=True):
+        try:
+            j = json.load(open(f))
+        except (OSError, ValueError):
+            continue
+        if isinstance(j, dict) and isinstance(j.get("date"), str) and isinstance(j.get("coins"), dict):
+            out[j["date"]] = j
+    return out
+
+
+def load_closes(daily, ibkr_dir=None, existing=None):
+    """Closes per coin: repo files (if any) < stored documents < fresh IBKR replies."""
     closes = {}
     for sym, c in daily["coins"].items():
         t = c["etf"]
@@ -48,6 +65,10 @@ def load_closes(daily, ibkr_dir=None):
             m.update(dict(zip(j["dates"], j["close"])))
         except (OSError, ValueError, KeyError):
             pass
+        for d, doc in (existing or {}).items():
+            v = (doc["coins"].get(sym) or {}).get("close")
+            if isinstance(v, (int, float)):
+                m[d] = float(v)
         if ibkr_dir:
             f = os.path.join(ibkr_dir, f"{t}.json")
             if os.path.exists(f):
@@ -142,13 +163,13 @@ def summary(daily, closes):
         per[s] = dict(v=v, pend=pend[di], s5=sum(last5) if last5 else None, s20=sum(last20) if last20 else None,
                       r60=r60[di], r60w=r60[di - 5] if di >= 5 else None, r30=r30[di], thr=thr)
         if s in ALTS:
+            five += per[s]["s5"] or 0
             if v is None:
                 missing.append(s)
             else:
                 n_data += 1
                 tot += v
                 n_in += v > 0.05
-                five += per[s]["s5"] or 0
     lines.append(f"山寨幣合計 {money(tot)}（{n_data} 檔有資料，{n_in} 檔淨流入）；近 5 日 {money(five)}")
     main = []
     for s in ["SOL", "XRP", "HYPE"]:
@@ -187,20 +208,12 @@ def main():
     ap.add_argument("--db")
     a = ap.parse_args()
     daily = json.load(open(P("data", "daily.json")))
-    closes = load_closes(daily, a.ibkr)
+    existing = db_export(a.db)
+    closes = load_closes(daily, a.ibkr, existing)
     allds = sorted({d for c in daily["coins"].values() for d in c["dates"]})
     cal = trading_days(daily["window_start"], allds[-1])
     dates = cal if a.all else cal[-a.days:]
     docs = build_docs(daily, closes, dates)
-    existing = {}
-    if a.db:
-        for f in glob.glob(os.path.join(a.db, "**", "*.json"), recursive=True):
-            try:
-                j = json.load(open(f))
-                if isinstance(j, dict) and j.get("date"):
-                    existing[j["date"]] = j
-            except (OSError, ValueError):
-                pass
     os.makedirs(os.path.join(a.out, "docs"), exist_ok=True)
     entries, unchanged = [], []
     for d, doc in sorted(docs.items()):
@@ -224,7 +237,9 @@ def main():
               "existing_need_version": [e["doc_id"] for e in entries if e.get("needs_if_version")],
               "missing_close_on_latest": [daily["coins"][s]["etf"] for s, ok in last_closes.items() if not ok]}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1, ensure_ascii=False)
-    print(json.dumps(report, ensure_ascii=False))
+    short = dict(report, written=f"{len(report['written'])} docs" + (f" ({report['written'][0]} .. {report['written'][-1]})" if report["written"] else ""),
+                 unchanged=f"{len(unchanged)} docs")
+    print(json.dumps(short, ensure_ascii=False))
     print(text)
 
 

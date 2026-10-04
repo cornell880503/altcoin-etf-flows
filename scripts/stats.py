@@ -9,14 +9,14 @@ Definitions
            (for BTC itself y = r);  'raw': r_t
 - corr     Pearson over days where x, r, rb are all present (days whose Canary part is
            still pending are excluded)
-- rolling  window of w trading days ending at t; needs >= 2/3 of the days; beta re-estimated
-           inside each window (so a window is self-contained)
-- HAC test Newey-West (4 lags, Bartlett) standard error of the standardized slope, normal p
+- rolling  window of w trading days ending at t; needs >= 2/3 of the days with data and at
+           least w/6 days with a non-zero flow; beta re-estimated inside each window
+- full     r from 10 days with 5 non-zero flow days; the HAC test (Newey-West, 4 lags,
+           Bartlett, normal p), interval and BH q need 30 days with 10 non-zero flow days
+           ("small" otherwise)
+- leadlag  needs 10 days with 5 non-zero flow days
 """
 import math
-
-MIN_SHARE = 2 / 3
-
 
 def _mean(a):
     return sum(a) / len(a)
@@ -57,23 +57,29 @@ def ys(r, rb, idx, mode, is_btc):
     return [r[i] - b * rb[i] for i in idx], b
 
 
+def nonzero(xs):
+    return sum(1 for v in xs if abs(v) > 1e-12)
+
+
 def corr_sample(x, r, rb, lo, hi, mode="abn", is_btc=False):
+    """(r, n, n_nonzero_flow)"""
     idx = triples(x, r, rb, lo, hi)
     if len(idx) < 3:
-        return None, len(idx)
+        return None, len(idx), 0
     y, _ = ys(r, rb, idx, mode, is_btc)
-    return pearson([x[i] for i in idx], y), len(idx)
+    xs = [x[i] for i in idx]
+    return pearson(xs, y), len(idx), nonzero(xs)
 
 
 def rolling(x, r, rb, w, mode="abn", is_btc=False):
     out = []
-    need = math.ceil(w * MIN_SHARE)
+    need, need_nz = math.ceil(w * 2 / 3), math.ceil(w / 6)
     for t in range(len(x)):
         if t + 1 < w:
             out.append(None)
             continue
-        c, n = corr_sample(x, r, rb, t - w + 1, t, mode, is_btc)
-        out.append(c if n >= need else None)
+        c, n, nz = corr_sample(x, r, rb, t - w + 1, t, mode, is_btc)
+        out.append(c if (n >= need and nz >= need_nz) else None)
     return out
 
 
@@ -106,17 +112,21 @@ def full_test(x, r, rb, lo, hi, mode="abn", is_btc=False):
     idx = triples(x, r, rb, lo, hi)
     if len(idx) < 10:
         return None
+    xs = [x[i] for i in idx]
+    nz = nonzero(xs)
+    if nz < 5:
+        return None
     y, b = ys(r, rb, idx, mode, is_btc)
-    res = hac_test([x[i] for i in idx], y)
+    res = hac_test(xs, y)
     if res:
-        res["beta"] = b
+        res.update(beta=b, nz=nz, small=len(idx) < 30 or nz < 10)
     return res
 
 
 def lead_lag(x, r, rb, lo, hi, kmax=5, mode="abn", is_btc=False):
     """corr(x_t, y_{t+k}) for k=-kmax..kmax over [lo, hi]; beta from the same-day sample."""
     idx = triples(x, r, rb, lo, hi)
-    if len(idx) < 10:
+    if len(idx) < 10 or nonzero([x[i] for i in idx]) < 5:
         return []
     if mode == "raw" or is_btc:
         b = 0.0
