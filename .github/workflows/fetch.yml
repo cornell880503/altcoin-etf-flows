@@ -28,6 +28,9 @@ jobs:
       - name: Fetch Canary primary data (shares outstanding x NAV)
         run: python scripts/fetch_canary.py
         continue-on-error: true
+      - name: Fetch ETF closes (Yahoo, Stooq fallback)
+        run: python scripts/fetch_prices.py
+        continue-on-error: true
       - name: Build the cleaned daily series (data/daily.json)
         run: python scripts/build_daily.py
         continue-on-error: true

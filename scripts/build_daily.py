@@ -58,6 +58,19 @@ ISSUER = {"blackrock": "BlackRock", "blackrock2": "BlackRock 2", "fidelity": "Fi
           "vanEck": "VanEck", "wisdomTree": "WisdomTree", "morganStanley": "Morgan Stanley",
           "morganStanleyEth": "Morgan Stanley", "grayscale": "Grayscale", "grayscaleBtc": "Grayscale Mini",
           "grayscaleCrypto": "Grayscale Mini", "canary": "Canary"}
+# issuer key in the source -> fund ticker, per coin (same funds as the source's fund list)
+TICKERS = {
+    "BTC": {"blackrock": "IBIT", "fidelity": "FBTC", "grayscale": "GBTC", "grayscaleBtc": "BTC", "bitwise": "BITB",
+            "twentyOneShares": "ARKB", "vanEck": "HODL", "morganStanley": "MSBT", "valkyrie": "BRRR",
+            "franklin": "EZBC", "invesco": "BTCO", "wisdomTree": "BTCW"},
+    "ETH": {"blackrock": "ETHA", "blackrock2": "ETHB", "fidelity": "FETH", "grayscale": "ETHE",
+            "grayscaleCrypto": "ETH", "bitwise": "ETHW", "vanEck": "ETHV", "franklin": "EZET",
+            "twentyOneShares": "TETH", "morganStanleyEth": "MSSE", "invesco": "QETH"},
+    "SOL": {"bitwise": "BSOL", "fidelity": "FSOL", "grayscale": "GSOL", "vanEck": "VSOL", "twentyOneShares": "TSOL",
+            "morganStanley": "MSOL", "franklin": "SOEZ", "canary": "SOLC", "invesco": "QSOL"},
+    "XRP": {"bitwise": "XRP", "canary": "XRPC", "franklin": "XRPZ", "grayscale": "GXRP", "twentyOneShares": "TOXR"},
+    "HYPE": {"bitwise": "BHYP", "twentyOneShares": "THYP", "grayscale": "HYPG"},
+}
 PRICE_KEYS = ("Price",)
 
 
@@ -192,7 +205,7 @@ def build_issuers(sym, cfg, pub):
     for c in cols:
         series = [None if days_rows[d][c] is None else r3(days_rows[d][c]) for d in ds]
         if any(v not in (None, 0.0) for v in series):
-            funds[ISSUER.get(c, c)] = series
+            funds[TICKERS.get(sym, {}).get(c) or ISSUER.get(c, c)] = series
     return {"dates": ds, "flow": flow, "funds": funds, "pending": canary_note, "log": log,
             "source": "cryptoetf.today 分發行商" + ("＋Canary 官網" if cfg.get("canary") else "")}
 
