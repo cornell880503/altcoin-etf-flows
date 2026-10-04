@@ -1,0 +1,98 @@
+{
+ "assets": {
+  "BTC": {
+   "first": "2024-01-11",
+   "keys": [
+    "bitwise",
+    "blackrock",
+    "btcPrice",
+    "fidelity",
+    "franklin",
+    "goldPrice",
+    "grayscale",
+    "grayscaleBtc",
+    "invesco",
+    "morganStanley",
+    "total",
+    "twentyOneShares",
+    "valkyrie",
+    "vanEck",
+    "wisdomTree"
+   ],
+   "last": "2026-10-04",
+   "rows": 685
+  },
+  "ETH": {
+   "first": "2024-07-23",
+   "keys": [
+    "bitwise",
+    "blackrock",
+    "blackrock2",
+    "ethPrice",
+    "fidelity",
+    "franklin",
+    "grayscale",
+    "grayscaleCrypto",
+    "invesco",
+    "morganStanleyEth",
+    "total",
+    "twentyOneShares",
+    "vanEck"
+   ],
+   "last": "2026-10-04",
+   "rows": 540
+  },
+  "HYPE": {
+   "first": "2026-05-12",
+   "keys": [
+    "bitwise",
+    "grayscale",
+    "hypPrice",
+    "total",
+    "twentyOneShares"
+   ],
+   "last": "2026-10-04",
+   "rows": 73
+  },
+  "SOL": {
+   "first": "2025-10-27",
+   "keys": [
+    "bitwise",
+    "canary",
+    "fidelity",
+    "franklin",
+    "grayscale",
+    "invesco",
+    "morganStanley",
+    "solPrice",
+    "total",
+    "twentyOneShares",
+    "vanEck"
+   ],
+   "last": "2026-10-04",
+   "rows": 187
+  },
+  "XRP": {
+   "first": "2025-11-14",
+   "keys": [
+    "bitwise",
+    "canary",
+    "franklin",
+    "grayscale",
+    "total",
+    "twentyOneShares",
+    "xrpPrice"
+   ],
+   "last": "2026-10-04",
+   "rows": 175
+  }
+ },
+ "changed": [
+  "BTC",
+  "ETH",
+  "SOL",
+  "XRP",
+  "HYPE"
+ ],
+ "updated_at": "2026-10-04T12:37:02Z"
+}
