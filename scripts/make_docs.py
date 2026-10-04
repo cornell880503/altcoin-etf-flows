@@ -195,6 +195,13 @@ def summary(daily, closes):
         lines.append("大額流入（上市以來前 10%）：" + "、".join(big))
     if missing:
         lines.append("尚未公布：" + "、".join(missing) + "（Canary 基金晚一天）" * any(m in ("LTC", "HBAR", "TRX") for m in missing))
+    try:
+        gen = dt.datetime.strptime(daily["generated"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+        age_h = (dt.datetime.now(dt.timezone.utc) - gen).total_seconds() / 3600
+        if age_h > 8:
+            lines.append(f"注意：流量資料最後抓取於 {gen.astimezone(SGT):%m/%d %H:%M}（新加坡時間），已超過 {age_h:.0f} 小時，自動抓取可能失敗")
+    except (KeyError, ValueError):
+        pass
     lines.append("儀表板：山寨幣 ETF 資金流")
     return "\n".join(lines), D, per
 
