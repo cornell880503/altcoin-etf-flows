@@ -235,6 +235,31 @@ def money(v, sign=True):
     return f"{s}${abs(v):,.1f}M" if sign else f"${abs(v):,.1f}M"
 
 
+def api_status():
+    """State of the keyed REST API fetch (scripts/fetch_api.py), and a warning line only when the
+    key is set but failing. No report file = the key secret is not configured (nothing to say)."""
+    try:
+        rep = json.load(open(P("data", "flows_api", "_report.json")))
+    except (OSError, ValueError):
+        return {"configured": False}, None
+    assets = rep.get("assets", {})
+    errs = {k: v["error"] for k, v in assets.items() if v.get("error")}
+    last = rep.get("last_success")
+    age_h = None
+    if last:
+        age_h = (dt.datetime.now(dt.timezone.utc) - dt.datetime.strptime(last, "%Y-%m-%dT%H:%M:%SZ")
+                 .replace(tzinfo=dt.timezone.utc)).total_seconds() / 3600
+    state = {"configured": True, "last_success": last, "run_at": rep.get("run_at"), "errors": errs}
+    first = "；".join(f"{k} {v}" for k, v in list(errs.items())[:2])
+    if errs and (last is None or rep.get("run_at") != last):
+        return state, f"注意：cryptoetf.today API 這次抓取失敗（{first}），金鑰可能無效或過期；流量改用公開資料，更新不受影響"
+    if errs:
+        return state, f"注意：cryptoetf.today API 有 {len(errs)} 檔沒抓到（{first}）"
+    if age_h is not None and age_h > 50:
+        return state, f"注意：cryptoetf.today API 已 {age_h / 24:.0f} 天沒有成功抓取"
+    return state, None
+
+
 def summary(daily, closes):
     allds = sorted({d for c in daily["coins"].values() for d in c["dates"]})
     cal = trading_days(daily["window_start"], allds[-1])
@@ -299,6 +324,12 @@ def summary(daily, closes):
     except (KeyError, ValueError):
         pass
     try:
+        api_line = api_status()[1]
+        if api_line:
+            lines.append(api_line)
+    except Exception:  # the API check must never block the summary
+        pass
+    try:
         lines.extend(significance(daily, closes, cal))
     except Exception as e:  # never block the daily summary on the statistics
         lines.append(f"（顯著性檢定這次沒有算出來：{type(e).__name__}）")
@@ -341,12 +372,13 @@ def main():
     if existing and D in existing and not entries:
         dd = dt.date.fromisoformat(D)
         text = (f"山寨幣 ETF 資金流：沒有新的美股交易日（最新仍是 {dd.month}/{dd.day}），資料已核對、沒有修正。\n"
-                + "\n".join(l for l in text.split("\n") if l.startswith(("領先檢定", "交易規則"))))
+                + "\n".join(l for l in text.split("\n") if l.startswith(("注意", "領先檢定", "交易規則"))))
     open(os.path.join(a.out, "summary.txt"), "w").write(text + "\n")
     last_closes = {s: (closes[s].get(D) is not None) for s in daily["coins"]}
     report = {"latest_date": D, "written": [e["doc_id"] for e in entries], "unchanged": unchanged,
               "existing_need_version": [e["doc_id"] for e in entries if e.get("needs_if_version")],
-              "missing_close_on_latest": [daily["coins"][s]["etf"] for s, ok in last_closes.items() if not ok]}
+              "missing_close_on_latest": [daily["coins"][s]["etf"] for s, ok in last_closes.items() if not ok],
+              "api": api_status()[0]}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1, ensure_ascii=False)
     short = dict(report, written=f"{len(report['written'])} docs" + (f" ({report['written'][0]} .. {report['written'][-1]})" if report["written"] else ""),
                  unchanged=f"{len(unchanged)} docs")
