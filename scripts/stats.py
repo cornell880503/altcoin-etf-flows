@@ -11,9 +11,9 @@ Definitions
            still pending are excluded)
 - rolling  window of w trading days ending at t; needs >= 2/3 of the days with data and at
            least w/6 days with a non-zero flow; beta re-estimated inside each window
-- full     r from 10 days with 5 non-zero flow days; the HAC test (Newey-West, 4 lags,
-           Bartlett, normal p), interval and BH q need 30 days with 10 non-zero flow days
-           ("small" otherwise)
+- full     r from 10 days with 5 non-zero flow days; the test (standard error = the larger
+           of Newey-West with 4 Bartlett lags and the classical OLS one; normal p),
+           interval and BH q need 30 days with 10 non-zero flow days ("small" otherwise)
 - leadlag  needs 10 days with 5 non-zero flow days
 """
 import math
@@ -102,7 +102,9 @@ def hac_test(xv, yv, lags=4):
         w = 1 - l / (lags + 1)
         s += 2 * w * sum(u[i] * u[i - l] for i in range(l, n))
     var = s / (n * n) * n / (n - 2)
-    se = math.sqrt(max(var, 1e-300))
+    # never below the classical standard error: with a few extreme flow days the
+    # Newey-West estimate can collapse and make a tiny correlation look significant
+    se = max(math.sqrt(max(var, 1e-300)), math.sqrt(max(1 - b * b, 0) / (n - 2)))
     z = b / se
     p = math.erfc(abs(z) / math.sqrt(2))
     return {"r": b, "se": se, "p": p, "lo": b - 1.96 * se, "hi": b + 1.96 * se, "n": n}
