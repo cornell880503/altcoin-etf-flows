@@ -83,18 +83,29 @@ def main():
         manifest = json.load(open(manifest_path))
     except (OSError, ValueError):
         manifest = {"assets": {}}
-    changed, failures = [], []
+    changed, failures, diag = [], [], {}
     for sym, slug in ASSETS.items():
         try:
             page = fetch(slug)
         except Exception as e:  # missing page or network error: keep the previous file
             failures.append(f"{sym}: {e}")
+            diag[sym] = {"error": str(e)[:200]}
             time.sleep(2)
             continue
-        cands = [clean_rows(a) for a in arrays_named(page, "historical")]
-        cands = [c for c in cands if c and any(k != "date" for k in c[0])]
+        t = page.replace('\\"', '"')
+        names = sorted(set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"\s*:\s*\[\s*\{\s*"date"', t)))
+        diag[sym] = {"bytes": len(page), "historical_mentions": t.count('"historical"'), "dated_arrays": names}
+        cands = []
+        for nm in (["historical"] + [n for n in names if n != "historical"]):
+            for a in arrays_named(page, nm):
+                c = clean_rows(a)
+                if c and any(k != "date" for k in c[0]) and any(("total" in r) for r in c):
+                    cands.append(c)
+            if cands:
+                diag[sym]["used"] = nm
+                break
         if not cands:
-            failures.append(f"{sym}: no historical array")
+            failures.append(f"{sym}: no dated flow array")
             time.sleep(2)
             continue
         rows = max(cands, key=len)  # the daily flow table is the longest dated array
@@ -115,6 +126,7 @@ def main():
         manifest["updated_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         manifest["changed"] = changed
         json.dump(manifest, open(manifest_path, "w"), indent=1, sort_keys=True)
+    json.dump({"failures": failures, "assets": diag}, open(os.path.join(ROOT, "data", "diagnostics.json"), "w"), indent=1, sort_keys=True)
     print("changed:", changed)
     print("failures:", failures)
     # fail the run (so it shows red in Actions) only if none of the core assets could be read
