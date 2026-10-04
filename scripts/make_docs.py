@@ -29,6 +29,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import stats as S  # noqa: E402
+import strategies as T  # noqa: E402
 from calendar_us import trading_days, prev_trading_day  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -132,6 +133,101 @@ def series_for(sym, daily, closes, cal):
     return F, Pc, R, X, pend
 
 
+CANARY_PART = {"SOL": "SOLC", "XRP": "XRPC", "SUI": "SUIS"}
+CANARY_ONLY = {"LTC", "HBAR", "TRX"}
+LT_KEYS = ["same_day", "next_day", "tradable_1d", "tradable_5d", "chase_1d", "chase_5d"]
+
+
+def known_flows(sym, daily, cal):
+    """Flow as first published (same rule as the dashboard): Canary parts post a day late."""
+    m = coin_maps(daily)[sym]
+    out = []
+    for d in cal:
+        f = m["flow"].get(d)
+        if f is None:
+            out.append(None)
+        elif sym in CANARY_PART:
+            out.append(f - ((m["funds"].get(d) or {}).get(CANARY_PART[sym]) or 0.0))
+        else:
+            out.append(None if d in m["pending"] else f)
+    return out
+
+
+def significance(daily, closes, cal):
+    """Two summary lines: who leads / lags (q < 0.10 across all coins) and the rule tests."""
+    ser = {}
+    for s in ALTS + REFS:
+        F, Pc, R, X, pend = series_for(s, daily, closes, cal)
+        ser[s] = dict(P=Pc, R=R, X=X, K=known_flows(s, daily, cal), lag=2 if s in CANARY_ONLY else 1)
+    RB = ser["BTC"]["R"]
+    coins = ALTS + REFS
+    lt = {s: S.leadlag_tests(ser[s]["X"], ser[s]["R"], RB, ser[s]["lag"], "abn", s == "BTC") for s in coins}
+    q = {}
+    for k in LT_KEYS:
+        qs = S.bh([(lt[s].get(k) or {}).get("p") for s in coins])
+        q[k] = dict(zip(coins, qs))
+
+    def sig(s, k, sign):
+        t = lt[s].get(k)
+        return t is not None and q[k][s] is not None and q[k][s] < 0.10 and (t["r"] > 0 if sign > 0 else t["r"] < 0)
+    lead = [s for s in coins if sig(s, "tradable_1d", 1) or sig(s, "tradable_5d", 1)]
+    rev = [s for s in coins if sig(s, "tradable_1d", -1) or sig(s, "tradable_5d", -1)]
+    sync = [s for s in coins if sig(s, "same_day", 1)]
+    chase = [s for s in coins if sig(s, "chase_1d", 1) or sig(s, "chase_5d", 1)]
+    line1 = "領先檢定：公布後還能預測幣價的幣：" + ("、".join(lead) if lead else "無")
+    line1 += "｜同步：" + ("、".join(sync) if sync else "無") + "｜追漲：" + ("、".join(chase) if chase else "無")
+    if rev:
+        line1 += "｜流入後反轉：" + "、".join(rev)
+    # rule tests (raw next-day returns), same family as the dashboard's trading tab
+    tests = []
+    for s in ALTS:
+        c = ser[s]
+        sg = T.signals(c["K"], c["P"], c["lag"])
+        for rule in T.RULES:
+            net, _ = T.backtest(sg[rule], c["R"])
+            if T.perf(net) is None:
+                continue
+            tt = T.timing(sg[rule], c["R"])
+            if tt is not None:
+                tests.append(tt["p"])
+    Rb = T.basket([ser[s]["R"] for s in ALTS])
+    n = len(cal)
+    agg = [None] * n
+    for d in range(1, n):
+        v = [ser[s]["K"][d - 1] for s in ALTS if ser[s]["lag"] == 1 and ser[s]["K"][d - 1] is not None]
+        agg[d] = sum(v) if v else None
+    btc = ser["BTC"]["K"]
+    lvl, cum = [None] * n, 0.0
+    for i in range(n):
+        if Rb[i] is not None:
+            cum += Rb[i]
+        lvl[i] = math.exp(cum)
+    bs = {k: [None] * n for k in ("ALTFLOW5", "BTCFLOW5", "TR20", "TF")}
+    for d in range(n):
+        w = agg[max(0, d - 4):d + 1]
+        if d >= 5 and all(v is not None for v in w):
+            bs["ALTFLOW5"][d] = 1 if sum(w) > 0 else 0
+        if d >= 5 and all(v is not None for v in btc[d - 5:d]):
+            bs["BTCFLOW5"][d] = 1 if sum(btc[d - 5:d]) > 0 else 0
+        if d >= 20:
+            bs["TR20"][d] = 1 if lvl[d] / lvl[d - 20] > 1 else 0
+        if bs["TR20"][d] is not None and bs["ALTFLOW5"][d] is not None:
+            bs["TF"][d] = bs["TR20"][d] * bs["ALTFLOW5"][d]
+    for k in ("ALTFLOW5", "BTCFLOW5", "TR20", "TF"):
+        tt = T.timing(bs[k], Rb)
+        if tt is not None:
+            tests.append(tt["p"])
+    qs = [v for v in S.bh(tests) if v is not None]
+    n_sig = sum(1 for v in qs if v < 0.10)
+    wb = btc[n - 5:n]
+    nxt = ""
+    if len(wb) == 5 and all(v is not None for v in wb):
+        tot5 = sum(wb)
+        nxt = f"；BTC ETF 近 5 日 {money(tot5)}，籃子規則下一個交易日「{'持有' if tot5 > 0 else '空手'}」（研究用）"
+    line2 = f"交易規則：{len(tests)} 個擇時檢定，校正後顯著 {n_sig} 個" + nxt
+    return [line1, line2]
+
+
 def money(v, sign=True):
     if v is None:
         return "—"
@@ -202,6 +298,10 @@ def summary(daily, closes):
             lines.append(f"注意：流量資料最後抓取於 {gen.astimezone(SGT):%m/%d %H:%M}（新加坡時間），已超過 {age_h:.0f} 小時，自動抓取可能失敗")
     except (KeyError, ValueError):
         pass
+    try:
+        lines.extend(significance(daily, closes, cal))
+    except Exception as e:  # never block the daily summary on the statistics
+        lines.append(f"（顯著性檢定這次沒有算出來：{type(e).__name__}）")
     lines.append("儀表板：山寨幣 ETF 資金流")
     return "\n".join(lines), D, per
 
@@ -238,6 +338,10 @@ def main():
     for k in range(0, len(entries), 50):
         json.dump(entries[k:k + 50], open(os.path.join(a.out, f"batch_{k // 50 + 1}.json"), "w"), indent=1)
     text, D, per = summary(daily, closes)
+    if existing and D in existing and not entries:
+        dd = dt.date.fromisoformat(D)
+        text = (f"山寨幣 ETF 資金流：沒有新的美股交易日（最新仍是 {dd.month}/{dd.day}），資料已核對、沒有修正。\n"
+                + "\n".join(l for l in text.split("\n") if l.startswith(("領先檢定", "交易規則"))))
     open(os.path.join(a.out, "summary.txt"), "w").write(text + "\n")
     last_closes = {s: (closes[s].get(D) is not None) for s in daily["coins"]}
     report = {"latest_date": D, "written": [e["doc_id"] for e in entries], "unchanged": unchanged,

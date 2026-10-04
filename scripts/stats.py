@@ -169,3 +169,48 @@ def quantile(vals, qq):
     lo = math.floor(pos)
     hi = math.ceil(pos)
     return v[lo] + (v[hi] - v[lo]) * (pos - lo)
+
+
+def leadlag_tests(x, r, rb, lag, mode="abn", is_btc=False):
+    """Who leads whom, on the full sample. x = flow / previous close, y = (abnormal) return.
+    same_day     corr(x_t, y_t)
+    next_day     corr(x_t, y_t+1)            includes hours before the flow is published
+    tradable_1d  corr(x_t, y_t+lag+1)        from the first close after publication
+    tradable_5d  corr(x_t, y_t+lag+1..+5)    5 days from that close (HAC 5 lags)
+    chase_1d     corr(y_t-1, x_t)            yesterday's return -> today's flow
+    chase_5d     corr(y_t-5..t-1, x_t)       last week's return -> today's flow (HAC 5 lags)
+    Each needs 30 pairs with 10 non-zero flow days."""
+    n = len(x)
+    idx = triples(x, r, rb, 0, n - 1)
+    if len(idx) < 10:
+        return {}
+    if mode == "raw" or is_btc:
+        b = 0.0
+    else:
+        b = beta([r[i] for i in idx], [rb[i] for i in idx])
+    y = [None if (r[i] is None or rb[i] is None) else r[i] - b * rb[i] for i in range(n)]
+
+    def ysum(a, z):
+        if a < 0 or z >= n:
+            return None
+        w = y[a:z + 1]
+        return None if any(v is None for v in w) else sum(w)
+
+    out = {}
+    specs = {
+        "same_day": ([(x[i], y[i]) for i in range(n)], 4, 0),
+        "next_day": ([(x[i], y[i + 1] if i + 1 < n else None) for i in range(n)], 4, 0),
+        "tradable_1d": ([(x[i], y[i + lag + 1] if i + lag + 1 < n else None) for i in range(n)], 4, 0),
+        "tradable_5d": ([(x[i], ysum(i + lag + 1, i + lag + 5)) for i in range(n)], 5, 0),
+        "chase_1d": ([(y[i - 1] if i >= 1 else None, x[i]) for i in range(n)], 4, 1),
+        "chase_5d": ([(ysum(i - 5, i - 1), x[i]) for i in range(n)], 5, 1),
+    }
+    for k, (pairs, lags, flow_second) in specs.items():
+        pairs = [(a, c) for a, c in pairs if a is not None and c is not None]
+        flows = [c if flow_second else a for a, c in pairs]
+        if len(pairs) < 30 or nonzero(flows) < 10:
+            out[k] = None
+            continue
+        res = hac_test([a for a, _ in pairs], [c for _, c in pairs], lags)
+        out[k] = res
+    return out
