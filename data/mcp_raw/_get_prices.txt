@@ -2,132 +2,44 @@
   "prices": {
     "BTC": {
       "symbol": "BTCUSDT",
-      "price": 85242.01,
-      "priceChange": 412.26,
-      "priceChangePercent": 0.486,
-      "volume": 7125.24194,
-      "quoteVolume": 605090207.20816
+      "price": 85165.24,
+      "priceChange": 327.23,
+      "priceChangePercent": 0.386,
+      "volume": 7149.25329,
+      "quoteVolume": 607143073.585905
     },
     "ETH": {
       "symbol": "ETHUSDT",
-      "price": 2701.37,
-      "priceChange": 19.99,
-      "priceChangePercent": 0.746,
-      "volume": 71091.2606,
-      "quoteVolume": 191348847.91969
+      "price": 2698.56,
+      "priceChange": 16.86,
+      "priceChangePercent": 0.629,
+      "volume": 71430.9232,
+      "quoteVolume": 192269393.089874
     },
     "SOL": {
       "symbol": "SOLUSDT",
-      "price": 121.53,
-      "priceChange": 2.22,
-      "priceChangePercent": 1.861,
-      "volume": 1008070.222,
-      "quoteVolume": 121302251.88403
+      "price": 121.38,
+      "priceChange": 1.88,
+      "priceChangePercent": 1.573,
+      "volume": 1012619.495,
+      "quoteVolume": 121858843.94457
     },
     "XRP": {
       "symbol": "XRPUSDT",
-      "price": 1.5001,
-      "priceChange": 0.0173,
-      "priceChangePercent": 1.167,
-      "volume": 45133764.9,
-      "quoteVolume": 67324550.62676
+      "price": 1.499,
+      "priceChange": 0.0149,
+      "priceChangePercent": 1.004,
+      "volume": 45143156.9,
+      "quoteVolume": 67340364.45157
     },
     "HYP": {
       "symbol": "HYPEUSDT",
-      "price": 90.39,
-      "priceChange": 2.5,
-      "priceChangePercent": 2.844,
-      "volume": 148658.15,
-      "quoteVolume": 13304742.49641
-    },
-    "DOGE": {
-      "symbol": "DOGEUSDT",
-      "price": 0.0935,
-      "priceChange": 0.00086,
-      "priceChangePercent": 0.928,
-      "volume": 296978787,
-      "quoteVolume": 27643704.45468
-    },
-    "LINK": {
-      "symbol": "LINKUSDT",
-      "price": 14.074,
-      "priceChange": 0.229,
-      "priceChangePercent": 1.654,
-      "volume": 1023615.98,
-      "quoteVolume": 14339381.04412
-    },
-    "AVAX": {
-      "symbol": "AVAXUSDT",
-      "price": 10.991,
-      "priceChange": -0.094,
-      "priceChangePercent": -0.848,
-      "volume": 1906996.21,
-      "quoteVolume": 21129574.71305
-    },
-    "HBAR": {
-      "symbol": "HBARUSDT",
-      "price": 0.10167,
-      "priceChange": 0.00042,
-      "priceChangePercent": 0.415,
-      "volume": 74693019,
-      "quoteVolume": 7609743.45694
-    },
-    "LTC": {
-      "symbol": "LTCUSDT",
-      "price": 71.22,
-      "priceChange": 1.79,
-      "priceChangePercent": 2.578,
-      "volume": 300997.717,
-      "quoteVolume": 21046379.73857
-    },
-    "BNB": {
-      "symbol": "BNBUSDT",
-      "price": 788.28,
-      "priceChange": 17.18,
-      "priceChangePercent": 2.228,
-      "volume": 107337.011,
-      "quoteVolume": 84373086.41196
-    },
-    "DOT": {
-      "symbol": "DOTUSDT",
-      "price": 1.196,
-      "priceChange": 0.012,
-      "priceChangePercent": 1.014,
-      "volume": 5866683.3,
-      "quoteVolume": 7005479.1155
-    },
-    "SUI": {
-      "symbol": "SUIUSDT",
-      "price": 1.1843,
-      "priceChange": 0.0044,
-      "priceChangePercent": 0.373,
-      "volume": 32365102.3,
-      "quoteVolume": 38176427.7819
-    },
-    "NEAR": {
-      "symbol": "NEARUSDT",
-      "price": 4.865,
-      "priceChange": 0.224,
-      "priceChangePercent": 4.827,
-      "volume": 16674950.8,
-      "quoteVolume": 79778935.4926
-    },
-    "TRX": {
-      "symbol": "TRXUSDT",
-      "price": 0.3364,
-      "priceChange": 0.0001,
-      "priceChangePercent": 0.03,
-      "volume": 46807106.7,
-      "quoteVolume": 15724644.36596
-    },
-    "ZEC": {
-      "symbol": "ZECUSDT",
-      "price": 1331.35,
-      "priceChange": 27.74,
-      "priceChangePercent": 2.128,
-      "volume": 89149.006,
-      "quoteVolume": 117166731.77432
+      "price": 90.14,
+      "priceChange": 1.95,
+      "priceChangePercent": 2.211,
+      "volume": 150312.881,
+      "quoteVolume": 13455430.55738
     }
   },
-  "updatedAt": "2026-10-04T12:44:41.018Z"
+  "updatedAt": "2026-10-04T12:53:08.268Z"
 }
