@@ -25,6 +25,9 @@ jobs:
       - name: Fetch flows (MCP endpoint, smaller assets)
         run: python scripts/fetch_mcp.py
         continue-on-error: true
+      - name: Fetch Canary primary data (shares outstanding x NAV)
+        run: python scripts/fetch_canary.py
+        continue-on-error: true
       - name: Commit if changed
         run: |
           git config user.name "etf-flows-bot"
