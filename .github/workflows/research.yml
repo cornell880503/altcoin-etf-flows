@@ -1,0 +1,45 @@
+name: research-fetch
+# On-demand research downloads (factor data for the BTC study, page probes). Not part of the
+# 3-hourly flow pipeline.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/*.py", ".github/workflows/research.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: research-fetch
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright
+        run: |
+          pip install playwright==1.47.0
+          python -m playwright install chromium || true
+      - name: Probe pages
+        run: python research/probe_site.py
+        continue-on-error: true
+        timeout-minutes: 8
+      - name: Fetch factor datasets
+        run: python research/fetch_factors.py
+        continue-on-error: true
+        timeout-minutes: 18
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/data data/probe || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "research data: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4; do git pull --rebase && git push && break; sleep 7; done
+          fi

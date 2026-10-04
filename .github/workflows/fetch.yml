@@ -47,5 +47,5 @@ jobs:
             echo "no data changes"
           else
             git commit -m "data: $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
+            for i in 1 2 3 4; do git pull --rebase && git push && break; sleep 7; done
           fi
