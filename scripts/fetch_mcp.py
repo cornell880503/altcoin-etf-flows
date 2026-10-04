@@ -72,8 +72,10 @@ def rows_from(obj):
     for i in best:
         d = str(i.get("date", ""))[:10]
         val = None
-        for k in ("netFlow", "net_flow", "flow", "total", "net", "value", "netFlowUsd", "netFlowMillions"):
-            if isinstance(i.get(k), (int, float)):
+        keys = ["netFlowUsdM", "netFlow", "net_flow", "flow", "total", "net", "value", "netFlowUsd", "netFlowMillions"]
+        keys += [k for k in i if k.lower().startswith("netflow") and k not in keys]
+        for k in keys:
+            if isinstance(i.get(k), (int, float)) and not isinstance(i.get(k), bool):
                 val, key = float(i[k]), k
                 break
         if re.match(r"\d{4}-\d{2}-\d{2}$", d) and val is not None:
@@ -93,15 +95,32 @@ def main():
     schema = {}
     for t in (tools or {}).get("result", {}).get("tools", []):
         schema[t["name"]] = t.get("inputSchema", {})
-    props = list((schema.get("get_asset_flows") or {}).get("properties", {}).keys())
-    arg = props[0] if props else "asset"
+    props = (schema.get("get_asset_flows") or {}).get("properties", {})
+    arg = "asset" if "asset" in props else (list(props)[0] if props else "asset")
+    enum = [str(e) for e in (props.get(arg) or {}).get("enum", [])]
+
+    def asset_code(sym):
+        """Map our symbol to the server's enum (e.g. HYPE -> 'hyp')."""
+        low = sym.lower()
+        if not enum or low in enum:
+            return low
+        for e in enum:
+            if low.startswith(e) or e.startswith(low):
+                return e
+        return low
     report = {"arg": arg, "assets": {}}
     summary = m.call("tools/call", {"name": "get_flows_summary", "arguments": {}})
     open(os.path.join(RAW, "_summary.txt"), "w").write(text_of(summary))
+    for extra in ("get_weekly_analytics", "get_prices"):
+        try:
+            time.sleep(1.0)
+            open(os.path.join(RAW, f"_{extra}.txt"), "w").write(text_of(m.call("tools/call", {"name": extra, "arguments": {}})))
+        except Exception:
+            pass
     for sym in ASSETS:
         time.sleep(1.5)
         try:
-            res = m.call("tools/call", {"name": "get_asset_flows", "arguments": {arg: sym.lower()}})
+            res = m.call("tools/call", {"name": "get_asset_flows", "arguments": {arg: asset_code(sym)}})
             txt = text_of(res)
             open(os.path.join(RAW, f"{sym}.txt"), "w").write(txt)
             try:
