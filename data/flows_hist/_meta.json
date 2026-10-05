@@ -1,0 +1,121 @@
+{
+ "asOf": "2026-10-02",
+ "generatedAt": "2026-10-04T14:25:01.942Z",
+ "captured": "2026-10-04",
+ "how": "response loaded by https://cryptoetf.today/en/<slug>-etf-flows during one browser render",
+ "assets": {
+  "ZEC": {
+   "first": "2026-08-25",
+   "last": "2026-10-02",
+   "rows": 28,
+   "fullHistory": true,
+   "cumulative": 228.4,
+   "sources": [
+    "computed"
+   ]
+  },
+  "LINK": {
+   "first": "2025-12-02",
+   "last": "2026-10-02",
+   "rows": 210,
+   "fullHistory": true,
+   "cumulative": 170.8,
+   "sources": [
+    "computed",
+    "sosovalue"
+   ]
+  },
+  "HBAR": {
+   "first": "2025-10-28",
+   "last": "2026-10-02",
+   "rows": 233,
+   "fullHistory": true,
+   "cumulative": 114.1,
+   "sources": [
+    "computed"
+   ]
+  },
+  "NEAR": {
+   "first": "2026-09-29",
+   "last": "2026-10-02",
+   "rows": 4,
+   "fullHistory": true,
+   "cumulative": 58.4,
+   "sources": [
+    "computed"
+   ]
+  },
+  "AVAX": {
+   "first": "2026-01-26",
+   "last": "2026-10-02",
+   "rows": 175,
+   "fullHistory": true,
+   "cumulative": 34.9,
+   "sources": [
+    "computed",
+    "sosovalue"
+   ]
+  },
+  "SUI": {
+   "first": "2026-02-18",
+   "last": "2026-10-02",
+   "rows": 158,
+   "fullHistory": false,
+   "cumulative": 20.6,
+   "sources": [
+    "computed"
+   ]
+  },
+  "LTC": {
+   "first": "2025-10-28",
+   "last": "2026-10-02",
+   "rows": 234,
+   "fullHistory": true,
+   "cumulative": 16.1,
+   "sources": [
+    "computed"
+   ]
+  },
+  "DOGE": {
+   "first": "2025-11-24",
+   "last": "2026-10-02",
+   "rows": 215,
+   "fullHistory": true,
+   "cumulative": 15.7,
+   "sources": [
+    "computed",
+    "sosovalue"
+   ]
+  },
+  "DOT": {
+   "first": "2026-03-06",
+   "last": "2026-10-02",
+   "rows": 145,
+   "fullHistory": true,
+   "cumulative": 2.7,
+   "sources": [
+    "computed"
+   ]
+  },
+  "BNB": {
+   "first": "2026-05-28",
+   "last": "2026-10-01",
+   "rows": 89,
+   "fullHistory": true,
+   "cumulative": 1.1,
+   "sources": [
+    "computed"
+   ]
+  },
+  "TRX": {
+   "first": "2026-09-10",
+   "last": "2026-10-02",
+   "rows": 17,
+   "fullHistory": true,
+   "cumulative": 0.5,
+   "sources": [
+    "computed"
+   ]
+  }
+ }
+}

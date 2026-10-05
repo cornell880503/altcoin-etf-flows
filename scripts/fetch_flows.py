@@ -17,13 +17,9 @@ import urllib.request
 
 UA = "altcoin-etf-flows/1.0 (+https://github.com/cornell880503/altcoin-etf-flows; daily research fetch)"
 BASE = "https://cryptoetf.today/en/{slug}-etf-flows"
-# symbol -> page slug (the last three are tried in case the site adds them)
-ASSETS = {
-    "BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "XRP": "xrp", "HYPE": "hype",
-    "LINK": "chainlink", "HBAR": "hedera", "AVAX": "avalanche", "DOGE": "dogecoin",
-    "LTC": "litecoin", "SUI": "sui", "DOT": "polkadot", "BNB": "bnb",
-    "NEAR": "near", "TRX": "tron", "ZEC": "zcash",
-}
+# symbol -> page slug. Only these five pages embed their history in the HTML; the smaller assets'
+# history was backfilled once (research/import_overview.py) and continues via the API.
+ASSETS = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "XRP": "xrp", "HYPE": "hype"}
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "flows")
 

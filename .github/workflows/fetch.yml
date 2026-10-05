@@ -32,6 +32,10 @@ jobs:
           CRYPTOETF_API_KEY: ${{ secrets.CRYPTOETF_API_KEY }}
         continue-on-error: true
         timeout-minutes: 4
+      - name: Fetch market caps (CoinGecko, once a day)
+        run: python scripts/fetch_mcap.py
+        continue-on-error: true
+        timeout-minutes: 6
       - name: Fetch Canary primary data (shares outstanding x NAV)
         run: python scripts/fetch_canary.py
         continue-on-error: true

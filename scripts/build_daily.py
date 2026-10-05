@@ -4,7 +4,9 @@ data/daily.json, the file the dashboard's daily job reads.
 
 Sources (all fetched by this repo's workflow)
 - data/flows/<SYM>.json        cryptoetf.today per-issuer history (BTC ETH SOL XRP HYPE)
+- data/flows_hist/<SYM>.json   cryptoetf.today asset totals since launch (one-time backfill, 2026-10-04)
 - data/flows_mcp/<SYM>.json    cryptoetf.today asset totals, last 30 days, accumulated per run
+- data/flows_api/<SYM>.json    the same from the keyed REST API (daily)
 - data/canary/<TICKER>.csv     Canary's own shares outstanding x NAV (XRPC LTCC HBR SOLC SUIS TRXS)
 
 Cleaning rules
@@ -211,8 +213,13 @@ def build_issuers(sym, cfg, pub):
 
 
 def load_mcp(sym):
-    """Asset totals: MCP endpoint history, overlaid by the REST API (same source, keyed)."""
+    """Asset totals since launch: the one-time backfill (data/flows_hist, the history the site's
+    flow page loads, captured 2026-10-04), overlaid by the MCP endpoint and then the REST API
+    (same source; their newer snapshots win where they overlap)."""
     out = {}
+    hist = load_json(P("data", "flows_hist", f"{sym}.json"))
+    for r in (hist or {}).get("rows", []):
+        out[r["date"][:10]] = float(r["total"])
     for folder in ("flows_mcp", "flows_api"):
         src = load_json(P("data", folder, f"{sym}.json"))
         for r in (src or {}).get("rows", []):
@@ -237,6 +244,43 @@ def build_canary_only(sym, cfg, pub):
             "source": "Canary 官網（流通單位 × NAV）"}
 
 
+def live_from(sym):
+    """First date the live feeds (MCP endpoint, REST API) cover; the backfill only fills before it."""
+    ds = []
+    for folder in ("flows_mcp", "flows_api"):
+        src = load_json(P("data", folder, f"{sym}.json"))
+        ds += [r["date"][:10] for r in (src or {}).get("rows", [])]
+    return min(ds) if ds else None
+
+
+def hist_coverage(sym):
+    """What the backfilled totals (data/flows_hist) contain. Early on the source built some totals
+    from a subset of the listed funds ("computed" rows); aggregate rows ("sosovalue") cover every
+    fund. Returns ({ticker: first date it is inside the totals}, [{fund, from, to}] spans where a
+    listed fund is missing from the totals), or (None, []) without a backfill file."""
+    h = load_json(P("data", "flows_hist", f"{sym}.json"))
+    if not h:
+        return None, []
+    listed = {f["ticker"]: f.get("listedAt") for f in h.get("funds", []) if f.get("ticker")}
+    first_in, missing = {}, {}
+    live = live_from(sym)
+    for r in sorted(h.get("rows", []), key=lambda r: r["date"]):
+        d = r["date"][:10]
+        if live and d >= live:  # replaced by the live feeds
+            break
+        covered = set(r.get("funds") or {})
+        if r.get("source") != "computed":  # an aggregate total includes every fund listed by then
+            covered = {tk for tk, la in listed.items() if la and la <= d}
+        for tk in covered:
+            first_in.setdefault(tk, d)
+        for tk, la in listed.items():
+            if la and la <= d and tk not in covered:
+                span = missing.setdefault(tk, [d, d])
+                span[1] = d
+    gaps = [{"fund": tk, "from": a, "to": b} for tk, (a, b) in sorted(missing.items())]
+    return first_in, gaps
+
+
 def build_totals(sym, cfg, pub, note=None):
     m = load_mcp(sym)
     if not m:
@@ -248,22 +292,42 @@ def build_totals(sym, cfg, pub, note=None):
     ds = sorted(days_rows)
     flow = [days_rows[d]["t"] for d in ds]
     pending = None
+    first_in, gaps = hist_coverage(sym)
     if cfg.get("canary"):
         cf, last_rate = canary_flows(cfg["canary"])
         if cf is not None:
-            # totals carry the Canary fund on settlement date: remove it and add its trade-dated value
+            # totals carry the Canary fund on settlement date: remove it and add its trade-dated value.
+            # Before the fund entered the backfilled totals there is nothing to remove.
+            incl_from = (first_in or {}).get(cfg["canary"]) if first_in is not None else None
             known_until = prev_trading_day(last_rate)
             settle = {next_trading_day(d): v for d, v in cf.items()}
             for i, d in enumerate(ds):
-                flow[i] = flow[i] - settle.get(d, 0.0) + (cf.get(d, 0.0) if d <= known_until else 0.0)
+                sub = settle.get(d, 0.0) if (incl_from is None or d >= incl_from) else 0.0
+                flow[i] = flow[i] - sub + (cf.get(d, 0.0) if d <= known_until else 0.0)
             pend = [d for d in ds if d > known_until]
             if pend:
                 pending = {"fund": cfg["canary"], "dates": pend}
-            log.append(f"{cfg['canary']} moved from settlement to trade date using Canary's table")
+            log.append(f"{cfg['canary']} moved from settlement to trade date using Canary's table"
+                       + (f" (inside the source totals from {incl_from})" if incl_from else ""))
+            gaps = [g for g in gaps if g["fund"] != cfg["canary"]]  # filled from Canary's own table
+    for g in gaps:
+        log.append(f"source totals miss {g['fund']} from {g['from']} to {g['to']}")
     if note:
         log.append(note)
-    return {"dates": ds, "flow": [r3(v) for v in flow], "funds": {}, "log": log, "pending": pending,
-            "source": "cryptoetf.today 資產合計（近 30 天起逐日累積）" + ("＋Canary 官網" if cfg.get("canary") else "")}
+    return {"dates": ds, "flow": [r3(v) for v in flow], "funds": {}, "log": log, "pending": pending, "gaps": gaps,
+            "source": "cryptoetf.today 資產合計" + ("＋Canary 官網" if cfg.get("canary") else "")}
+
+
+def market_caps(sym, dates):
+    """Market cap (US$ millions) at about the previous US close for each trading day: CoinGecko's
+    00:00 UTC snapshot of that date (data/mcap, fetched daily). None when missing."""
+    src = load_json(P("data", "mcap", f"{sym}.json")) or {}
+    rows = src.get("rows", {})
+    out = []
+    for d in dates:
+        v = (rows.get(d) or [None])[0]
+        out.append(round(v / 1e6) if isinstance(v, (int, float)) and v > 0 else None)
+    return out
 
 
 def main():
@@ -289,6 +353,7 @@ def main():
         res["dates"] = [res["dates"][i] for i in keep]
         res["flow"] = [res["flow"][i] for i in keep]
         res["funds"] = {k: [v[i] for i in keep] for k, v in res.get("funds", {}).items()}
+        res["mcap"] = market_caps(sym, res["dates"])
         out["coins"][sym] = {"launch": cfg["launch"], "etf": cfg["etf"], "ref": cfg.get("ref", False), **res}
         print(f"{sym:5s} {res['dates'][0] if res['dates'] else '-'} .. {res['dates'][-1] if res['dates'] else '-'} "
               f"n={len(res['dates'])} sum={sum(res['flow']):.1f} pending={res.get('pending')} | {'; '.join(res.get('log', [])[:3])}")
