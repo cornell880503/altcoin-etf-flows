@@ -4,7 +4,7 @@ Daily net flows (US$ millions, per fund) for US spot crypto ETFs: BTC, ETH, SOL,
 
 - Sources: [cryptoetf.today](https://cryptoetf.today/en) (public flow pages, plus its API with a key kept as an Actions secret), Canary Capital's own fund data, each coin's price from Coinbase (Binance or Hyperliquid when a pair is missing), market caps from CoinGecko.
 - Schedule: a GitHub Action runs every 3 hours, commits only when the numbers change (so the commit history is also a revision log), and rebuilds the website.
-- Files: `data/daily.json` (cleaned daily flows per coin and fund, by US trade date), `data/coin_px/<SYMBOL>.json` (the coin's price at 10:00 and 16:00 New York and its daily close at 00:00 UTC), `data/mcap/`, `data/flows/<SYMBOL>.json` (as published).
+- Files: `data/daily.json` (cleaned daily flows per coin and fund, by US trade date, since the first altcoin ETF session on 2025-10-28), `data/daily_long.json` (BTC and ETH totals since their ETFs launched), `data/coin_px/<SYMBOL>.json` (the coin's price at 10:00 and 16:00 New York and its daily close at 00:00 UTC), `data/mcap/`, `data/flows/<SYMBOL>.json` (as published).
 - Raw URL pattern: `https://raw.githubusercontent.com/cornell880503/altcoin-etf-flows/main/data/daily.json`
 
 Notes: Canary funds are reported on settlement date (T+1); the cleaning shifts them back one trading day. Seed capital before an ETF's first trading day is dropped. Every return and statistic uses the coin's own daily close at 00:00 UTC (08:00 Singapore; that UTC day holds the whole US session), never an ETF's share price.
@@ -13,7 +13,7 @@ Notes: Canary funds are reported on settlement date (T+1); the cleaning shifts t
 
 Live at **https://cornell880503.github.io/altcoin-etf-flows/** (GitHub Pages, published from the `site` branch; it refreshes by itself after every run of the workflow).
 
-`scripts/build_site.py` turns the data into one static page: `site/template.html` (the dashboard; its statistics run in the browser) plus the fixed research results in `site/research.json`. The workflow builds it after every data refresh and force-pushes it to the `site` branch, which always holds a single commit:
+`scripts/build_site.py` turns the data into one static page: `site/template.html` (the dashboard; its statistics run in the browser), the fixed research results in `site/research.json`, and the signal research from `scripts/signals.py` (needs numpy), which is recomputed on every build: whether cumulative flows, flips from outflow to inflow and similar states lead each coin's price, timed the way a trader could have acted, with multiple-testing and rotation tests. The workflow builds it after every data refresh and force-pushes it to the `site` branch, which always holds a single commit:
 
 - `https://raw.githubusercontent.com/cornell880503/altcoin-etf-flows/site/index.html`
 - `https://raw.githubusercontent.com/cornell880503/altcoin-etf-flows/site/health.json` (build time, latest trading day)

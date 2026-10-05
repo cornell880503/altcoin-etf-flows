@@ -6,6 +6,7 @@ Inputs (all in this repo):
   data/coin_px/*.json    each coin's own daily close, 00:00 UTC (scripts/fetch_coin_px.py)
   site/template.html     the dashboard (statistics run in the browser, same code as make_docs)
   site/research.json     fixed research results (SOL/XRP/BTC study, BTC flow study, rule tests)
+  scripts/signals.py     the signal research, recomputed on every build (needs numpy; skipped without)
 
 Usage: python3 scripts/build_site.py --out DIR
 Writes DIR/index.html, DIR/health.json and DIR/.nojekyll (for GitHub Pages). Standard library only. Exits non-zero, without
@@ -82,13 +83,29 @@ def check(snap, px):
 
 def json_for_script(obj):
     # safe inside <script type="application/json">: no "</" sequence can close the tag early
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"), allow_nan=False).replace("</", "<\\/")
 
 
-def render(snap, research, built_at):
+def signal_research():
+    """The signal tab's results (scripts/signals.py, needs numpy); None when it cannot run, and
+    the page then says so instead of showing stale numbers."""
+    try:
+        import signals as SGM  # noqa: E402
+    except Exception as e:  # numpy missing
+        print("signal research skipped:", type(e).__name__, e, file=sys.stderr)
+        return None
+    try:
+        return SGM.run(iters=int(os.environ.get("SIGNAL_ITERS", "200")))
+    except Exception as e:
+        print("signal research failed:", type(e).__name__, e, file=sys.stderr)
+        return None
+
+
+def render(snap, research, built_at, sig=None):
     tpl = open(P("site", "template.html"), encoding="utf-8").read()
-    body = tpl.replace("/*SNAP*/", json_for_script(snap)).replace("/*DATA*/", json_for_script(research))
-    if "/*SNAP*/" in body or "/*DATA*/" in body:
+    body = tpl.replace("/*SNAP*/", json_for_script(snap)).replace("/*DATA*/", json_for_script(research)) \
+              .replace("/*SIG*/", json_for_script(sig))
+    if "/*SNAP*/" in body or "/*DATA*/" in body or "/*SIG*/" in body:
         raise SystemExit("template placeholders not filled")
     cut = body.index('<div class="wrap">')
     head, rest = body[:cut].strip(), body[cut:].strip()
@@ -126,13 +143,14 @@ def main():
         sys.exit(1)
     research = json.load(open(P("site", "research.json"), encoding="utf-8"))
     research.pop("_about", None)
-    html = render(snap, research, built_at)
+    sig = signal_research()
+    html = render(snap, research, built_at, sig)
     os.makedirs(a.out, exist_ok=True)
     tmp = os.path.join(a.out, ".index.html.tmp")
     open(tmp, "w", encoding="utf-8").write(html)
     os.replace(tmp, os.path.join(a.out, "index.html"))
     health = {"built_at": built_at, "latest_date": snap["asof"], "trading_days": len(snap["dates"]),
-              "missing_price_on_latest": missing, "bytes": len(html.encode())}
+              "missing_price_on_latest": missing, "signals": sig is not None, "bytes": len(html.encode())}
     json.dump(health, open(os.path.join(a.out, "health.json"), "w"), indent=1)
     open(os.path.join(a.out, ".nojekyll"), "w").close()  # GitHub Pages: serve the files as they are
     print(json.dumps(health, ensure_ascii=False))

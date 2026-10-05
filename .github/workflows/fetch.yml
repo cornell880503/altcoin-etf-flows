@@ -36,7 +36,7 @@ jobs:
         run: python scripts/fetch_mcap.py
         continue-on-error: true
         timeout-minutes: 6
-      - name: Fetch each coin's own price (10:00 / 16:00 New York)
+      - name: Fetch each coin's own price (daily close 00:00 UTC, plus 10:00 / 16:00 New York)
         run: python scripts/fetch_coin_px.py
         continue-on-error: true
         timeout-minutes: 20
@@ -57,6 +57,9 @@ jobs:
             git commit -m "data: $(date -u +%Y-%m-%dT%H:%MZ)"
             for i in 1 2 3 4; do git pull --rebase && git push && break; sleep 7; done
           fi
+      - name: Install numpy (the signal research on the website needs it)
+        run: python -m pip install --quiet numpy
+        continue-on-error: true
       - name: Build the website (one static page with all the data)
         run: python scripts/build_site.py --out "$RUNNER_TEMP/site"
       - name: Publish it to the "site" branch (servers pull it from there)

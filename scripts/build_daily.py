@@ -358,6 +358,29 @@ def main():
         print(f"{sym:5s} {res['dates'][0] if res['dates'] else '-'} .. {res['dates'][-1] if res['dates'] else '-'} "
               f"n={len(res['dates'])} sum={sum(res['flow']):.1f} pending={res.get('pending')} | {'; '.join(res.get('log', [])[:3])}")
     json.dump(out, open(P("data", "daily.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    build_long(pub, out["generated"])
+
+
+def build_long(pub, generated):
+    """BTC and ETH since their first ETF day (the dashboard window starts later): the long sample
+    the signal research leans on. Same cleaning as daily.json; no market caps (the research
+    multiplies the daily close by the circulating supply)."""
+    global WINDOW_START
+    saved, long = WINDOW_START, {"generated": generated, "units": "US$ millions", "coins": {}}
+    try:
+        for sym in ("BTC", "ETH"):
+            WINDOW_START = COINS[sym]["launch"]
+            try:
+                res = build_issuers(sym, COINS[sym], pub)
+            except Exception as e:  # keep the short-window file even if this fails
+                print(sym, "long history failed:", type(e).__name__, e)
+                continue
+            if res:
+                long["coins"][sym] = {"launch": COINS[sym]["launch"], "etf": COINS[sym]["etf"],
+                                      "dates": res["dates"], "flow": res["flow"]}
+    finally:
+        WINDOW_START = saved
+    json.dump(long, open(P("data", "daily_long.json"), "w"), separators=(",", ":"), ensure_ascii=False)
 
 
 if __name__ == "__main__":
