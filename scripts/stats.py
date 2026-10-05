@@ -2,8 +2,9 @@
 Keep both implementations identical; scripts/check_stats.py compares them.
 
 Definitions
-- r_t      log return of the coin's reference ETF close, previous trading day to t
-- rb_t     same for IBIT (BTC)
+- r_t      log return of the coin's own price at 16:00 New York (data/coin_px), previous
+           trading day to t; the ETF's price is not used
+- rb_t     same for BTC
 - x_t      net flow / the coin's market cap at about the previous close, in basis points
 - y_t      'abn': r_t - beta * rb_t, beta = OLS slope of r on rb over the same sample
            (for BTC itself y = r);  'raw': r_t
@@ -172,7 +173,7 @@ def quantile(vals, qq):
 
 
 def leadlag_tests(x, r, rb, lag, mode="abn", is_btc=False):
-    """Who leads whom, on the full sample. x = flow / previous close, y = (abnormal) return.
+    """Who leads whom, on the full sample. x = flow in bp of market cap, y = (abnormal) return of the coin's own price.
     same_day     corr(x_t, y_t)
     next_day     corr(x_t, y_t+1)            includes hours before the flow is published
     tradable_1d  corr(x_t, y_t+lag+1)        from the first close after publication

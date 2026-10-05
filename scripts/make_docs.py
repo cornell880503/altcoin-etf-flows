@@ -7,11 +7,11 @@ stored too, for reference only.
 Usage
   python3 scripts/make_docs.py --out OUT [--days 8 | --all] [--ibkr DIR] [--db DIR]
 
-  --ibkr DIR  closes from Interactive Brokers, one <TICKER>.json per ETF holding the
-              get_price_history reply ({"time": [...], "close": [...]}); they override
-              stored closes for the same dates.
+  --ibkr DIR  ETF closes from Interactive Brokers (reference only), one <TICKER>.json per ETF
+              holding the get_price_history reply ({"time": [...], "close": [...]}); they
+              override stored closes for the same dates.
   --db DIR    export of the existing documents (ArtifactData list with out_dir): supplies
-              the closes history for the statistics; unchanged documents are skipped and
+              the stored ETF closes (reference only); unchanged documents are skipped and
               existing ones are flagged "needs_if_version".
 
 Outputs (in OUT)
@@ -19,7 +19,7 @@ Outputs (in OUT)
   batch_<k>.json     ArtifactData batch entries (<= 50 each); entries for documents that
                      already exist need "if_version" added from the database listing
   summary.txt        Traditional Chinese summary for the push notification
-  report.json        what was written, missing closes, latest date
+  report.json        what was written, coins missing their own price or an ETF close, latest date
 """
 import argparse
 import datetime as dt

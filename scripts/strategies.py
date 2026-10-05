@@ -4,7 +4,8 @@ dashboard's JavaScript can mirror it line by line (scripts/check_stats.py compar
 Inputs per coin, aligned on the trading calendar (index i = trading day):
   K[i]  net flow of trade date i as known when first published (US$m; Canary parts that
         post a day late are excluded; None when unknown)
-  P[i]  reference ETF close;  R[i] = log(P[i]/P[i-1]);  RB[i] = same for IBIT (BTC)
+  P[i]  the coin's own price at 16:00 New York;  R[i] = log(P[i]/P[i-1]);  RB[i] = same for BTC
+        (the backtests score R only from the coin's first ETF day)
   lag   trading days from trade date to the decision close (1; 2 for Canary-only coins)
 
 Decision at close d = t + lag uses only K[..t] and P[..d]; the position earns R[d+1].
