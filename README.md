@@ -11,6 +11,8 @@ Notes: Canary funds are reported on settlement date (T+1); the cleaning shifts t
 
 ## Website
 
+Live at **https://cornell880503.github.io/altcoin-etf-flows/** (GitHub Pages, published from the `site` branch; it refreshes by itself after every run of the workflow).
+
 `scripts/build_site.py` turns the data into one static page: `site/template.html` (the dashboard; its statistics run in the browser) plus the fixed research results in `site/research.json`. The workflow builds it after every data refresh and force-pushes it to the `site` branch, which always holds a single commit:
 
 - `https://raw.githubusercontent.com/cornell880503/altcoin-etf-flows/site/index.html`
