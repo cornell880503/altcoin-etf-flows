@@ -2,11 +2,11 @@ name: fetch-etf-flows
 on:
   schedule:
     - cron: "17 */3 * * *"
-    - cron: "47 14 * * *"  # extra run shortly before the dashboard's daily job (15:47 UTC)
+    - cron: "47 14 * * *"  # extra run mid-morning New York, when the previous day's flows are usually complete
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["scripts/**", ".github/workflows/**"]
+    paths: ["scripts/**", "site/**", ".github/workflows/**"]
 permissions:
   contents: write
 concurrency:
@@ -57,3 +57,16 @@ jobs:
             git commit -m "data: $(date -u +%Y-%m-%dT%H:%MZ)"
             for i in 1 2 3 4; do git pull --rebase && git push && break; sleep 7; done
           fi
+      - name: Build the website (one static page with all the data)
+        run: python scripts/build_site.py --out "$RUNNER_TEMP/site"
+      - name: Publish it to the "site" branch (servers pull it from there)
+        run: |
+          cd "$RUNNER_TEMP/site"
+          git init -q -b site
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "site: $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:site && break; sleep 5; done
+        env:
+          GH_TOKEN: ${{ github.token }}

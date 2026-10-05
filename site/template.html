@@ -1,0 +1,2078 @@
+<title>山寨幣 ETF 資金流</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* Layout: a trading-desk monitor read top to bottom - today's totals, one card per coin, the correlation board, then the selected coin's workbench. Research lives in its own tab. Dark first. */
+:root {
+  color-scheme: dark;
+  --bg: #0e1116;
+  --surface: #151a21;
+  --surface-2: #1c222b;
+  --ink: #e8ebee;
+  --ink-2: #b3bcc6;
+  --muted: #8a939d;
+  --hair: #252c35;
+  --axis: #3b4450;
+  --accent: #e2b45c;
+  --accent-wash: rgba(226, 180, 92, 0.14);
+  --pos: #3987e5;
+  --pos-wash: rgba(57, 135, 229, 0.16);
+  --neg: #d95926;
+  --neg-wash: rgba(217, 89, 38, 0.16);
+  --stat: #a48af0;
+  --stat-2: rgba(164, 138, 240, 0.5);
+  --stat-wash: rgba(164, 138, 240, 0.16);
+  --band: rgba(138, 147, 157, 0.13);
+  --price: #c3cbd4;
+  --live: #2fb86a;
+  --s-sol: #3987e5;
+  --s-btc: #d95926;
+  --s-xrp: #199e70;
+  --spark: #8a939d;
+  --ring: #151a21;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  --font-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-body: "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #f3f5f7; --surface: #ffffff; --surface-2: #eceff3; --ink: #101720; --ink-2: #3c4651; --muted: #69727d;
+    --hair: #dce1e7; --axis: #c2c9d1; --accent: #8f6300; --accent-wash: rgba(143, 99, 0, 0.10);
+    --pos: #2a78d6; --pos-wash: rgba(42, 120, 214, 0.12); --neg: #eb6834; --neg-wash: rgba(235, 104, 52, 0.13);
+    --stat: #6f4fd1; --stat-2: rgba(111, 79, 209, 0.45); --stat-wash: rgba(111, 79, 209, 0.12); --band: rgba(105, 114, 125, 0.12); --price: #3c4651; --live: #12873f;
+    --s-sol: #2a78d6; --s-btc: #eb6834; --s-xrp: #1baf7a; --spark: #69727d; --ring: #ffffff; --shadow: 0 6px 24px rgba(16, 23, 32, 0.12);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f7; --surface: #ffffff; --surface-2: #eceff3; --ink: #101720; --ink-2: #3c4651; --muted: #69727d;
+  --hair: #dce1e7; --axis: #c2c9d1; --accent: #8f6300; --accent-wash: rgba(143, 99, 0, 0.10);
+  --pos: #2a78d6; --pos-wash: rgba(42, 120, 214, 0.12); --neg: #eb6834; --neg-wash: rgba(235, 104, 52, 0.13);
+  --stat: #6f4fd1; --stat-2: rgba(111, 79, 209, 0.45); --stat-wash: rgba(111, 79, 209, 0.12); --band: rgba(105, 114, 125, 0.12); --price: #3c4651; --live: #12873f;
+  --s-sol: #2a78d6; --s-btc: #eb6834; --s-xrp: #1baf7a; --spark: #69727d; --ring: #ffffff; --shadow: 0 6px 24px rgba(16, 23, 32, 0.12);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.65; margin: 0; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: max(16px, 3.5vw); padding-block: 22px 64px; display: grid; gap: 40px; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: clamp(26px, 3.6vw, 34px); line-height: 1.25; }
+h2 { font-size: clamp(19px, 2.2vw, 23px); line-height: 1.35; }
+h3 { font-size: 15.5px; line-height: 1.5; margin: 0; font-weight: 700; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); }
+.tnum { font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--muted); }
+.ink2 { color: var(--ink-2); }
+.small { font-size: 13px; line-height: 1.6; }
+a { color: var(--accent); text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* header */
+header.top { display: grid; gap: 12px; }
+.toprow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+.toprow > div:not(.seg) { display: grid; gap: 6px; min-width: 0; }
+.status { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.status span { display: inline-flex; gap: 6px; align-items: center; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; flex: none; }
+.pulse.live { background: var(--live); }
+
+/* segmented controls and tabs */
+.seg { display: inline-flex; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; background: var(--surface); flex: none; }
+.seg button { font-size: 13px; padding: 6px 13px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.seg button + button { border-left: 1px solid var(--hair); }
+.seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); font-weight: 700; }
+.seg button:hover { color: var(--ink); }
+.tabs button { font-size: 14px; padding: 8px 16px; }
+
+/* sections */
+section { display: grid; gap: 16px; min-width: 0; }
+.sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 8px 20px; }
+.sec-head > div:not(.seg) { display: grid; gap: 4px; max-width: 760px; min-width: 0; }
+.sec-head p { color: var(--ink-2); font-size: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 18px clamp(14px, 2.2vw, 22px); display: grid; gap: 12px; min-width: 0; }
+.note { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.explain { font-size: 14.5px; color: var(--ink-2); max-width: 72ch; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: minmax(0, 1.55fr) repeat(4, minmax(0, 1fr)); border: 1px solid var(--hair); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.kpi { padding: 16px 18px 18px; display: grid; gap: 4px; align-content: start; min-width: 0; border-left: 1px solid var(--hair); }
+.kpi:first-child { border-left: 0; }
+.kpi .lab { font-size: 12.5px; color: var(--muted); }
+.kpi .val { font-size: 24px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+.kpi .val.hero { font-size: clamp(40px, 5vw, 52px); line-height: 1.05; }
+.kpi .sub { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+.kpi .sub b { font-weight: 600; color: var(--ink); }
+.kpi svg { display: block; margin-top: 6px; }
+@media (max-width: 980px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:first-child { grid-column: 1 / -1; border-bottom: 1px solid var(--hair); }
+  .kpi { border-left: 0; border-top: 1px solid var(--hair); }
+  .kpi:nth-child(2) { border-top: 0; }
+  .kpi:nth-child(3) { border-top: 0; border-left: 1px solid var(--hair); }
+  .kpi:nth-child(5) { border-left: 1px solid var(--hair); }
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--ink-2); }
+
+/* coin cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; padding: 13px 14px 12px; display: grid; gap: 8px; text-align: left; cursor: pointer; min-width: 0; transition: border-color .12s, background .12s; }
+.card:hover { border-color: var(--axis); }
+.card[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.card .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-width: 0; }
+.card .sym { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+.card .nm { color: var(--muted); font-size: 12px; margin-left: 6px; font-weight: 400; }
+.card .big { font-size: 25px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+.card .when { font-size: 12px; color: var(--muted); line-height: 1.45; min-height: 17px; }
+.card .sums { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-2); }
+.card .sums b { font-family: var(--font-mono); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.card .foot { border-top: 1px solid var(--hair); padding-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+.card .foot .mono { font-size: 12px; }
+.card.ref { background: transparent; }
+.dir { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; color: var(--ink); background: var(--surface-2); }
+.dir i { font-style: normal; font-size: 10px; }
+.dir.in { background: var(--pos-wash); } .dir.in i { color: var(--pos); }
+.dir.out { background: var(--neg-wash); } .dir.out i { color: var(--neg); }
+.dir.big { background: var(--accent-wash); }
+.dir.big i { color: var(--accent); }
+.rchip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+.rchip .dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--stat); display: inline-block; }
+.rchip .dot.sig { background: var(--stat); }
+.group-label { font-size: 12px; letter-spacing: 0.06em; color: var(--muted); }
+
+/* tables */
+.tablewrap { overflow-x: auto; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--hair); white-space: nowrap; vertical-align: middle; }
+th { font-weight: 500; color: var(--muted); font-size: 12.5px; }
+th:first-child, td:first-child { text-align: left; }
+td.num, th.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+td.txt, th.txt { text-align: left; }
+tbody tr:last-child td { border-bottom: none; }
+tr.ref td { color: var(--ink-2); }
+tr.group td { color: var(--muted); font-size: 12px; letter-spacing: 0.06em; padding-top: 14px; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--surface-2); }
+tr.sel td { background: var(--accent-wash); }
+.coin { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 700; }
+.coin small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--hair); color: var(--muted); }
+.chip.on { background: var(--accent-wash); border-color: transparent; color: var(--ink); }
+details { font-size: 13px; }
+details > summary { cursor: pointer; color: var(--ink-2); list-style: none; display: inline-flex; gap: 6px; align-items: center; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 11px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details[open] > summary { margin-bottom: 10px; }
+
+/* detail workbench */
+.dhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 20px; }
+.dhead .t { display: grid; gap: 4px; min-width: 0; }
+.dstats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; border-bottom: 1px solid var(--hair); padding-bottom: 12px; }
+.dstat { display: grid; gap: 2px; padding: 0 14px; border-left: 1px solid var(--hair); min-width: 0; }
+.dstat:first-child { border-left: 0; padding-left: 0; }
+.dstat .lab { font-size: 12px; color: var(--muted); }
+.dstat .val { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.dstat .sub { font-size: 12px; color: var(--ink-2); }
+@media (max-width: 900px) { .dstats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 12px; } .dstat:nth-child(4) { border-left: 0; padding-left: 0; } }
+@media (max-width: 520px) { .dstats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dstat:nth-child(4) { border-left: 1px solid var(--hair); padding-left: 14px; } .dstat:nth-child(odd) { border-left: 0; padding-left: 0; } }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+.chart { width: 100%; min-width: 0; position: relative; }
+.chart svg { display: block; overflow: visible; }
+.chart-title { font-size: 13.5px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.chart-title .sub { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.key { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; }
+.sq { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.empty { font-size: 13px; color: var(--muted); padding: 18px 0; }
+
+/* research tab */
+.thesis { border-left: 3px solid var(--accent); padding: 4px 0 4px 18px; font-size: 18px; line-height: 1.65; max-width: 62ch; }
+.findings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; }
+.finding { border-top: 1px solid var(--hair); padding-block: 16px 20px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.finding .fig { font-family: var(--font-mono); font-size: 14px; color: var(--accent); font-weight: 500; }
+.finding p { color: var(--ink-2); font-size: 14.5px; }
+@media (max-width: 900px) { .findings { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .findings { grid-template-columns: minmax(0, 1fr); } }
+ul.method { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(--ink-2); font-size: 14px; max-width: 80ch; }
+.cols2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .cols2 { grid-template-columns: minmax(0, 1fr); } }
+.dotkey { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+
+/* answer + verdict chips */
+.answer .thesis { font-size: 17px; }
+.verdicts { display: flex; flex-wrap: wrap; gap: 8px; }
+.vcoin { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair); border-radius: 999px; padding: 3px 10px 3px 4px; background: var(--surface); font-size: 12.5px; }
+.vcoin b { font-weight: 700; padding: 0 4px; }
+.vtag { font-size: 11.5px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.vtag.sync { background: var(--stat-wash); color: var(--ink); }
+.vtag.lead { background: var(--pos-wash); color: var(--ink); }
+.vtag.chase { background: var(--accent-wash); color: var(--ink); }
+.vtag.rev { background: var(--neg-wash); color: var(--ink); }
+.cellr { display: inline-grid; justify-items: end; line-height: 1.25; }
+.cellr .r { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.cellr .q { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+.cellr .r i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+.cellr .r i.sig { background: var(--stat); }
+.sigchip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.sigchip .st { padding: 1px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); }
+.sigchip .st.on { background: var(--pos-wash); color: var(--ink); }
+.sigchip .v { color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--surface-2); color: var(--ink); border: 1px solid var(--axis); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5; box-shadow: var(--shadow); max-width: 280px; }
+#tip .t-head { color: var(--muted); font-size: 12px; margin-bottom: 4px; font-family: var(--font-mono); }
+#tip .t-row { display: flex; align-items: center; gap: 8px; }
+#tip .t-val { font-family: var(--font-mono); font-weight: 600; }
+#tip .t-lab { color: var(--ink-2); }
+@media (max-width: 520px) { .tabs button { padding: 8px 10px; font-size: 13.5px; } }
+.grid2 > .panel, .cols2 > .panel { align-content: start; }
+.hbars { display: grid; gap: 10px; }
+.hbar { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 4.2em; gap: 10px; align-items: center; font-size: 13px; }
+.hbar .lab { color: var(--ink-2); line-height: 1.35; }
+.hbar .track { height: 10px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+.hbar .fill { height: 100%; background: var(--stat); border-radius: 5px; }
+.hbar .fill.flow { background: var(--accent); }
+.hbar .v { font-family: var(--font-mono); font-size: 12.5px; text-align: right; color: var(--ink); }
+@media (max-width: 520px) { .hbar { grid-template-columns: minmax(0, 8em) minmax(0, 1fr) 3.6em; } }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hair); padding-top: 16px; display: grid; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="toprow">
+      <div>
+        <div class="eyebrow">美國現貨 ETF · 每日淨申購</div>
+        <h1>山寨幣 ETF 資金流</h1>
+      </div>
+      <div class="seg tabs" role="tablist" aria-label="頁面">
+        <button type="button" role="tab" id="tab-track" aria-selected="true" aria-controls="view-track">每日追蹤</button>
+        <button type="button" role="tab" id="tab-btc" aria-selected="false" aria-controls="view-btc">BTC 研究</button>
+        <button type="button" role="tab" id="tab-trading" aria-selected="false" aria-controls="view-trading">交易研究</button>
+        <button type="button" role="tab" id="tab-research" aria-selected="false" aria-controls="view-research">研究結論</button>
+      </div>
+    </div>
+    <div class="status" id="status">
+      <span><span class="pulse" id="pulse"></span><span id="status-text">載入中</span></span>
+      <span id="status-asof"></span>
+      <span id="status-sched"></span>
+    </div>
+  </header>
+
+  <main id="view-track" role="tabpanel" aria-labelledby="tab-track" style="display:grid;gap:40px;min-width:0">
+    <section aria-label="最新交易日摘要">
+      <div class="kpis" id="kpis"></div>
+      <div class="controls">
+        <span>相關係數用的報酬</span>
+        <div class="seg" role="group" aria-label="報酬口徑">
+          <button type="button" id="mode-abn" aria-pressed="true">扣除 BTC 後</button>
+          <button type="button" id="mode-raw" aria-pressed="false">原始漲跌</button>
+        </div>
+        <span class="muted" id="mode-note">扣除 BTC 後 = 幣的報酬減掉 β × BTC 報酬，看的是這個幣自己的漲跌</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-answer">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">每天重算</div>
+          <h2 id="h-answer">流量是領先還是落後指標？</h2>
+        </div>
+      </div>
+      <div class="panel answer">
+        <p class="thesis" id="ans-text"></p>
+        <div class="verdicts" id="ans-chips"></div>
+        <p class="note">判讀根據下方的領先落後檢定，多重檢定校正後 q &lt; 0.10 才算數。「領先」指的是流量資料公布之後、在下一個收盤進場還能賺到的報酬，不是資料公布前就已經發生的漲跌。流量占市值的大小、和美股、基差等其他因素一起看的結果，見 <a href="#btc" id="ans-btc-link">BTC 研究</a>。</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-board">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-board">各幣最新一天</h2>
+          <p>點一張卡看細節。金額為當日淨申購（百萬美元，+ 流入、− 流出），以美股交易日記帳。</p>
+        </div>
+        <div class="seg" role="group" aria-label="排序">
+          <button type="button" data-sort="default" aria-pressed="true">預設</button>
+          <button type="button" data-sort="today" aria-pressed="false">最新一天</button>
+          <button type="button" data-sort="s20" aria-pressed="false">近 20 日</button>
+          <button type="button" data-sort="corr" aria-pressed="false">60 日相關</button>
+        </div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="group-label">對照：BTC、ETH 現貨 ETF</div>
+      <div class="cards" id="cards-ref"></div>
+    </section>
+
+    <section aria-labelledby="h-corr">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-corr">領先落後檢定</h2>
+          <p>每格是相關係數 r，下面是多重檢定校正後的 q（16 個幣一起校正）；實心點 = q &lt; 0.10。流量換算成占市值比例，報酬依上方設定（預設扣除 BTC）。「公布後」從資料公布後的第一個收盤起算；Canary 的幣再晚一天。標準誤取 Newey–West 和 OLS 兩者較大的。</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="tablewrap"><table id="tb-corr"></table></div>
+        <p class="note" id="corr-note"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-int">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-int">流量占市值多大？</h2>
+          <p>橫軸是每天淨流量（絕對值）占市值的平均，單位 bp（0.01%），對數刻度；縱軸是全期同日相關 r，報酬口徑依上方設定。流量相對市值太小的幣，本來就很難看出關係。</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="chart" id="ch-int" role="img" aria-label="各幣流量占市值的平均和同日相關"></div>
+        <p class="note" id="int-note"></p>
+        <details><summary>表格</summary><div class="tablewrap"><table id="tb-int"></table></div></details>
+      </div>
+    </section>
+
+    <section aria-labelledby="dt-title" id="detail">
+      <div class="dhead">
+        <div class="t">
+          <div class="eyebrow" id="dt-eyebrow"></div>
+          <h2 id="dt-title"></h2>
+          <p class="small ink2" id="dt-sub"></p>
+        </div>
+        <div class="seg" role="group" aria-label="期間">
+          <button type="button" data-range="30" aria-pressed="false">30 天</button>
+          <button type="button" data-range="90" aria-pressed="true">90 天</button>
+          <button type="button" data-range="0" aria-pressed="false">全部</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="dstats" id="dt-stats"></div>
+        <div class="chart-title">每日淨流量 <span class="sub">百萬美元</span>
+          <span class="legend"><span><span class="sq" style="background:var(--pos)"></span>流入</span><span><span class="sq" style="background:var(--neg)"></span>流出</span></span></div>
+        <div class="chart" id="ch-flow" role="img" aria-label="每日淨流量長條圖"></div>
+        <div class="chart-title">幣價 <span class="sub" id="price-sub"></span></div>
+        <div class="chart" id="ch-price" role="img" aria-label="幣價走勢（美東 16:00）"></div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="chart-title">滾動相關 <span class="sub">流量 vs 當天報酬</span></div>
+          <div class="legend"><span><span class="key" style="background:var(--stat)"></span>60 日</span><span><span class="key" style="background:var(--stat-2)"></span>30 日</span><span><span class="sq" style="background:var(--band)"></span>60 日視窗下和 0 分不開的範圍</span></div>
+          <div class="chart" id="ch-roll" role="img" aria-label="滾動相關係數走勢"></div>
+          <p class="note" id="roll-note"></p>
+        </div>
+        <div class="panel">
+          <div class="chart-title">誰先誰後 <span class="sub">corr(今天流量, 第 k 天報酬)</span></div>
+          <div class="chart" id="ch-ll" role="img" aria-label="流量與報酬的領先落後相關"></div>
+          <p class="note" id="ll-note"></p>
+        </div>
+      </div>
+      <div class="panel" id="funds-panel">
+        <div class="chart-title" id="funds-title">各檔 ETF</div>
+        <div class="tablewrap"><table id="tb-funds"></table></div>
+        <p class="note" id="funds-note"></p>
+      </div>
+      <details class="panel" id="days-panel"><summary>逐日資料（所選期間）</summary><div class="tablewrap"><table id="tb-days"></table></div></details>
+    </section>
+
+    <section aria-labelledby="h-notes">
+      <div class="sec-head"><div><h2 id="h-notes">資料怎麼來</h2></div></div>
+      <div class="cols2">
+        <div class="panel">
+          <h3>來源與日期</h3>
+          <ul class="method">
+            <li>流量：cryptoetf.today。BTC、ETH、SOL、XRP、HYPE 用網站的分基金歷史；其他幣用網站流量頁載入的上市以來合計（2026-10-04 擷取一次），之後每天接官方 API。Canary 旗下 XRPC、SOLC、LTCC、HBR、TRXS、SUIS 改用 Canary 官網的每日流通單位 × NAV 自己算。</li>
+            <li>來源早期有兩段合計不完整：SUI 在 2026-08-21 前不含 21Shares 的 TSUI（Canary 的 SUIS 已用官網資料補上），AVAX 在 2026-03-12 到 07-24 不含 VanEck 的 VAVX。這兩檔那段時間的流量都很小。</li>
+            <li>幣價：每個美股交易日美東 16:00 的現貨價，也就是 ETF 計算淨值、決定當天申購贖回的同一時間。來源以 Coinbase 的美元報價為主，Coinbase 沒有的幣用 Binance（USDT）或 Hyperliquid。週一的報酬包含週末。</li>
+            <li>一律用申購日記帳。Canary 的表以交割日記帳，這裡往前移一天，所以最新一天的 XRPC、SOLC、SUIS 要隔天才補上，LTC、HBAR、TRX 整條晚一天。SoSoValue 等新聞把 Canary 記在隔天，對不上時差一天是正常的。</li>
+            <li>來源有時把週五的流量拆到週六、週日，這裡加回週五（和來源先前版本逐筆相符）；假日重複的列刪除；上市前的種子資金不算。</li>
+            <li>抓取程式公開在 <a href="https://github.com/cornell880503/altcoin-etf-flows" target="_blank" rel="noopener">github.com/cornell880503/altcoin-etf-flows</a>，每 3 小時跑一次。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>相關係數怎麼算、怎麼讀</h3>
+          <ul class="method">
+            <li>流量除以這個幣在前一個收盤時的市值（CoinGecko 每日 UTC 0 點的值，大約是前一個美股收盤後 4 小時），單位 bp（0.01%）。這樣不同大小的幣可以直接比較，幣價跌了一半時，同樣的錢也不會被看成一樣大。</li>
+            <li>報酬用幣價（美東 16:00 到隔一個交易日 16:00）的對數報酬，不是 ETF 的價格。「扣除 BTC 後」= 報酬 − β × BTC 報酬，β 在同一段樣本裡估計；BTC 自己用原始報酬。</li>
+            <li>相關是同一天的關聯，分不出因果：錢推價格、價格吸引錢都會讓它變大。「誰先誰後」圖的 k &gt; 0 才是預測力。</li>
+            <li>研究分頁裡的 0.18、0.20 是美元流量對原始報酬；這裡改用占市值比例與扣除 BTC 的報酬，同一份資料 SOL、XRP 會略高，檢定結論不變。</li>
+            <li>NEAR、TRX 上市不久，ZEC 也只有一個多月，樣本少於 30 天或有流量的日子少於 10 天不檢定。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-btc" role="tabpanel" aria-labelledby="tab-btc" hidden style="display:grid;gap:40px;min-width:0">
+    <section aria-labelledby="h-btc">
+      <div class="sec-head"><div>
+        <div class="eyebrow" id="btc-eyebrow">BTC 研究</div>
+        <h2 id="h-btc">流量占市值越大，當天漲跌越明顯；但它跟著價格走，不走在價格前面</h2>
+      </div></div>
+      <p class="thesis" id="btc-thesis"></p>
+      <div class="findings" id="btc-findings"></div>
+    </section>
+
+    <section aria-labelledby="h-btc-size">
+      <div class="sec-head"><div>
+        <h2 id="h-btc-size">流量大小和當天漲跌</h2>
+        <p>每天的淨流量除以前一個收盤時 BTC 的市值，按大小分成 7 組。1 bp = 0.01%，這段期間約等於 <span id="btc-bp-usd"></span>。</p>
+      </div></div>
+      <div class="panel">
+        <div class="chart-title">各組當天平均漲跌 <span class="sub">%，長條旁的數字是收漲的比例</span></div>
+        <div class="chart" id="ch-btc-bk" role="img" aria-label="依流量占市值大小分組的 BTC 當天平均漲跌"></div>
+        <div class="tablewrap"><table id="tb-btc-bk"></table></div>
+        <p class="note" id="btc-bk-note"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-btc-ll">
+      <div class="sec-head"><div>
+        <h2 id="h-btc-ll">誰先誰後</h2>
+        <p>左圖是 corr(今天的流量占市值, 第 k 天的 BTC 報酬)：k 為負代表報酬在前、流量在後（資金追漲），k 為正代表流量在前。右表把時間拉長，看累積 h 天的流量和同期、下一期報酬的關係。</p>
+      </div></div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="chart" id="ch-btc-ll" role="img" aria-label="BTC 流量與報酬的領先落後相關"></div>
+          <p class="note" id="btc-ll-note"></p>
+        </div>
+        <div class="panel">
+          <div class="tablewrap"><table id="tb-btc-h"></table></div>
+          <p class="note" id="btc-h-note"></p>
+          <div class="tablewrap"><table id="tb-btc-dose"></table></div>
+          <p class="note" id="btc-dose-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-btc-f">
+      <div class="sec-head"><div>
+        <h2 id="h-btc-f">其他會一起影響 BTC 的因素</h2>
+        <p>把同一天的 BTC 報酬對 13 個變數一起做迴歸，再把解釋力（R²）按因素分組拆開。這些都是「同一天一起動」的關係，用來判斷 ETF 流量在當天的漲跌裡占多少份量，不是預測。</p>
+      </div></div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="chart-title">各組因素的解釋力 <span class="sub">R² 的 Shapley 分解，加總 = 整個模型的 R²</span></div>
+          <div class="hbars" id="btc-shap"></div>
+          <p class="note" id="btc-shap-note"></p>
+        </div>
+        <div class="panel">
+          <div class="chart-title">各變數的係數 <span class="sub">標準化 β；q = 13 個係數一起校正後</span></div>
+          <div class="tablewrap"><table id="tb-btc-f"></table></div>
+          <p class="note" id="btc-f-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-btc-r">
+      <div class="sec-head"><div>
+        <h2 id="h-btc-r">不同年份、不同市況</h2>
+      </div></div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="chart-title">每年流入多少、BTC 漲跌多少</div>
+          <div class="tablewrap"><table id="tb-btc-y"></table></div>
+          <p class="note" id="btc-y-note"></p>
+          <div class="chart-title" style="margin-top:8px">滾動 120 個交易日的同日相關 <span class="sub">流量占市值 vs 當天報酬</span></div>
+          <div class="chart" id="ch-btc-roll" role="img" aria-label="BTC 流量與當天報酬的滾動相關"></div>
+        </div>
+        <div class="panel">
+          <div class="chart-title">分段看 <span class="sub">同日相關、乘數，以及公布後當天的相關</span></div>
+          <div class="tablewrap"><table id="tb-btc-reg"></table></div>
+          <p class="note" id="btc-reg-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-btc-basis">
+      <div class="sec-head"><div>
+        <h2 id="h-btc-basis">基差交易：有多少 ETF 買盤其實有對沖？</h2>
+        <p>避險基金可以一邊買 ETF、一邊在 CME 放空期貨賺價差，這種買盤不看漲。CFTC 每週公布 CME 上「槓桿基金」的部位，這裡拿它的淨空單和 ETF 累積買進的 BTC 比較。</p>
+      </div></div>
+      <div class="panel">
+        <div class="legend"><span><span class="key" style="background:var(--accent)"></span>ETF 累積淨買進</span><span><span class="key" style="background:var(--neg)"></span>CME 槓桿基金淨空單</span></div>
+        <div class="chart" id="ch-btc-cme" role="img" aria-label="ETF 累積淨買進的 BTC 與 CME 槓桿基金淨空單"></div>
+        <p class="note" id="btc-cme-note"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-btc-m">
+      <div class="sec-head"><div><h2 id="h-btc-m">資料與方法</h2></div></div>
+      <div class="cols2">
+        <div class="panel">
+          <h3>資料</h3>
+          <ul class="method">
+            <li>ETF 流量：cryptoetf.today 的分基金歷史（美國現貨 BTC ETF 合計，2024-01-11 起，以申購日記帳）。報酬：BTC 本身在美東 16:00 的價格（Coinbase BTC-USD）的對數報酬，也就是 ETF 計算淨值的同一時間，不是 ETF 的價格。</li>
+            <li>市值 = 同一個 16:00 價格 × Coin Metrics 的流通量；流量除以前一個 16:00 的市值，單位 bp。</li>
+            <li>其他因素：期貨基差（Binance 季度合約對現貨的年化溢價）、資金費率（Binance 永續）、Coinbase 溢價（對 Binance，美東 10:00–16:00 平均）、穩定幣總供給（DefiLlama）、交易所鏈上淨轉入（Coin Metrics）、那斯達克、美元指數、10 年期殖利率、VIX、高收益債利差（FRED）、Strategy 買幣（strategy.com 公告，每筆平均攤到公告前的交易日）、CME 部位（CFTC TFF 週報）。鏈上與穩定幣是 UTC 日，週一含週末。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>方法與限制</h3>
+          <ul class="method">
+            <li>迴歸用 OLS，標準誤取 Newey–West（5 期）和古典兩者較大的，常態 p 值；同一組檢定用 Benjamini–Hochberg 校正。乘數 = 100 × 斜率（報酬 % 對流量 bp），區間用 10 天一塊的 block bootstrap（2,000 次）。</li>
+            <li>「公布後」從美東隔天 10:00 起算（流量在美股開盤前公布）；VAR 用 5 期落後，流量排第一和排最後各算一次，夾出流量衝擊能解釋的上下限。</li>
+            <li>同一天的關係分不出因果。Strategy 買幣的時點、UTC 日和美股交易日差約 4 小時，都是近似；Binance 基差代替 CME 基差。樣本只有 2024 年的多頭和 2025–26 年的震盪下跌，換到別的市況不一定成立。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-trading" role="tabpanel" aria-labelledby="tab-trading" hidden style="display:grid;gap:40px;min-width:0">
+    <section aria-labelledby="h-tr">
+      <div class="sec-head"><div>
+        <div class="eyebrow">交易研究 · 每天用最新資料重算</div>
+        <h2 id="h-tr">能不能用 ETF 流量做山寨幣的交易計劃？</h2>
+      </div></div>
+      <p class="thesis" id="tr-thesis"></p>
+      <div class="findings" id="tr-findings"></div>
+    </section>
+
+    <section aria-labelledby="h-sig">
+      <div class="sec-head"><div>
+        <h2 id="h-sig">下一個交易日，每條規則怎麼說</h2>
+        <p id="sig-sub">研究用的訊號，沒有一條通過顯著性檢定，不要當成買賣建議。「持有」= 規則在下一個收盤要持有，「空手」= 不持有。</p>
+      </div></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-signals"></table></div>
+        <p class="note">FF 跟著最新一天的淨流入；FZ 只在流入比過去 60 天平均高 1 個標準差以上時持有；FM5 看最近 5 天的淨流量合計；TR20 只看幣價比 20 個交易日前高（不用流量，當對照）；TF 要 TR20 和 FM5 同時成立。</p></div>
+    </section>
+
+    <section aria-labelledby="h-bk">
+      <div class="sec-head"><div>
+        <h2 id="h-bk">山寨幣籃子：用流量決定持有或空手</h2>
+        <p>每天等權重持有所有已上市 ETF 的山寨幣，比較四種做法：一直持有、BTC 現貨 ETF 5 日淨流量為正才持有、山寨幣 ETF 5 日合計淨流量為正才持有、籃子價格比 20 天前高才持有。已扣每次進出 0.1% 的成本。</p>
+      </div></div>
+      <div class="panel">
+        <div class="legend" id="bk-legend"></div>
+        <div class="chart" id="ch-basket" role="img" aria-label="山寨幣籃子四種做法的累積報酬"></div>
+        <div class="tablewrap"><table id="tb-basket"></table></div>
+        <p class="note" id="bk-note"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-rules">
+      <div class="sec-head"><div>
+        <h2 id="h-rules">各幣規則回測</h2>
+        <p>每格上排是「規則說持有的隔天」減「說空手的隔天」的平均報酬差（每天 %），這個差是規則有沒有擇時能力的檢定；下排是扣成本後的年化報酬。最右欄是同期一直持有的年化報酬。</p>
+      </div></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-rules"></table></div><p class="note" id="rules-note"></p></div>
+    </section>
+
+    <section aria-labelledby="h-fwd">
+      <div class="sec-head"><div>
+        <h2 id="h-fwd">前瞻紀錄（樣本外）</h2>
+        <p>規則在 2026-10-05 定案，之後每天的結果都是沒看過的資料，這才是真正的檢驗。</p>
+      </div></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-forward"></table></div><p class="note" id="fwd-note"></p></div>
+    </section>
+
+    <section aria-labelledby="h-long">
+      <div class="sec-head"><div>
+        <h2 id="h-long">比較長的樣本：BTC、ETH</h2>
+        <p>BTC 從 2024-01-11、ETH 從 2024-07-23 起，用一樣的規則和檢定（固定在 2026-10-02 為止的結果）。</p>
+      </div></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-long"></table></div><p class="note" id="long-note"></p></div>
+    </section>
+
+    <section aria-labelledby="h-trm">
+      <div class="sec-head"><div><h2 id="h-trm">方法與限制</h2></div></div>
+      <div class="cols2">
+        <div class="panel">
+          <h3>時間點和成本</h3>
+          <ul class="method">
+            <li>第 T 天的流量在 T+1 美股開盤前公布，規則在 T+1 收盤決定部位、持有到下一個收盤；Canary 的基金晚一天公布，所以 LTC、HBAR、TRX 在 T+2 才能用，SOL、XRP、SUI 裡 SOLC、XRPC、SUIS 那一塊也不算進 T+1 的訊號。</li>
+            <li>價格用幣本身在美東 16:00 的現貨價，假設在那個時間成交，每次改變部位扣 0.1%。每個幣只從它的第一檔 ETF 上市日起算。</li>
+            <li>所有門檻只用當時以前的資料（例如 z 分數用前 60 天），沒有偷看未來。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>檢定</h3>
+          <ul class="method">
+            <li>擇時檢定：把隔天報酬對「持有/空手」做迴歸，看兩組平均報酬差；標準誤取 Newey–West（5 期）和 OLS 兩者較大的。</li>
+            <li>試了很多條規則，總會有一條看起來不錯，所以用兩道校正：Benjamini–Hochberg 的 q 值，以及旋轉檢定（把報酬和訊號錯開隨機天數重抽 500 次）算「最好那條」是不是運氣。</li>
+            <li>限制：山寨幣 ETF 最多不到一年、而且大多是空頭；規則在 16:00 決定、16:00 成交，沒有檢驗「資料一公布就進場」的做法（BTC 研究分頁有算公布後 10:00 進場的報酬）。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-research" role="tabpanel" aria-labelledby="tab-research" hidden style="display:grid;gap:48px;min-width:0">
+    <section aria-labelledby="h-verdict">
+      <div class="sec-head"><div>
+        <div class="eyebrow">研究結論 · 資料截至 2026-10-02</div>
+        <h2 id="h-verdict">流量跟著幣價一起動，但不走在幣價前面</h2>
+      </div></div>
+      <p class="thesis">在 SOL 和 XRP 身上，ETF 流量和當天漲跌同步，卻沒有預測力；XRP 的大額流入還常出現在短線漲完之後。若用來判斷山寨季，它比較像確認訊號，不是領先訊號。</p>
+      <div class="findings">
+        <div class="finding">
+          <h3>同一天有關聯，但很弱</h3>
+          <div class="fig">r ≈ 0.18（SOL）· 0.20（XRP）· 0.50（BTC）</div>
+          <p>流入多的那天，幣價通常也比較強，但流量只解釋得了單日漲跌的 3–6%。扣掉 BTC 大盤影響後仍然成立；XRP 經多重檢定校正後顯著（q=0.001），SOL 勉強過門檻（q=0.08）。</p>
+        </div>
+        <div class="finding">
+          <h3>今天的流量預測不了明天</h3>
+          <div class="fig">隔日 p = 0.31（SOL）· 0.40（XRP）</div>
+          <p>今天的流量對隔天、未來 5 天的超額報酬都沒有預測力，Granger 因果檢定兩個方向也不顯著。對照組 BTC 則兩個方向都有：資金會追前一天的漲幅，對隔天也有小幅預測力。</p>
+        </div>
+        <div class="finding">
+          <h3>大額流入常出現在短線高點</h3>
+          <div class="fig">XRP：事件前 5 日 +2.3% → 事件後 5 日 −1.7%</div>
+          <p>挑出流入最多的 10% 交易日，和其他交易日比較相對 BTC 的超額報酬：XRP 事件前 5 天高 2.3%，當天高 1.8%，之後 5 天低 1.7%（前後 5 天 p≈0.04–0.07，當天 p = 0.002）。SOL 方向相同，只有當天顯著。</p>
+        </div>
+        <div class="finding">
+          <h3>市值小確實放大，但沒有等比例放大</h3>
+          <div class="fig">每 1 億美元：SOL +3.9% · XRP +4.5% · BTC +0.45%</div>
+          <p>同樣金額，山寨幣的同日漲幅約是 BTC 的 8–10 倍，方向和你的直覺一致。可是它們的市值小了 18–24 倍，按市值比例算反而比 BTC 弱；而且平均每天的淨流量（絕對值）只有約 800 萬美元。</p>
+        </div>
+        <div class="finding">
+          <h3>ETF 上市不是起漲點</h3>
+          <div class="fig">上市後 120 個交易日：9 檔中 9 檔跑輸 BTC</div>
+          <p>10 個有現貨 ETF 的山寨幣，上市後 20、60 個交易日都有 8 個跑輸 BTC，120 日平均落後 33%；唯一明顯例外是 HYPE。對照：BTC 2024 年 ETF 上市後 12 週 +54%，ETH 同年 −19%。</p>
+        </div>
+        <div class="finding">
+          <h3>累積流入和幣價沒有長期關係</h3>
+          <div class="fig">SOL 累積淨流入約 15 億美元，同期幣價 −40%</div>
+          <p>把累積流入曲線疊在幣價上看，在統計上沒有意義：兩者都是非平穩序列，共整合檢定不顯著（SOL p=0.72、XRP p=0.52）。SOL 的水平相關甚至是 −0.60。</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-study">
+      <div class="sec-head"><div>
+        <div class="eyebrow">研究細節</div>
+        <h2 id="h-study">五個檢定，逐一看</h2>
+        <p>報酬一律用幣本身的價格：各幣在美東 16:00（ETF 計算淨值的時點）的現貨價，算對數報酬，不是 ETF 的價格。流量換算成前一日市值的 bp，超額報酬 = 幣的報酬 − β × BTC 報酬。標準誤用 Newey–West（4 期落後），相關係數的信賴區間用 stationary bootstrap（5,000 次）。</p>
+      </div></div>
+      <div class="panel">
+        <div class="chart-title">1 · 誰先誰後：流量與報酬的領先落後相關 <span class="sub">corr(今天流量, 第 k 天報酬)</span></div>
+        <p class="explain">k = 0 是同一天；k 為正代表「流量在前、價格在後」，能拿來預測；k 為負代表「價格在前、流量在後」，也就是資金追漲。實心長條是經多重檢定校正後仍顯著（q &lt; 0.10）的落差。山寨幣用扣除 BTC 後的超額報酬，BTC 用原始報酬。</p>
+        <div class="grid3">
+          <div><div class="chart-title"><span class="key" style="background:var(--s-sol)"></span>SOL</div><div class="chart" id="ch-ccf-sol" role="img" aria-label="SOL 流量與超額報酬的領先落後相關"></div></div>
+          <div><div class="chart-title"><span class="key" style="background:var(--s-xrp)"></span>XRP</div><div class="chart" id="ch-ccf-xrp" role="img" aria-label="XRP 流量與超額報酬的領先落後相關"></div></div>
+          <div><div class="chart-title"><span class="key" style="background:var(--s-btc)"></span>BTC（對照組）</div><div class="chart" id="ch-ccf-btc" role="img" aria-label="BTC 流量與報酬的領先落後相關"></div></div>
+        </div>
+        <p class="note">讀法：BTC 在 k = −1（0.36）和 k = 0（0.50）都很高，代表 BTC 的錢會追前一天的漲幅。XRP 在 k = 0（0.25）顯著，k = −4（0.17）也過了門檻，但前後幾天都沒有，比較像巧合；SOL 的 k = 0（0.19）在 21 個落差一起校正後不顯著（q = 0.61）。k 為正的一側（流量在前）沒有任何一格顯著。樣本大小下，相關係數要 ≥ 0.18 左右才有 80% 的把握偵測得到。</p>
+        <details><summary>表格</summary><div class="tablewrap"><table id="tb-ccf"></table></div></details>
+      </div>
+      <div class="panel">
+        <div class="chart-title">2 · 大額流入日前後，超額報酬怎麼走 <span class="sub">流入最多的 10% 交易日，相對 BTC 的累積超額報酬（%）</span></div>
+        <div class="legend"><span><span class="key" style="background:var(--s-sol)"></span>SOL（24 個事件日）</span><span><span class="key" style="background:var(--s-xrp)"></span>XRP（23 個事件日）</span></div>
+        <div class="chart" id="ch-event" role="img" aria-label="大額流入日前後五天的累積超額報酬"></div>
+        <p class="note">第 0 天 = 大額流入當天；圖上是事件日的平均累積超額報酬。顯著性用 HAC 迴歸和其他交易日比較（可處理事件日重疊與聚集）：XRP 事件前 5 天高 2.3%（p = 0.044）、當天高 1.8%（p = 0.002）、之後 5 天低 1.7%（p = 0.066）。SOL 只有當天顯著（+1.6%，p = 0.045）；另外 SOL 大額流出日之後 5 天也偏弱（−1.9%，p = 0.039）。</p>
+        <details><summary>表格</summary><div class="tablewrap"><table id="tb-event"></table></div></details>
+      </div>
+      <div class="panel">
+        <div class="dhead">
+          <div class="chart-title">3 · 累積流入 vs 幣價：常見但沒有意義的圖</div>
+          <div class="seg" role="group" aria-label="選擇幣種"><button type="button" id="lv-sol" aria-pressed="true">SOL</button><button type="button" id="lv-xrp" aria-pressed="false">XRP</button></div>
+        </div>
+        <p class="explain">兩條都是一路累積、不會回到平均的序列，隨便放在一起都可能看起來很像。統計上要先檢驗共整合，兩檔都不成立；這裡分成上下兩張圖，避免雙 Y 軸製造假的同步感。</p>
+        <div class="chart" id="ch-lv-price" role="img" aria-label="幣價指數，ETF 上市日 = 100"></div>
+        <div class="chart" id="ch-lv-cum" role="img" aria-label="ETF 累積淨流入，百萬美元"></div>
+        <p class="note" id="lv-note"></p>
+      </div>
+      <div class="panel">
+        <div class="chart-title">4 · 同樣的錢，誰動得比較多 <span class="sub">同日關聯的幅度，點 = 估計值，線 = 95% 信賴區間</span></div>
+        <div class="grid2">
+          <div><div class="chart-title">每 1 億美元淨流入對應的當日漲幅（%）</div><div class="chart" id="ch-x-usd" role="img" aria-label="每一億美元淨流入對應的當日漲幅"></div></div>
+          <div><div class="chart-title">每 1 bp 市值的淨流入對應的當日漲幅（%）</div><div class="chart" id="ch-x-bp" role="img" aria-label="每一個基點市值的淨流入對應的當日漲幅"></div></div>
+        </div>
+        <p class="note">左圖支持「市值小，同樣的錢推得比較動」；右圖說明按市值比例，山寨幣的反應其實比 BTC 小。SOL 與 XRP 的斜率差異不顯著（p = 0.32），合併估計為每 bp +0.32%（p &lt; 0.001）。這些是同日關聯，不是因果的價格衝擊：同一天裡，錢追價格和價格被錢推動都會造成這個數字。</p>
+      </div>
+      <div class="panel">
+        <div class="chart-title">5 · ETF 上市之後：相對 BTC 的報酬 <span class="sub">從首檔 ETF 第一天美東 16:00 的幣價起算，扣掉 BTC 同期報酬（對數差，%）</span></div>
+        <div class="tablewrap"><table id="tb-launch"></table></div>
+        <p class="note">上市日集中在 2025 年 10 月到 2026 年 3 月，視窗在時間上高度重疊（同一段山寨幣空頭），所以「9/9 跑輸」的 p 值會高估獨立性，請當描述性結果看。* BTC、ETH 的對照數字是幣價從 ETF 上市後第一個週五起算 4 週、12 週的漲跌。</p>
+      </div>
+      <div class="panel">
+        <div class="chart-title">全部主要檢定 <span class="sub">p = 原始 p 值；q = 每個資產 8 個假設做 Benjamini–Hochberg 校正後</span></div>
+        <div class="tablewrap"><table id="tb-tests"></table></div>
+        <details><summary>同日斜率的穩健性</summary><div class="tablewrap"><table id="tb-robust"></table></div>
+          <p class="note" style="margin-top:8px">SOL 的結果集中在後半段樣本，而且改用美元而不是 bp 衡量時不顯著（p = 0.15），證據比 XRP 弱。XRP 在大多數設定下都穩定，只有拿掉前 10 天時變成 p = 0.10。改用週資料（46–52 週）結論相同：同週正相關（SOL 0.28、XRP 0.16、BTC 0.65），下一週沒有延續，山寨幣反而略為反轉；只有 BTC 看得到「上週漲、這週錢進來」。</p></details>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-method">
+      <div class="sec-head"><div><div class="eyebrow">方法與限制</div><h2 id="h-method">研究的資料與方法</h2></div></div>
+      <div class="cols2">
+        <div class="panel">
+          <h3>資料與清理</h3>
+          <ul class="method">
+            <li>樣本：SOL 233、XRP 221、BTC 250 個交易日，到 2026-10-02 為止。流量來自 cryptoetf.today 的分基金資料，和 Farside 逐日比對過（最大差 13 萬美元）。</li>
+            <li>XRPC 用 Canary 官網的每日流通單位 × NAV 自己算，並往前移一天到申購日（XRPC 首日 2.43 億美元的申購發生在 2025-11-13 上市當天）。不移的話 XRP 斜率從 0.42 降到 0.33，仍然顯著。</li>
+            <li>價格：幣本身在美東 16:00 的現貨價（Coinbase 美元交易對的 1 小時 K 線收盤），和 ETF 定淨值、流量記帳是同一個時點。2026-10-05 以前用 ETF 收盤，兩者的每日報酬相關約 0.9995，所以結論不變；最大的差別是 SOL：BSOL 會把質押收益加進淨值，同期 BSOL −36%、SOL 本身 −40%。市值 = 幣價 × 流通量（流通量按時間線性內插）。</li><li>ETF 上市第一天不放進主樣本（和改用幣價前相同）：XRPC 首日的 2.43 億美元等於 17 bp，是平常的 9 個標準差。若放進去，同日結論不變，但 XRP「流量 → 隔日超額報酬」的 p 會從 0.15 變成 0.006，完全來自這一天，所以不採用。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>統計方法與限制</h3>
+          <ul class="method">
+            <li>每日流量與報酬都沒有單根（ADF p &lt; 0.05）；KPSS 對 SOL 報酬、SOL 與 XRP 流量在 5% 水準拒絕平穩，表示有些持續性，所以標準誤一律用 Newey–West。對數價格與累積流量非平穩，所以只對差分序列做相關與迴歸，水平用 Engle–Granger 檢定。</li>
+            <li>同日：Pearson、Spearman、扣除 BTC 的偏相關；HAC 迴歸。預測：隔日、未來 5 日超額報酬。追漲：過去 5 日報酬對今天流量的聯合 Wald 檢定。VAR（BIC 選落後期）加 HAC 的 Granger 檢定。</li>
+            <li>檢定力：約 220–233 天的樣本，只能可靠地偵測 |r| ≥ 0.18 的關係。研究完成時 HYPE 和小幣的完整歷史還拿不到；現在所有幣都已補齊上市以來的流量，在每日追蹤分頁看得到全期相關，BTC 2024 年以來的長樣本見「BTC 研究」分頁。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>資料：cryptoetf.today、Canary Capital（流量）；Coinbase、Binance（幣價，美東 16:00）；CoinGecko（市值）。BTC 研究另用 Coin Metrics、DefiLlama、FRED、CFTC、strategy.com；研究結論另用 Farside Investors、CoinMarketCap、Interactive Brokers（ETF 收盤，只用於比對）。本頁是資料整理與統計，不是投資建議。</p>
+  </footer>
+</div>
+<div id="tip" hidden></div>
+
+<script id="page-data" type="application/json">/*DATA*/</script>
+<script id="snap-data" type="application/json">/*SNAP*/</script>
+<script>
+(function () {
+  'use strict';
+  var D = JSON.parse(document.getElementById('page-data').textContent);
+  var SNAP = JSON.parse(document.getElementById('snap-data').textContent);
+  var SITE = SNAP.mode === 'site';  // self-hosted build: everything is in the page, rebuilt every 3 hours
+  var NS = 'http://www.w3.org/2000/svg';
+  var ALTS = ['SOL', 'XRP', 'HYPE', 'ZEC', 'LINK', 'DOGE', 'AVAX', 'HBAR', 'LTC', 'SUI', 'DOT', 'NEAR', 'BNB', 'TRX'];
+  var REFS = ['BTC', 'ETH'];
+  var ALL = ALTS.concat(REFS);
+  var NAMES = { SOL: 'Solana', XRP: 'XRP', HYPE: 'Hyperliquid', ZEC: 'Zcash', LINK: 'Chainlink', DOGE: 'Dogecoin', AVAX: 'Avalanche', HBAR: 'Hedera', LTC: 'Litecoin', SUI: 'Sui', DOT: 'Polkadot', NEAR: 'NEAR', BNB: 'BNB', TRX: 'TRON', BTC: 'Bitcoin', ETH: 'Ether' };
+  var META = SNAP.meta;
+  var CANARY_PART = { SOL: 'SOLC', XRP: 'XRPC', SUI: 'SUIS' }, CANARY_ONLY = { LTC: 1, HBAR: 1, TRX: 1 };
+  var FWD_START = '2026-10-05';
+
+  // ---------------------------------------------------------------- state
+  var state = { sel: 'SOL', range: 90, mode: 'abn', sort: 'default', tab: 'track' };
+  try { var saved = JSON.parse(localStorage.getItem('etf-dash') || '{}'); if (saved.sel && ALL.indexOf(saved.sel) >= 0) state.sel = saved.sel; if ([0, 30, 90].indexOf(saved.range) >= 0) state.range = saved.range; if (saved.mode === 'raw') state.mode = 'raw'; } catch (e) { /* storage unavailable */ }
+  function remember() { try { localStorage.setItem('etf-dash', JSON.stringify({ sel: state.sel, range: state.range, mode: state.mode })); } catch (e) { /* ignore */ } }
+
+  // ---------------------------------------------------------------- formatting
+  function money(v) {
+    if (v == null || !isFinite(v)) return '—';
+    var a = Math.abs(v), s = a < 0.05 ? '' : (v > 0 ? '+' : '−');
+    return s + '$' + (a >= 1000 ? (a / 1000).toFixed(2) + 'B' : a.toFixed(1) + 'M');
+  }
+  function rf(r) { return (r == null || !isFinite(r)) ? '—' : (r < -0.005 ? '−' : '') + Math.abs(r).toFixed(2); }
+  function pf(p) { return p == null ? '—' : (p < 0.001 ? '<0.001' : p.toFixed(3)); }
+  function pct(x, d) { if (x == null || !isFinite(x)) return '—'; d = d == null ? 1 : d; return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(d) + '%'; }
+  function f1(x) { return (x == null || !isFinite(x)) ? '—' : x.toLocaleString('zh-TW', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+  function s1(x) { if (x == null || !isFinite(x)) return '—'; var v = Math.abs(x) < 0.05 ? 0 : x; return (v > 0 ? '+' : v < 0 ? '−' : '') + f1(Math.abs(v)); }
+  function price(x) { if (x == null || !isFinite(x)) return '—'; if (x >= 1000) return x.toLocaleString('en-US', { maximumFractionDigits: 0 }); if (x >= 100) return x.toFixed(1); if (x >= 1) return x.toFixed(2); if (x >= 0.1) return x.toFixed(4); return x.toFixed(5); }
+  function md(d) { return d ? (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)) : '—'; }
+  function bpf(v, signed) { if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v), t = a >= 10 ? a.toFixed(0) : (a >= 1 ? a.toFixed(1) : a.toFixed(2)); return (signed ? (v > 0 ? '+' : v < 0 ? '−' : '') : (v < 0 ? '−' : '')) + t + ' bp'; }
+  function wk(d) { return '日一二三四五六'[new Date(d + 'T12:00:00Z').getUTCDay()]; }
+  function ymd(d) { return d.slice(2, 4) + '/' + d.slice(5, 7) + '/' + d.slice(8, 10); }
+
+  // ---------------------------------------------------------------- statistics (mirrors scripts/stats.py in the repo)
+  function mean(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s / a.length; }
+  function pearson(x, y) {
+    var n = x.length; if (n < 3) return null;
+    var mx = mean(x), my = mean(y), sxy = 0, sxx = 0, syy = 0;
+    for (var i = 0; i < n; i++) { var a = x[i] - mx, b = y[i] - my; sxy += a * b; sxx += a * a; syy += b * b; }
+    if (sxx <= 0 || syy <= 0) return null;
+    return sxy / Math.sqrt(sxx * syy);
+  }
+  function beta(r, rb) {
+    if (r.length < 3) return 0;
+    var mr = mean(r), mb = mean(rb), sbb = 0, s = 0;
+    for (var i = 0; i < r.length; i++) { var b = rb[i] - mb; sbb += b * b; s += (r[i] - mr) * b; }
+    return sbb > 0 ? s / sbb : 0;
+  }
+  function triples(x, r, rb, lo, hi) { var o = []; for (var i = Math.max(lo, 0); i <= hi; i++) if (x[i] != null && r[i] != null && rb[i] != null) o.push(i); return o; }
+  function ys(r, rb, idx, mode, isB) {
+    if (mode === 'raw' || isB) return { y: idx.map(function (i) { return r[i]; }), b: 0 };
+    var b = beta(idx.map(function (i) { return r[i]; }), idx.map(function (i) { return rb[i]; }));
+    return { y: idx.map(function (i) { return r[i] - b * rb[i]; }), b: b };
+  }
+  function nonzero(xs) { var k = 0; for (var i = 0; i < xs.length; i++) if (Math.abs(xs[i]) > 1e-12) k++; return k; }
+  function corrSample(x, r, rb, lo, hi, mode, isB) {
+    var idx = triples(x, r, rb, lo, hi);
+    if (idx.length < 3) return { r: null, n: idx.length, nz: 0 };
+    var xs = idx.map(function (i) { return x[i]; });
+    return { r: pearson(xs, ys(r, rb, idx, mode, isB).y), n: idx.length, nz: nonzero(xs) };
+  }
+  // a window counts when 2/3 of its days have data and at least w/6 of them had a non-zero flow
+  function rolling(x, r, rb, w, mode, isB) {
+    var need = Math.ceil(w * 2 / 3), needNZ = Math.ceil(w / 6), out = [];
+    for (var t = 0; t < x.length; t++) {
+      if (t + 1 < w) { out.push(null); continue; }
+      var c = corrSample(x, r, rb, t - w + 1, t, mode, isB);
+      out.push(c.n >= need && c.nz >= needNZ ? c.r : null);
+    }
+    return out;
+  }
+  function erfc(x) {
+    var z = Math.abs(x), t = 1 / (1 + 0.5 * z);
+    var r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+    return x >= 0 ? r : 2 - r;
+  }
+  function hacTest(xv, yv, L) {
+    var n = xv.length; L = L || 4; if (n < 10) return null;
+    var mx = mean(xv), my = mean(yv), sx = 0, sy = 0, i;
+    for (i = 0; i < n; i++) { sx += (xv[i] - mx) * (xv[i] - mx); sy += (yv[i] - my) * (yv[i] - my); }
+    sx = Math.sqrt(sx / n); sy = Math.sqrt(sy / n); if (sx <= 0 || sy <= 0) return null;
+    var zx = xv.map(function (a) { return (a - mx) / sx; }), zy = yv.map(function (b) { return (b - my) / sy; });
+    var b = 0; for (i = 0; i < n; i++) b += zx[i] * zy[i]; b /= n;
+    var u = []; for (i = 0; i < n; i++) u.push(zx[i] * (zy[i] - b * zx[i]));
+    var s = 0; for (i = 0; i < n; i++) s += u[i] * u[i];
+    for (var l = 1; l <= L; l++) { var w = 1 - l / (L + 1), acc = 0; for (i = l; i < n; i++) acc += u[i] * u[i - l]; s += 2 * w * acc; }
+    // never below the classical standard error, so a few extreme flow days cannot make a tiny r look significant
+    var se = Math.max(Math.sqrt(Math.max(s / (n * n) * n / (n - 2), 1e-300)), Math.sqrt(Math.max(1 - b * b, 0) / (n - 2))), z = b / se;
+    return { r: b, se: se, p: erfc(Math.abs(z) / Math.SQRT2), lo: b - 1.96 * se, hi: b + 1.96 * se, n: n };
+  }
+  // r is shown from 10 days with 5 flow days; the test, interval and q need 30 days with 10 flow days
+  function fullTest(x, r, rb, lo, hi, mode, isB) {
+    var idx = triples(x, r, rb, lo, hi); if (idx.length < 10) return null;
+    var xs = idx.map(function (i) { return x[i]; }), nz = nonzero(xs); if (nz < 5) return null;
+    var Y = ys(r, rb, idx, mode, isB), res = hacTest(xs, Y.y, 4);
+    if (res) { res.beta = Y.b; res.nz = nz; res.small = idx.length < 30 || nz < 10; }
+    return res;
+  }
+  function leadLag(x, r, rb, lo, hi, kmax, mode, isB) {
+    var idx = triples(x, r, rb, lo, hi); if (idx.length < 10 || nonzero(idx.map(function (i) { return x[i]; })) < 5) return [];
+    var b = (mode === 'raw' || isB) ? 0 : beta(idx.map(function (i) { return r[i]; }), idx.map(function (i) { return rb[i]; }));
+    var y = r.map(function (v, i) { return (v == null || rb[i] == null) ? null : v - b * rb[i]; }), out = [];
+    for (var k = -kmax; k <= kmax; k++) {
+      var xs = [], yv = [];
+      for (var t = Math.max(lo, 0); t <= hi; t++) { var s = t + k; if (s >= lo && s <= hi && s < y.length && x[t] != null && y[s] != null) { xs.push(x[t]); yv.push(y[s]); } }
+      out.push({ k: k, r: xs.length >= 10 ? pearson(xs, yv) : null, n: xs.length });
+    }
+    return out;
+  }
+  // who leads whom on the full sample (mirrors stats.leadlag_tests)
+  function leadlagTests(x, r, rb, lag, mode, isB) {
+    var n = x.length, idx = triples(x, r, rb, 0, n - 1);
+    if (idx.length < 10) return {};
+    var b = (mode === 'raw' || isB) ? 0 : beta(idx.map(function (i) { return r[i]; }), idx.map(function (i) { return rb[i]; }));
+    var y = r.map(function (v, i) { return (v == null || rb[i] == null) ? null : v - b * rb[i]; });
+    function ysum(a, z) { if (a < 0 || z >= n) return null; var s = 0; for (var i = a; i <= z; i++) { if (y[i] == null) return null; s += y[i]; } return s; }
+    var specs = [
+      ['same_day', function (i) { return [x[i], y[i]]; }, 4, 0],
+      ['next_day', function (i) { return [x[i], i + 1 < n ? y[i + 1] : null]; }, 4, 0],
+      ['tradable_1d', function (i) { return [x[i], i + lag + 1 < n ? y[i + lag + 1] : null]; }, 4, 0],
+      ['tradable_5d', function (i) { return [x[i], ysum(i + lag + 1, i + lag + 5)]; }, 5, 0],
+      ['chase_1d', function (i) { return [i >= 1 ? y[i - 1] : null, x[i]]; }, 4, 1],
+      ['chase_5d', function (i) { return [ysum(i - 5, i - 1), x[i]]; }, 5, 1]
+    ], out = {};
+    specs.forEach(function (sp) {
+      var a = [], c = [];
+      for (var i = 0; i < n; i++) { var pr = sp[1](i); if (pr[0] != null && pr[1] != null) { a.push(pr[0]); c.push(pr[1]); } }
+      out[sp[0]] = (a.length < 30 || nonzero(sp[3] ? c : a) < 10) ? null : hacTest(a, c, sp[2]);
+    });
+    return out;
+  }
+
+  // ---------------------------------------------------------------- trading rules (mirrors scripts/strategies.py)
+  var RULES = ['FF', 'FZ', 'FM5', 'TR20', 'TF'], COST = 0.0010;
+  var RULE_NAME = { FF: '跟著流入', FZ: '強流入', FM5: '5 日流量', TR20: '價格趨勢', TF: '趨勢＋流量' };
+  function zscoreAt(K, t) {
+    var hist = []; for (var i = Math.max(0, t - 60); i < t; i++) if (K[i] != null) hist.push(K[i]);
+    if (K[t] == null || hist.length < 20) return null;
+    var m = 0; hist.forEach(function (v) { m += v; }); m /= hist.length;
+    var ss = 0; hist.forEach(function (v) { ss += (v - m) * (v - m); });
+    var sd = Math.sqrt(ss / (hist.length - 1));
+    return sd > 0 ? (K[t] - m) / sd : null;
+  }
+  function sum5(K, t) { if (t < 4) return null; var s = 0; for (var i = t - 4; i <= t; i++) { if (K[i] == null) return null; s += K[i]; } return s; }
+  function ruleSignals(K, P, lag) {
+    var n = P.length, out = {};
+    RULES.forEach(function (r) { out[r] = new Array(n).fill(null); });
+    for (var d = 0; d < n; d++) {
+      var t = d - lag;
+      if (t >= 0 && K[t] != null) {
+        out.FF[d] = K[t] > 0 ? 1 : 0;
+        var z = zscoreAt(K, t); out.FZ[d] = z == null ? null : (z > 1 ? 1 : 0);
+        var s5 = sum5(K, t); out.FM5[d] = s5 == null ? null : (s5 > 0 ? 1 : 0);
+      }
+      if (d >= 20 && P[d] != null && P[d - 20] != null) out.TR20[d] = P[d] / P[d - 20] > 1 ? 1 : 0;
+      if (out.TR20[d] != null && out.FM5[d] != null) out.TF[d] = out.TR20[d] * out.FM5[d];
+    }
+    return out;
+  }
+  function backtest(sig, R) {
+    var n = R.length, net = new Array(n).fill(null), bhr = new Array(n).fill(null), prev = null, prevBh = null;
+    for (var d = 0; d < n - 1; d++) {
+      var s = sig[d], r = R[d + 1];
+      if (s == null || r == null) { if (s == null) prev = null; continue; }
+      var turn = Math.abs(s - (prev != null ? prev : 0));
+      net[d + 1] = s * r - turn * COST;
+      bhr[d + 1] = r - (prevBh == null ? COST : 0);
+      prev = s; prevBh = 1;
+    }
+    return { net: net, bh: bhr };
+  }
+  function perf(rets) {
+    var v = rets.filter(function (x) { return x != null; }); if (v.length < 20) return null;
+    var m = 0; v.forEach(function (x) { m += x; }); m /= v.length;
+    var ss = 0; v.forEach(function (x) { ss += (x - m) * (x - m); }); var sd = Math.sqrt(ss / (v.length - 1));
+    var cum = 0, peak = 1, dd = 0;
+    v.forEach(function (x) { cum += x; var eq = Math.exp(cum); peak = Math.max(peak, eq); dd = Math.min(dd, eq / peak - 1); });
+    return { n: v.length, ann_ret: Math.expm1(m * 252), sharpe: sd > 0 ? m / sd * Math.sqrt(252) : null, max_dd: dd, total: Math.expm1(cum) };
+  }
+  function hacSlope(s, y, lags) {
+    var n = s.length; if (n < 10) return null;
+    var ms = 0, my = 0, i; for (i = 0; i < n; i++) { ms += s[i]; my += y[i]; } ms /= n; my /= n;
+    var sxx = 0; for (i = 0; i < n; i++) sxx += (s[i] - ms) * (s[i] - ms); if (sxx <= 0) return null;
+    var sxy = 0; for (i = 0; i < n; i++) sxy += (s[i] - ms) * (y[i] - my);
+    var b = sxy / sxx, a0 = my - b * ms, e = [], u = [];
+    for (i = 0; i < n; i++) { e.push(y[i] - a0 - b * s[i]); u.push((s[i] - ms) * e[i]); }
+    var S = 0; for (i = 0; i < n; i++) S += u[i] * u[i];
+    for (var l = 1; l <= lags; l++) { var w = 1 - l / (lags + 1), acc = 0; for (i = l; i < n; i++) acc += u[i] * u[i - l]; S += 2 * w * acc; }
+    var ee = 0; for (i = 0; i < n; i++) ee += e[i] * e[i];
+    var se = Math.sqrt(Math.max(S / (sxx * sxx) * n / (n - 2), ee / (n - 2) / sxx, 1e-300)), z = b / se;
+    return { diff: b, se: se, t: z, p: erfc(Math.abs(z) / Math.SQRT2), n: n };
+  }
+  function timing(sig, Y) {
+    var s = [], y = [];
+    for (var d = 0; d < sig.length - 1; d++) if (sig[d] != null && Y[d + 1] != null) { s.push(sig[d]); y.push(Y[d + 1]); }
+    var on = 0; s.forEach(function (v) { on += v; });
+    if (s.length < 40 || on < 8 || s.length - on < 8) return null;
+    var res = hacSlope(s, y, 5); if (!res) return null;
+    var so = 0, sf = 0; for (var i = 0; i < s.length; i++) { if (s[i]) so += y[i]; else sf += y[i]; }
+    res.n_on = on; res.mean_on = so / on; res.mean_off = sf / (s.length - on);
+    return res;
+  }
+  function hedged(R, RB) {
+    var out = new Array(R.length).fill(null), sx = 0, sy = 0, sxy = 0, sxx = 0, k = 0;
+    for (var i = 0; i < R.length; i++) {
+      if (R[i] != null && RB[i] != null && k >= 20) {
+        var mb = sx / k, mr = sy / k, v = sxx / k - mb * mb, bt = v > 0 ? (sxy / k - mb * mr) / v : 0;
+        out[i] = R[i] - bt * RB[i];
+      }
+      if (R[i] != null && RB[i] != null) { sx += RB[i]; sy += R[i]; sxy += RB[i] * R[i]; sxx += RB[i] * RB[i]; k++; }
+    }
+    return out;
+  }
+  function basketRet(Rs) {
+    var n = Rs[0].length, out = new Array(n).fill(null);
+    for (var i = 0; i < n; i++) { var s = 0, c = 0; Rs.forEach(function (R) { if (R[i] != null) { s += Math.exp(R[i]); c++; } }); if (c) out[i] = Math.log(s / c); }
+    return out;
+  }
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function rotationCheck(tests, iters, seed) {
+    var ts = tests.map(function (t) { return Math.abs(t.t); }); if (!ts.length) return null;
+    var obs = Math.max.apply(null, ts), rnd = mulberry32(seed), exceed = 0;
+    for (var it = 0; it < iters; it++) {
+      var shifts = {}, best = 0;
+      tests.forEach(function (t) {
+        var n = t.Y.length;
+        if (!(t.group in shifts)) shifts[t.group] = 20 + Math.floor(rnd() * (n - 40));
+        var k = shifts[t.group], Y = t.Y.slice(k).concat(t.Y.slice(0, k)), r = timing(t.sig, Y);
+        if (r && Math.abs(r.t) > best) best = Math.abs(r.t);
+      });
+      if (best >= obs) exceed++;
+    }
+    return { max_abs_t: obs, p_adjusted: (exceed + 1) / (iters + 1), iters: iters, n_tests: ts.length };
+  }
+
+  function bh(p) {
+    var items = []; p.forEach(function (v, i) { if (v != null) items.push([v, i]); });
+    items.sort(function (a, b) { return a[0] - b[0]; });
+    var m = items.length, q = p.map(function () { return null; }), prev = 1;
+    for (var rank = m; rank >= 1; rank--) { var it = items[rank - 1]; prev = Math.min(prev, it[0] * m / rank); q[it[1]] = prev; }
+    return q;
+  }
+  function quantile(v, qq) { var a = v.slice().sort(function (x, y) { return x - y; }); if (!a.length) return null; var pos = (a.length - 1) * qq, lo = Math.floor(pos), hi = Math.ceil(pos); return a[lo] + (a[hi] - a[lo]) * (pos - lo); }
+
+  // ---------------------------------------------------------------- data: snapshot + live database
+  var snapByDate = {};
+  SNAP.dates.forEach(function (d, i) {
+    var day = {};
+    ALL.forEach(function (s) {
+      var c = SNAP.coins[s]; if (!c) return;
+      var e = {};
+      if (c.f[i] != null) e.flow = c.f[i];
+      if (c.c && c.c[i] != null) e.close = c.c[i];
+      if (c.x && c.x[i] != null) e.px = c.x[i];
+      if (c.m && c.m[i] != null) e.mcap = c.m[i];
+      if (c.p && c.p[i]) e.pending = c.p[i];
+      if (c.funds) { var fu = {}, any = false; Object.keys(c.funds).forEach(function (t) { var v = c.funds[t][i]; if (v != null && v !== 0) { fu[t] = v; any = true; } }); if (any) e.funds = fu; }
+      if (Object.keys(e).length) day[s] = e;
+    });
+    snapByDate[d] = day;
+  });
+  var dbByDate = null, lastRun = null, dbState = 'connecting';
+
+  var M = null; // model
+  function buildModel() {
+    var byDate = {}, d;
+    for (d in snapByDate) byDate[d] = Object.assign({}, snapByDate[d]);
+    if (dbByDate) for (d in dbByDate) { byDate[d] = Object.assign({}, byDate[d] || {}); var dc = dbByDate[d]; for (var s in dc) byDate[d][s] = dc[s]; }
+    var dates = Object.keys(byDate).sort();
+    var C = {};
+    ALL.forEach(function (s) {
+      var F = [], P = [], E = [], MC = [], pend = [], funds = [];
+      dates.forEach(function (dd) { var e = byDate[dd][s]; F.push(e && typeof e.flow === 'number' ? e.flow : null); P.push(e && typeof e.px === 'number' ? e.px : null); E.push(e && typeof e.close === 'number' ? e.close : null); MC.push(e && typeof e.mcap === 'number' && e.mcap > 0 ? e.mcap : null); pend.push(e && e.pending ? String(e.pending) : null); funds.push(e && e.funds ? e.funds : null); });
+      // X = net flow as a share of the coin's market cap at about the previous close, in bp (mirrors make_docs.series_for)
+      var R = [null], X = [null];
+      for (var i = 1; i < dates.length; i++) {
+        R.push(P[i] != null && P[i - 1] != null && P[i - 1] > 0 ? Math.log(P[i] / P[i - 1]) : null);
+        X.push(F[i] != null && MC[i] != null && !pend[i] ? F[i] / MC[i] * 1e4 : null);
+      }
+      // flow as first published: Canary's SOLC/XRPC part and Canary-only coins arrive a day later
+      var K = F.map(function (f, i) {
+        if (f == null) return null;
+        if (CANARY_PART[s]) { var fu = funds[i]; return f - ((fu && fu[CANARY_PART[s]]) || 0); }
+        return pend[i] ? null : f;
+      });
+      // trading backtests count a coin only from its first ETF day (the coin price exists before that)
+      var L0 = META[s].launch, RL = R.map(function (r, i) { return r != null && dates[i] >= L0 ? r : null; });
+      C[s] = { F: F, P: P, E: E, MC: MC, R: R, RL: RL, X: X, K: K, lag: CANARY_ONLY[s] ? 2 : 1, pend: pend, funds: funds };
+    });
+    M = { dates: dates, C: C, stats: {}, trading: null };
+  }
+  function lastIdx(arr, from) { for (var i = (from == null ? arr.length - 1 : from); i >= 0; i--) if (arr[i] != null) return i; return -1; }
+  function firstIdx(arr) { for (var i = 0; i < arr.length; i++) if (arr[i] != null) return i; return -1; }
+  function sumWin(F, end, w) { var s = 0, n = 0; for (var i = Math.max(0, end - w + 1); i <= end; i++) if (F[i] != null) { s += F[i]; n++; } return { s: s, n: n }; }
+
+  function coinStats(s) {
+    var key = s + '|' + state.mode; if (M.stats[key]) return M.stats[key];
+    var c = M.C[s], RB = M.C.BTC.R, n = M.dates.length, isB = s === 'BTC';
+    var li = lastIdx(c.F), fi = firstIdx(c.F), lp = -1;
+    for (var i = n - 1; i > li; i--) if (c.pend[i]) { lp = i; break; }
+    var st = { li: li, fi: fi, pendNext: lp >= 0 ? { date: M.dates[lp], fund: c.pend[lp] } : null };
+    if (li >= 0) {
+      st.date = M.dates[li]; st.v = c.F[li]; st.pend = c.pend[li];
+      st.w5 = sumWin(c.F, li, 5); st.w20 = sumWin(c.F, li, 20);
+      st.cum = sumWin(c.F, li, li - fi + 1).s;
+      var hist = c.F.slice(fi, li + 1).filter(function (v) { return v != null; });
+      st.nFlow = hist.length;
+      st.q90 = hist.length >= 60 ? quantile(hist, 0.9) : null;
+      st.big = st.q90 != null && st.v != null && st.v > 0 && st.v >= st.q90;
+      st.spark = []; for (var k = Math.max(0, li - 19); k <= li; k++) st.spark.push(c.F[k]);
+      var xa = c.X.filter(function (v) { return v != null; });
+      st.flowBp = xa.length ? xa.reduce(function (a, v) { return a + Math.abs(v); }, 0) / xa.length : null;
+      st.nX = xa.length;
+      st.lastBp = c.MC[li] ? c.F[li] / c.MC[li] * 1e4 : null;
+      var mcl = lastIdx(c.MC); st.cumPct = mcl >= 0 ? st.cum / c.MC[mcl] * 100 : null;
+    }
+    var pi = lastIdx(c.P); st.pi = pi;
+    if (pi > 0) { st.close = c.P[pi]; st.chg = c.R[pi] != null ? (Math.exp(c.R[pi]) - 1) * 100 : null; st.pdate = M.dates[pi]; }
+    st.full = fullTest(c.X, c.R, RB, 0, n - 1, state.mode, isB);
+    st.r60 = rolling(c.X, c.R, RB, 60, state.mode, isB);
+    st.r30 = rolling(c.X, c.R, RB, 30, state.mode, isB);
+    var e60 = lastIdx(st.r60), e30 = lastIdx(st.r30);
+    st.r60now = e60 >= 0 && e60 >= n - 3 ? st.r60[e60] : null; st.r60i = e60;
+    st.r30now = e30 >= 0 && e30 >= n - 3 ? st.r30[e30] : null;
+    st.r60wk = e60 >= 5 ? st.r60[e60 - 5] : null;
+    st.n60 = e60 >= 0 ? corrSample(c.X, c.R, RB, e60 - 59, e60, state.mode, isB).n : 0;
+    st.ll = leadLag(c.X, c.R, RB, 0, n - 1, 1, state.mode, isB);
+    st.lt = leadlagTests(c.X, c.R, RB, c.lag, state.mode, isB);
+    M.stats[key] = st; return st;
+  }
+
+  // ---------------------------------------------------------------- svg + tooltip helpers
+  function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function txt(parent, x, y, s, o) {
+    o = o || {};
+    var t = el('text', { x: x, y: y, 'text-anchor': o.anchor || 'middle' }, parent);
+    t.style.fill = o.color || 'var(--muted)'; t.style.fontSize = (o.size || 11) + 'px';
+    t.style.fontFamily = o.mono === false ? 'var(--font-body)' : 'var(--font-mono)';
+    if (o.weight) t.style.fontWeight = o.weight;
+    t.textContent = s; return t;
+  }
+  function nice(min, max, n) {
+    if (!isFinite(min) || !isFinite(max)) { min = 0; max = 1; }
+    if (min === max) { min -= 1; max += 1; }
+    var span = max - min, step = Math.pow(10, Math.floor(Math.log10(span / n))), err = span / n / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var lo = Math.floor(min / step + 1e-9) * step, hi = Math.ceil(max / step - 1e-9) * step, t = [];
+    for (var v = lo; v <= hi + step / 2; v += step) t.push(+(Math.round(v / step) * step).toFixed(10));
+    return { lo: lo, hi: hi, ticks: t, step: step };
+  }
+  function barPath(x, y0, y1, w, r) {
+    var h = Math.abs(y1 - y0); r = Math.min(r, h, w / 2);
+    if (h < 0.5) return 'M' + x + ',' + y0 + 'h' + w;
+    if (y1 < y0) return 'M' + x + ',' + y0 + 'V' + (y1 + r) + 'Q' + x + ',' + y1 + ' ' + (x + r) + ',' + y1 + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y1 + ' ' + (x + w) + ',' + (y1 + r) + 'V' + y0 + 'Z';
+    return 'M' + x + ',' + y0 + 'V' + (y1 - r) + 'Q' + x + ',' + y1 + ' ' + (x + r) + ',' + y1 + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y1 + ' ' + (x + w) + ',' + (y1 - r) + 'V' + y0 + 'Z';
+  }
+  var tip = document.getElementById('tip');
+  function showTip(evt, head, rows) {
+    tip.replaceChildren();
+    var h = document.createElement('div'); h.className = 't-head'; h.textContent = head; tip.appendChild(h);
+    rows.forEach(function (r) {
+      var row = document.createElement('div'); row.className = 't-row';
+      if (r.color) { var k = document.createElement('span'); k.className = 'key'; k.style.background = r.color; row.appendChild(k); }
+      var v = document.createElement('span'); v.className = 't-val'; v.textContent = r.value; row.appendChild(v);
+      var l = document.createElement('span'); l.className = 't-lab'; l.textContent = r.label || ''; row.appendChild(l);
+      tip.appendChild(row);
+    });
+    tip.hidden = false;
+    var x, y;
+    if (evt && evt.clientX != null && evt.type !== 'focus') { x = evt.clientX; y = evt.clientY; }
+    else { var b = (evt && evt.target ? evt.target : document.body).getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; }
+    var tw = tip.offsetWidth, th = tip.offsetHeight, vw = window.innerWidth;
+    var left = Math.min(Math.max(8, x + 12), vw - tw - 8), top = y - th - 12; if (top < 8) top = y + 16;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
+  }
+  function hideTip() { tip.hidden = true; }
+  function xTicks(n, every) { var out = {}, step = every || Math.max(1, Math.ceil(n / 6)); for (var i = 0; i < n; i += step) out[i] = 1; if (n) out[n - 1] = 1; if (n > step) { var prev = n - 1 - ((n - 1) % step); if (n - 1 - prev < step * 0.6 && prev !== n - 1) delete out[prev]; } return out; }
+
+  // signed bars: one series, sign by direction (flows) or one colour (research charts)
+  function barChart(host, cfg) {
+    host.replaceChildren();
+    var W = Math.max(260, host.clientWidth || 600), H = cfg.height || 190, m = { t: 12, r: 10, b: 26, l: cfg.left || 50 };
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H }, host);
+    var vals = cfg.values.map(function (v) { return v == null ? 0 : v; });
+    var mn = cfg.domain ? cfg.domain[0] : Math.min(0, Math.min.apply(null, vals)), mx = cfg.domain ? cfg.domain[1] : Math.max(0, Math.max.apply(null, vals));
+    var sc = nice(mn, mx, 4);
+    var y = function (v) { return m.t + (sc.hi - v) / (sc.hi - sc.lo) * (H - m.t - m.b); };
+    sc.ticks.forEach(function (t) {
+      var yy = y(t), g = el('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy }, svg);
+      g.style.stroke = t === 0 ? 'var(--axis)' : 'var(--hair)'; g.style.strokeWidth = 1;
+      txt(svg, m.l - 6, yy + 3.5, cfg.yFmt ? cfg.yFmt(t) : String(t), { anchor: 'end', size: 10.5 });
+    });
+    if (cfg.before) cfg.before(svg, { y: y, m: m, W: W, H: H });
+    var n = vals.length, band = (W - m.l - m.r) / Math.max(n, 1), gap = band > 6 ? 2 : (band > 3 ? 1 : 0.4);
+    var bw = Math.min(24, Math.max(0.8, band - gap)), y0 = y(0), marks = [];
+    vals.forEach(function (v, i) {
+      var x = m.l + i * band + (band - bw) / 2, isNull = cfg.values[i] == null;
+      var p = el('path', { d: barPath(x, y0, y(v), bw, Math.min(3, bw / 2)) }, svg);
+      p.style.fill = isNull ? 'transparent' : (cfg.colorAt ? cfg.colorAt(i, v) : (cfg.color || (v >= 0 ? 'var(--pos)' : 'var(--neg)')));
+      p.style.opacity = cfg.opacityAt ? cfg.opacityAt(i) : 1;
+      marks.push(p);
+    });
+    var every = cfg.xEvery, ticks = cfg.xShow ? null : xTicks(n, every);
+    cfg.labels.forEach(function (lab, i) { if (cfg.xShow ? cfg.xShow(i) : ticks[i]) txt(svg, m.l + i * band + band / 2, H - 8, cfg.xFmt ? cfg.xFmt(lab) : lab, { size: 10.5, anchor: (!cfg.xShow && i === n - 1 && n > 8) ? 'end' : 'middle' }); });
+    var cross = el('line', { y1: m.t, y2: H - m.b, x1: -10, x2: -10 }, svg); cross.style.stroke = 'var(--muted)'; cross.style.strokeWidth = 1; cross.style.opacity = 0; cross.style.pointerEvents = 'none';
+    var hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent', tabindex: 0 }, svg);
+    hit.setAttribute('aria-label', cfg.aria || '長條圖，左右鍵逐日查看');
+    var cur = n - 1, lit = null;
+    function at(i, e) {
+      cur = Math.max(0, Math.min(n - 1, i));
+      if (lit) lit.style.filter = ''; lit = marks[cur]; if (lit) lit.style.filter = 'brightness(1.3)';
+      var cx = m.l + cur * band + band / 2; cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); cross.style.opacity = cfg.crosshair ? 0.6 : 0;
+      if (cfg.onCross) cfg.onCross(cur);
+      showTip(e, cfg.tipHead ? cfg.tipHead(cur) : cfg.labels[cur], cfg.tipRows(cur));
+    }
+    hit.addEventListener('pointermove', function (e) { var r = svg.getBoundingClientRect(); var px = (e.clientX - r.left) * (W / r.width); at(Math.floor((px - m.l) / band), e); });
+    hit.addEventListener('pointerleave', function () { if (lit) lit.style.filter = ''; cross.style.opacity = 0; hideTip(); if (cfg.onCross) cfg.onCross(null); });
+    hit.addEventListener('focus', function (e) { at(cur, e); });
+    hit.addEventListener('blur', function () { if (lit) lit.style.filter = ''; cross.style.opacity = 0; hideTip(); });
+    hit.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') { at(cur - 1, { target: hit }); e.preventDefault(); } if (e.key === 'ArrowRight') { at(cur + 1, { target: hit }); e.preventDefault(); } });
+    if (cfg.after) cfg.after(svg, { y: y, m: m, W: W, H: H, band: band });
+    return { setCross: function (i) { if (i == null) { cross.style.opacity = 0; return; } var cx = m.l + i * band + band / 2; cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); cross.style.opacity = 0.6; } };
+  }
+
+  // lines on one axis, optional band, synced crosshair
+  function lineChart(host, cfg) {
+    host.replaceChildren();
+    var W = Math.max(260, host.clientWidth || 600), H = cfg.height || 220, m = { t: 14, r: cfg.rightPad == null ? 14 : cfg.rightPad, b: 26, l: cfg.left || 50 };
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H }, host);
+    var all = []; cfg.series.forEach(function (s) { s.y.forEach(function (v) { if (v != null) all.push(v); }); });
+    if (cfg.band) { all.push(cfg.band[0], cfg.band[1]); }
+    if (cfg.includeZero) all.push(0);
+    var sc = cfg.domain ? nice(cfg.domain[0], cfg.domain[1], 4) : nice(all.length ? Math.min.apply(null, all) : 0, all.length ? Math.max.apply(null, all) : 1, 4);
+    var n = cfg.x.length;
+    var xs = function (i) { return m.l + (n === 1 ? (W - m.l - m.r) / 2 : i / (n - 1) * (W - m.l - m.r)); };
+    var y = function (v) { return m.t + (sc.hi - v) / (sc.hi - sc.lo) * (H - m.t - m.b); };
+    if (cfg.band) { var bnd = el('rect', { x: m.l, width: W - m.l - m.r, y: y(cfg.band[1]), height: Math.max(0, y(cfg.band[0]) - y(cfg.band[1])) }, svg); bnd.style.fill = 'var(--band)'; }
+    sc.ticks.forEach(function (t) {
+      var yy = y(t), g = el('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy }, svg);
+      g.style.stroke = (t === 0 && (cfg.includeZero || cfg.band)) ? 'var(--axis)' : 'var(--hair)'; g.style.strokeWidth = 1;
+      txt(svg, m.l - 6, yy + 3.5, cfg.yFmt ? cfg.yFmt(t) : String(t), { anchor: 'end', size: 10.5 });
+    });
+    if (cfg.vline != null) { var vl = el('line', { x1: xs(cfg.vline), x2: xs(cfg.vline), y1: m.t, y2: H - m.b }, svg); vl.style.stroke = 'var(--axis)'; vl.style.strokeWidth = 1; }
+    cfg.series.forEach(function (s) {
+      var d = '', started = false, pts = 0;
+      s.y.forEach(function (v, i) { if (v == null) { started = false; return; } d += (started ? 'L' : 'M') + xs(i).toFixed(1) + ',' + y(v).toFixed(1); started = true; pts++; });
+      if (!pts) return;
+      if (s.area) {
+        var fi = s.y.findIndex(function (v) { return v != null; }), li2 = s.y.length - 1; while (li2 > 0 && s.y[li2] == null) li2--;
+        var base = y(Math.max(sc.lo, 0));
+        var a = el('path', { d: d + 'L' + xs(li2) + ',' + base + 'L' + xs(fi) + ',' + base + 'Z' }, svg); a.style.fill = s.color; a.style.opacity = 0.10;
+      }
+      var p = el('path', { d: d, fill: 'none' }, svg); p.style.stroke = s.color; p.style.strokeWidth = s.width || 2; p.style.strokeLinejoin = 'round'; p.style.strokeLinecap = 'round';
+      var li = s.y.length - 1; while (li > 0 && s.y[li] == null) li--;
+      if (s.y[li] != null && s.dot !== false) { var c = el('circle', { cx: xs(li), cy: y(s.y[li]), r: 4 }, svg); c.style.fill = s.color; c.style.stroke = 'var(--ring)'; c.style.strokeWidth = 2; }
+      if (s.endLabel && s.y[li] != null) txt(svg, xs(li) + 8, y(s.y[li]) + 4, s.endLabel, { anchor: 'start', color: 'var(--ink-2)', size: 11 });
+    });
+    var ticks = cfg.xShow ? null : xTicks(n, cfg.xEvery);
+    cfg.x.forEach(function (lab, i) { if (cfg.xShow ? cfg.xShow(i) : ticks[i]) txt(svg, xs(i), H - 8, cfg.xFmt ? cfg.xFmt(lab) : lab, { size: 10.5, anchor: (!cfg.xShow && i === n - 1 && n > 8 && !cfg.rightPad) ? 'end' : 'middle' }); });
+    var cross = el('line', { y1: m.t, y2: H - m.b, x1: -10, x2: -10 }, svg); cross.style.stroke = 'var(--muted)'; cross.style.strokeWidth = 1; cross.style.opacity = 0; cross.style.pointerEvents = 'none';
+    var hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent', tabindex: 0 }, svg);
+    hit.setAttribute('aria-label', cfg.aria || '折線圖，左右鍵逐日查看');
+    var cur = n - 1;
+    function at(i, e) {
+      cur = Math.max(0, Math.min(n - 1, i));
+      cross.setAttribute('x1', xs(cur)); cross.setAttribute('x2', xs(cur)); cross.style.opacity = 1;
+      if (cfg.onCross) cfg.onCross(cur);
+      var rows = cfg.tipRows ? cfg.tipRows(cur) : cfg.series.map(function (s) { return { color: s.color, value: s.y[cur] == null ? '—' : (cfg.tipFmt ? cfg.tipFmt(s.y[cur]) : s.y[cur]), label: s.name }; });
+      showTip(e, cfg.tipHead ? cfg.tipHead(cur) : String(cfg.x[cur]), rows);
+    }
+    hit.addEventListener('pointermove', function (e) { var r = svg.getBoundingClientRect(); var px = (e.clientX - r.left) * (W / r.width); at(Math.round((px - m.l) / ((W - m.l - m.r) / Math.max(1, n - 1))), e); });
+    hit.addEventListener('pointerleave', function () { cross.style.opacity = 0; hideTip(); if (cfg.onCross) cfg.onCross(null); });
+    hit.addEventListener('focus', function (e) { at(cur, e); });
+    hit.addEventListener('blur', function () { cross.style.opacity = 0; hideTip(); });
+    hit.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') { at(cur - 1, { target: hit }); e.preventDefault(); } if (e.key === 'ArrowRight') { at(cur + 1, { target: hit }); e.preventDefault(); } });
+    return { setCross: function (i) { if (i == null) { cross.style.opacity = 0; return; } cross.setAttribute('x1', xs(i)); cross.setAttribute('x2', xs(i)); cross.style.opacity = 1; } };
+  }
+
+  function ciChart(host, rows, fmt) {
+    host.replaceChildren();
+    var W = Math.max(260, host.clientWidth || 500), rowH = 38, H = rows.length * rowH + 34, m = { l: 48, r: 18, t: 8, b: 26 };
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H }, host);
+    var lo = Math.min(0, Math.min.apply(null, rows.map(function (r) { return r.lo; }))), hi = Math.max.apply(null, rows.map(function (r) { return r.hi; }));
+    var sc = nice(lo, hi, 4), x = function (v) { return m.l + (v - sc.lo) / (sc.hi - sc.lo) * (W - m.l - m.r); };
+    sc.ticks.forEach(function (t) { var g = el('line', { x1: x(t), x2: x(t), y1: m.t, y2: H - m.b }, svg); g.style.stroke = t === 0 ? 'var(--axis)' : 'var(--hair)'; g.style.strokeWidth = 1; txt(svg, x(t), H - 8, fmt(t), { size: 10.5 }); });
+    rows.forEach(function (r, i) {
+      var yy = m.t + i * rowH + rowH / 2;
+      txt(svg, m.l - 10, yy + 4, r.name, { anchor: 'end', color: 'var(--ink)', size: 12, weight: 600 });
+      var w = el('line', { x1: x(r.lo), x2: x(r.hi), y1: yy, y2: yy }, svg); w.style.stroke = r.color; w.style.strokeWidth = 2; w.style.strokeLinecap = 'round';
+      var c = el('circle', { cx: x(r.v), cy: yy, r: 5 }, svg); c.style.fill = r.color; c.style.stroke = 'var(--ring)'; c.style.strokeWidth = 2;
+      txt(svg, Math.min(Math.max(x(r.v), m.l + 20), W - m.r - 20), yy - 10, fmt(r.v), { color: 'var(--ink-2)', size: 11 });
+      var hit = el('rect', { x: m.l, y: yy - rowH / 2, width: W - m.l - m.r, height: rowH, fill: 'transparent', tabindex: 0 }, svg);
+      hit.setAttribute('aria-label', r.name + ' ' + fmt(r.v) + '，95% 區間 ' + fmt(r.lo) + ' 到 ' + fmt(r.hi));
+      var on = function (e) { showTip(e, r.name, [{ color: r.color, value: fmt(r.v), label: '估計值' }, { value: fmt(r.lo) + ' ~ ' + fmt(r.hi), label: '95% 信賴區間' }]); };
+      hit.addEventListener('pointermove', on); hit.addEventListener('pointerleave', hideTip); hit.addEventListener('focus', on); hit.addEventListener('blur', hideTip);
+    });
+  }
+
+  function spark(vals, w, h) {
+    w = w || 200; h = h || 30;
+    var svg = el('svg', { width: '100%', height: h, viewBox: '0 0 ' + w + ' ' + h, preserveAspectRatio: 'none', 'aria-hidden': 'true' });
+    var mx = Math.max.apply(null, vals.map(function (v) { return Math.abs(v || 0); }).concat([0.001]));
+    var nb = Math.max(vals.length, 20), bw = w / nb, mid = h / 2;
+    var base = el('line', { x1: 0, x2: w, y1: mid, y2: mid }, svg); base.style.stroke = 'var(--hair)'; base.style.strokeWidth = 1; base.setAttribute('vector-effect', 'non-scaling-stroke');
+    var off = nb - vals.length;
+    vals.forEach(function (v, i) {
+      if (v == null) return;
+      var hh = Math.max(1, Math.abs(v) / mx * (mid - 1));
+      var r = el('rect', { x: (off + i) * bw + 1, y: v >= 0 ? mid - hh : mid, width: Math.max(1, bw - 2), height: hh }, svg);
+      r.style.fill = v >= 0 ? 'var(--pos)' : 'var(--neg)'; r.style.opacity = i === vals.length - 1 ? 1 : 0.62;
+    });
+    return svg;
+  }
+  function ciGlyph(res) {
+    var w = 110, h = 16, svg = el('svg', { width: w, height: h, viewBox: '0 0 ' + w + ' ' + h, 'aria-hidden': 'true' });
+    var lo = -0.6, hi = 1.0, x = function (v) { return 4 + (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (w - 8); };
+    var z = el('line', { x1: x(0), x2: x(0), y1: 1, y2: h - 1 }, svg); z.style.stroke = 'var(--axis)'; z.style.strokeWidth = 1;
+    if (res) {
+      var l = el('line', { x1: x(res.lo), x2: x(res.hi), y1: h / 2, y2: h / 2 }, svg); l.style.stroke = 'var(--stat)'; l.style.strokeWidth = 2; l.style.strokeLinecap = 'round';
+      var c = el('circle', { cx: x(res.r), cy: h / 2, r: 3.6 }, svg); c.style.fill = 'var(--stat)'; c.style.stroke = 'var(--ring)'; c.style.strokeWidth = 1.5;
+    }
+    return svg;
+  }
+  function node(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function table(tb, head, rows, opts) {
+    tb.replaceChildren(); opts = opts || {};
+    var th = document.createElement('thead'), tr = document.createElement('tr');
+    head.forEach(function (h, i) { var c = document.createElement('th'); c.scope = 'col'; c.textContent = h; if (i > 0 && !(opts.textCols || []).includes(i)) c.className = 'num'; else if (i > 0) c.className = 'txt'; tr.appendChild(c); });
+    th.appendChild(tr); tb.appendChild(th);
+    var tbody = document.createElement('tbody');
+    rows.forEach(function (r) {
+      var tr2 = document.createElement('tr'); if (r._cls) tr2.className = r._cls;
+      if (r._click) { tr2.classList.add('clickable'); tr2.tabIndex = 0; tr2.addEventListener('click', r._click); tr2.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); r._click(); } }); }
+      (r.cells || r).forEach(function (v, i) {
+        var c = document.createElement('td');
+        if (v && typeof v === 'object' && v.node) c.appendChild(v.node); else c.textContent = v;
+        if (i > 0 && !(opts.textCols || []).includes(i)) c.className = 'num'; else if (i > 0) c.className = 'txt';
+        if (r.colspan && i === 0) c.colSpan = r.colspan;
+        tr2.appendChild(c);
+      });
+      tbody.appendChild(tr2);
+    });
+    tb.appendChild(tbody);
+  }
+  function chip(text, on) { var s = node('span', 'chip' + (on ? ' on' : ''), text); return { node: s }; }
+  function coinCell(name, sub, color) {
+    var s = node('span', 'coin');
+    if (color) { var d = node('span', 'dotkey'); d.style.background = color; s.appendChild(d); }
+    s.appendChild(document.createTextNode(name));
+    if (sub) s.appendChild(node('small', null, sub));
+    return { node: s };
+  }
+
+  // ---------------------------------------------------------------- dashboard rendering
+  function latestAltDate() { var best = null; ALTS.forEach(function (s) { var st = coinStats(s); if (st.date && (!best || st.date > best)) best = st.date; }); return best; }
+
+  function sgtTime(iso) {
+    var t = new Date(iso); if (isNaN(t)) return iso;
+    var s = new Date(t.getTime() + 8 * 3600e3).toISOString();
+    return s.slice(0, 10) + ' ' + s.slice(11, 16);
+  }
+  function renderStatus() {
+    var st = document.getElementById('status-text'), pulse = document.getElementById('pulse');
+    var siteAge = SITE ? (Date.now() - new Date(SNAP.built_at).getTime()) / 3600e3 : null;
+    pulse.className = 'pulse' + (dbState === 'live' || (SITE && siteAge < 8) ? ' live' : '');
+    var D0 = M ? latestAltDate() : null;
+    document.getElementById('status-asof').textContent = D0 ? '資料截至 ' + D0 + '（' + wk(D0) + '）美東收盤' : '';
+    var sch = document.getElementById('status-sched'); if (sch) sch.textContent = SITE ? '' : '這一版已停止每日更新，最新資料在自架網站';
+    if (SITE) st.textContent = '每 3 小時自動更新，最近一次 ' + sgtTime(SNAP.built_at) + '（新加坡時間）' + (siteAge > 12 ? '，已經 ' + Math.floor(siteAge) + ' 小時沒有更新' : '');
+    else if (dbState === 'live') st.textContent = '資料庫最後寫入 ' + (lastRun || '—');
+    else if (dbState === 'offline') st.textContent = '顯示內建資料（' + SNAP.asof + '）；在 claude.ai 開啟才會載入每日更新';
+    else if (dbState === 'error') st.textContent = '每日更新暫時讀不到，顯示內建資料（' + SNAP.asof + '）';
+    else st.textContent = '連線中，先顯示內建資料（' + SNAP.asof + '）';
+  }
+
+  function renderKPIs() {
+    var host = document.getElementById('kpis'); host.replaceChildren();
+    var D0 = latestAltDate(); if (!D0) return;
+    var di = M.dates.indexOf(D0);
+    var tot = 0, nData = 0, nIn = 0, best = null, worst = null, missing = [], pendings = [];
+    ALTS.forEach(function (s) {
+      var v = M.C[s].F[di], p = M.C[s].pend[di];
+      if (v == null) { missing.push(s); return; }
+      nData++; tot += v; if (v > 0.05) nIn++;
+      if (p) pendings.push(p);
+      if (!best || v > best.v) best = { s: s, v: v };
+      if (!worst || v < worst.v) worst = { s: s, v: v };
+    });
+    function altSum(end, w) { var s = 0; for (var i = Math.max(0, end - w + 1); i <= end; i++) ALTS.forEach(function (c) { var v = M.C[c].F[i]; if (v != null) s += v; }); return s; }
+    var trend = []; for (var i = Math.max(0, di - 19); i <= di; i++) { var t = 0, any = false; ALTS.forEach(function (c) { var v = M.C[c].F[i]; if (v != null) { t += v; any = true; } }); trend.push(any ? t : null); }
+    function tile(lab, val, sub, hero, extra) {
+      var k = node('div', 'kpi'); k.appendChild(node('div', 'lab', lab));
+      k.appendChild(node('div', 'val' + (hero ? ' hero' : ''), val));
+      if (sub) { var s = node('div', 'sub'); if (typeof sub === 'string') s.textContent = sub; else s.appendChild(sub); k.appendChild(s); }
+      if (extra) k.appendChild(extra);
+      host.appendChild(k);
+    }
+    var sub1 = node('span'); sub1.textContent = md(D0) + '（' + wk(D0) + '）· ' + nData + ' 檔有資料，' + nIn + ' 檔淨流入' + (missing.length ? ' · 未公布：' + missing.join('、') : '');
+    tile('山寨幣合計淨流量', money(tot), sub1, true, spark(trend, 240, 34));
+    var s5 = node('span'); s5.appendChild(document.createTextNode('近 20 日 ')); s5.appendChild(node('b', null, money(altSum(di, 20))));
+    tile('近 5 日合計', money(altSum(di, 5)), s5);
+    var sb = node('span'); if (worst) { sb.appendChild(document.createTextNode('最大流出 ')); sb.appendChild(node('b', null, worst.s + ' ' + money(worst.v))); }
+    tile('最大流入', best ? best.s + ' ' + money(best.v) : '—', sb);
+    var b = coinStats('BTC'), e = coinStats('ETH');
+    var se = node('span'); se.appendChild(document.createTextNode('ETH ')); se.appendChild(node('b', null, money(e.v)));
+    tile('BTC 現貨 ETF', money(b.v), se);
+    var rs = ALTS.map(function (s) { return { s: s, r: coinStats(s).r60now }; }).filter(function (x) { return x.r != null; });
+    var med = rs.length ? quantile(rs.map(function (x) { return x.r; }), 0.5) : null;
+    rs.sort(function (a, b2) { return b2.r - a.r; });
+    var sr = node('span'); sr.textContent = rs.length ? rs.slice(0, 3).map(function (x) { return x.s + ' ' + rf(x.r); }).join(' · ') + '（' + rs.length + ' 檔有 60 日資料）' : '樣本不足';
+    tile('60 日相關（中位數）', rf(med), sr);
+    if (pendings.length) { var pn = node('div', 'sub'); pn.textContent = '不含 ' + pendings.join('、') + '（Canary，次日補）'; host.firstChild.appendChild(pn); }
+  }
+
+  function dirChip(st) {
+    var v = st.v;
+    if (v == null) return node('span', 'dir', st.pend ? '待公布' : '無資料');
+    if (st.big) { var b = node('span', 'dir big'); b.appendChild(node('i', null, '▲')); b.appendChild(document.createTextNode('大額流入')); return b; }
+    if (v > 0.05) { var a = node('span', 'dir in'); a.appendChild(node('i', null, '▲')); a.appendChild(document.createTextNode('流入')); return a; }
+    if (v < -0.05) { var o = node('span', 'dir out'); o.appendChild(node('i', null, '▼')); o.appendChild(document.createTextNode('流出')); return o; }
+    return node('span', 'dir', '無申贖');
+  }
+  function rChip(r, n) {
+    var s = node('span', 'rchip');
+    if (r == null) { s.textContent = '60 日 r —'; return s; }
+    var d = node('span', 'dot' + (Math.abs(r) > 1.96 / Math.sqrt(Math.max(n, 1)) ? ' sig' : ''));
+    s.appendChild(d); s.appendChild(document.createTextNode('60 日 r ' + rf(r))); return s;
+  }
+  function whenText(s, st) {
+    var bits = [];
+    var D0 = latestAltDate();
+    if (st.date) bits.push(md(st.date) + (st.date !== D0 ? '（' + wk(st.date) + '）' : ''));
+    if (st.pend) bits.push('不含 ' + st.pend + '，次日補');
+    if (st.pendNext) bits.push(md(st.pendNext.date) + ' 待 ' + st.pendNext.fund + ' 公布');
+    if (!META[s].full && META[s].flowFrom) bits.push('資料自 ' + md(META[s].flowFrom));
+    return bits.join(' · ');
+  }
+
+  function renderCards() {
+    function make(s, ref) {
+      var st = coinStats(s);
+      var b = node('button', 'card' + (ref ? ' ref' : '')); b.type = 'button'; b.setAttribute('aria-pressed', String(state.sel === s));
+      b.setAttribute('aria-label', s + ' ' + (st.v == null ? '無資料' : money(st.v)) + '，查看細節');
+      var r1 = node('div', 'row'); var t = node('span', 'sym', s); t.appendChild(node('span', 'nm', NAMES[s])); r1.appendChild(t); r1.appendChild(dirChip(st)); b.appendChild(r1);
+      b.appendChild(node('div', 'big', st.v == null ? '—' : money(st.v)));
+      b.appendChild(node('div', 'when', whenText(s, st)));
+      var sums = node('div', 'sums');
+      var a = node('span'); a.appendChild(document.createTextNode('5 日 ')); a.appendChild(node('b', null, st.w5 ? money(st.w5.s) : '—')); sums.appendChild(a);
+      var c = node('span'); c.appendChild(document.createTextNode('20 日 ')); c.appendChild(node('b', null, st.w20 ? money(st.w20.s) + (st.w20.n < 20 ? '*' : '') : '—')); sums.appendChild(c);
+      b.appendChild(sums);
+      if (st.spark) b.appendChild(spark(st.spark, 200, 30));
+      var f = node('div', 'row foot');
+      var pr = node('span'); pr.appendChild(node('span', 'mono', '$' + price(st.close))); pr.appendChild(document.createTextNode(' ' + (st.chg == null ? '' : pct(st.chg)))); f.appendChild(pr);
+      f.appendChild(rChip(st.r60now, st.n60)); b.appendChild(f);
+      b.addEventListener('click', function () { select(s, true); });
+      return b;
+    }
+    var order = ALTS.slice();
+    var key = { today: function (s) { var v = coinStats(s).v; return v == null ? -Infinity : v; }, s20: function (s) { var w = coinStats(s).w20; return w ? w.s : -Infinity; }, corr: function (s) { var r = coinStats(s).r60now; return r == null ? -Infinity : r; } }[state.sort];
+    if (key) order.sort(function (a, b) { return key(b) - key(a); });
+    var host = document.getElementById('cards'); host.replaceChildren(); order.forEach(function (s) { host.appendChild(make(s, false)); });
+    var h2 = document.getElementById('cards-ref'); h2.replaceChildren(); REFS.forEach(function (s) { h2.appendChild(make(s, true)); });
+  }
+
+  // ---------------------------------------------------------------- lead / lag board and the plain-language answer
+  var LT_KEYS = ['same_day', 'next_day', 'tradable_1d', 'tradable_5d', 'chase_1d', 'chase_5d'];
+  function boardQ() {
+    var key = 'board|' + state.mode; if (M.stats[key]) return M.stats[key];
+    var q = {};
+    LT_KEYS.forEach(function (k) {
+      var ps = ALL.map(function (s) { var t = coinStats(s).lt[k]; return t ? t.p : null; }), qs = bh(ps);
+      q[k] = {}; ALL.forEach(function (s, i) { q[k][s] = qs[i]; });
+    });
+    M.stats[key] = q; return q;
+  }
+  function verdict(s) {
+    var lt = coinStats(s).lt, q = boardQ(), tags = [];
+    function sig(k) { return lt[k] && q[k][s] != null && q[k][s] < 0.10; }
+    if (!lt.same_day && !lt.tradable_1d && !lt.chase_1d) return [{ cls: '', text: '樣本不足' }];
+    if (sig('same_day') && lt.same_day.r > 0) tags.push({ cls: 'sync', text: '同日同步' });
+    var lead = ['tradable_1d', 'tradable_5d'].filter(sig);
+    if (lead.some(function (k) { return lt[k].r > 0; })) tags.push({ cls: 'lead', text: '領先' });
+    if (lead.some(function (k) { return lt[k].r < 0; })) tags.push({ cls: 'rev', text: '之後反轉' });
+    if (['chase_1d', 'chase_5d'].filter(sig).some(function (k) { return lt[k].r > 0; })) tags.push({ cls: 'chase', text: '資金追漲' });
+    if (!tags.length) tags.push({ cls: '', text: '沒有顯著關係' });
+    return tags;
+  }
+  function renderAnswer() {
+    var have = ALL.filter(function (s) { return verdict(s)[0].text !== '樣本不足'; });
+    var has = function (cls) { return have.filter(function (s) { return verdict(s).some(function (t) { return t.cls === cls; }); }); };
+    var lead = has('lead'), sync = has('sync'), chase = has('chase'), rev = has('rev'), few = ALL.filter(function (s) { return have.indexOf(s) < 0; });
+    var t = lead.length ? '流量在資料公布後仍能預測幣價的有：' + lead.join('、') + '。' : '目前沒有任何一個幣的 ETF 流量，在資料公布之後還能預測幣價：公布後 1 天、5 天的報酬都不顯著。';
+    t += sync.length ? '流量和當天漲跌同步的有 ' + sync.join('、') + '。' : '';
+    t += chase.length ? '「價格先漲、資金後到」（追漲）的有 ' + chase.join('、') + '。' : '';
+    t += rev.length ? '流入之後反而走弱的有 ' + rev.join('、') + '。' : '';
+    document.getElementById('ans-text').textContent = t;
+    var host = document.getElementById('ans-chips'); host.replaceChildren();
+    ALL.forEach(function (s) {
+      var v = node('span', 'vcoin'); v.appendChild(node('b', null, s));
+      verdict(s).forEach(function (tg) { v.appendChild(node('span', 'vtag ' + tg.cls, tg.text)); });
+      host.appendChild(v);
+    });
+    if (few.length) host.appendChild(node('span', 'small muted', '樣本還不夠的幣（' + few.join('、') + '）每天累積，30 個交易日後開始檢定。'));
+  }
+  function cellR(t, q) {
+    var w = node('span', 'cellr');
+    if (!t) { w.appendChild(node('span', 'q', '樣本不足')); return { node: w }; }
+    var r = node('span', 'r'); var dot = node('i', q != null && q < 0.10 ? 'sig' : 'no'); r.appendChild(dot); r.appendChild(document.createTextNode(rf(t.r))); w.appendChild(r);
+    w.appendChild(node('span', 'q', 'q ' + (q == null ? '—' : pf(q))));
+    w.title = 'r ' + t.r.toFixed(3) + '，p ' + pf(t.p) + '，n ' + t.n;
+    return { node: w };
+  }
+  function renderBoard() {
+    var q = boardQ(), rows = [];
+    function row(s, ref) {
+      var st = coinStats(s), lt = st.lt;
+      var tags = node('span'); tags.style.display = 'inline-flex'; tags.style.gap = '4px'; tags.style.flexWrap = 'wrap';
+      verdict(s).forEach(function (tg) { tags.appendChild(node('span', 'vtag ' + tg.cls, tg.text)); });
+      var nTxt = lt.same_day ? String(lt.same_day.n) : String(st.nFlow || 0);
+      return { _cls: (ref ? 'ref ' : '') + (state.sel === s ? 'sel' : ''), _click: function () { select(s, true); },
+        cells: [coinCell(s, META[s].etf), nTxt, bpf(st.flowBp)].concat(LT_KEYS.map(function (k) { return cellR(lt[k], q[k][s]); })).concat([rf(st.r60now), rf(st.r30now), { node: tags }]) };
+    }
+    ALTS.forEach(function (s) { rows.push(row(s, false)); });
+    rows.push({ _cls: 'group', cells: ['對照', '', '', '', '', '', '', '', '', '', '', ''] });
+    REFS.forEach(function (s) { rows.push(row(s, true)); });
+    table(document.getElementById('tb-corr'), ['幣種', '天數', '日均流量', '同日', '隔日', '公布後 1 日', '公布後 5 日', '追漲 1 日', '追漲 5 日', '60 日', '30 日', '判讀'], rows, { textCols: [11] });
+    document.getElementById('corr-note').textContent = '同日 = 流量和當天報酬；隔日 = 流量和下一天報酬，其中有一部分在資料公布前就發生了，不能拿來交易；公布後 1／5 日 = 從資料公布後第一個收盤開始算的報酬，這才是能交易的預測力；追漲 = 前 1／5 天的報酬和今天的流量。少於 30 天或有流量的日子少於 10 天不檢定。60 日、30 日是滾動相關（同日）。日均流量 = 每天淨流量絕對值占市值的平均（bp）。點一列看那個幣的細節。';
+  }
+  function renderCorr() { renderAnswer(); renderBoard(); renderIntensity(); }
+
+  // ---------------------------------------------------------------- flow size relative to market cap, across coins
+  function scatterChart(host, pts, cfg) {
+    host.replaceChildren();
+    var W = Math.max(260, host.clientWidth || 600), H = cfg.height || 280, m = { t: 14, r: 18, b: 40, l: 46 };
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H }, host);
+    var lx = pts.map(function (p) { return Math.log10(p.x); });
+    var x0 = Math.floor(Math.min.apply(null, lx)), x1 = Math.ceil(Math.max.apply(null, lx));
+    if (x1 - x0 < 2) x1 = x0 + 2;
+    var ysc = nice(Math.min(-0.1, Math.min.apply(null, pts.map(function (p) { return p.y; }))), Math.max(0.6, Math.max.apply(null, pts.map(function (p) { return p.y; }))), 4);
+    var X = function (v) { return m.l + (Math.log10(v) - x0) / (x1 - x0) * (W - m.l - m.r); };
+    var Y = function (v) { return m.t + (ysc.hi - v) / (ysc.hi - ysc.lo) * (H - m.t - m.b); };
+    ysc.ticks.forEach(function (t) { var g = el('line', { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t) }, svg); g.style.stroke = t === 0 ? 'var(--axis)' : 'var(--hair)'; g.style.strokeWidth = 1; txt(svg, m.l - 6, Y(t) + 3.5, rf(t), { anchor: 'end', size: 10.5 }); });
+    for (var e = x0; e <= x1; e++) { var v = Math.pow(10, e), gx = el('line', { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b }, svg); gx.style.stroke = 'var(--hair)'; gx.style.strokeWidth = 1; txt(svg, X(v), H - m.b + 15, (e < 0 ? v.toFixed(-e) : String(v)), { size: 10.5 }); }
+    txt(svg, (m.l + W - m.r) / 2, H - 4, cfg.xTitle || '', { size: 11, mono: false });
+    var placed = [];
+    function clash(b) { return placed.some(function (o) { return !(b.x2 < o.x1 || b.x1 > o.x2 || b.y2 < o.y1 || b.y1 > o.y2); }); }
+    pts.slice().sort(function (a, b) { return b.x - a.x; }).forEach(function (p) {
+      var cx = X(p.x), cy = Y(p.y);
+      var c = el('circle', { cx: cx, cy: cy, r: p.sel ? 6.5 : 5 }, svg);
+      c.style.fill = p.sig ? 'var(--stat)' : 'var(--surface)'; c.style.stroke = p.ref ? 'var(--muted)' : 'var(--stat)'; c.style.strokeWidth = p.sel ? 3 : 1.8;
+      var wTxt = p.label.length * 7.2 + 4, cands = [[cx + 8, cy + 4, 'start'], [cx - 8, cy + 4, 'end'], [cx + 8, cy - 8, 'start'], [cx + 8, cy + 15, 'start'], [cx - 8, cy - 8, 'end'], [cx - 8, cy + 15, 'end']];
+      var pick = null;
+      for (var i = 0; i < cands.length; i++) {
+        var a = cands[i], bx = a[2] === 'start' ? { x1: a[0], x2: a[0] + wTxt } : { x1: a[0] - wTxt, x2: a[0] };
+        bx.y1 = a[1] - 10; bx.y2 = a[1] + 2;
+        if (bx.x1 < m.l || bx.x2 > W - 2) continue;
+        if (!clash(bx)) { pick = [a, bx]; break; }
+      }
+      if (!pick) { var a0 = cands[0]; pick = [a0, { x1: a0[0], x2: a0[0] + wTxt, y1: a0[1] - 10, y2: a0[1] + 2 }]; }
+      placed.push(pick[1], { x1: cx - 6, x2: cx + 6, y1: cy - 6, y2: cy + 6 });
+      txt(svg, pick[0][0], pick[0][1], p.label, { anchor: pick[0][2], color: p.ref ? 'var(--muted)' : 'var(--ink)', size: 11.5, weight: 600 });
+      var hit = el('circle', { cx: cx, cy: cy, r: 12, fill: 'transparent', tabindex: 0 }, svg);
+      hit.setAttribute('aria-label', p.label + '：日均流量 ' + bpf(p.x) + '，同日 r ' + rf(p.y));
+      var on = function (ev) { showTip(ev, p.label, [{ color: 'var(--stat)', value: 'r = ' + rf(p.y), label: p.sig ? '同日相關（校正後顯著）' : '同日相關' }, { value: bpf(p.x), label: '日均 |淨流量| 占市值' }, { value: p.cum == null ? '—' : pct(p.cum, 1), label: '累積淨流入占市值' }]); };
+      hit.addEventListener('pointermove', on); hit.addEventListener('pointerleave', hideTip); hit.addEventListener('focus', on); hit.addEventListener('blur', hideTip);
+      if (cfg.onClick) hit.addEventListener('click', function () { cfg.onClick(p.key); });
+    });
+  }
+  function renderIntensity() {
+    var q = boardQ(), pts = [], rows = [], skip = [];
+    ALL.forEach(function (s) {
+      var st = coinStats(s), t = st.lt.same_day;
+      if (st.flowBp == null || st.flowBp <= 0 || !t) { skip.push(s); return; }
+      pts.push({ key: s, label: s, x: st.flowBp, y: t.r, sig: q.same_day[s] != null && q.same_day[s] < 0.10, ref: REFS.indexOf(s) >= 0, sel: state.sel === s, cum: st.cumPct });
+    });
+    ALL.slice().sort(function (a, b) { return (coinStats(b).flowBp || 0) - (coinStats(a).flowBp || 0); }).forEach(function (s) {
+      var st = coinStats(s), t = st.lt.same_day;
+      rows.push({ _cls: REFS.indexOf(s) >= 0 ? 'ref' : '', _click: function () { select(s, true); }, cells: [coinCell(s, META[s].etf), bpf(st.flowBp), st.cumPct == null ? '—' : pct(st.cumPct, 2), st.nX ? String(st.nX) : '—', t ? rf(t.r) : '—', t ? pf(q.same_day[s]) : '—'] });
+    });
+    var host = document.getElementById('ch-int');
+    if (pts.length < 3) host.replaceChildren(node('p', 'empty', '有足夠樣本的幣還不到 3 個。'));
+    else scatterChart(host, pts, { height: 290, xTitle: '日均 |淨流量| 占市值（bp，對數刻度）', onClick: function (k) { select(k, true); } });
+    table(document.getElementById('tb-int'), ['幣種', '日均 |淨流量|', '累積淨流入占市值', '天數', '同日 r', 'q'], rows);
+    // rank correlation across coins between flow size and same-day r
+    var a = pts.filter(function (p) { return !p.ref; });
+    function ranks(v) { var o = v.map(function (x, i) { return [x, i]; }).sort(function (x, y) { return x[0] - y[0]; }), r = new Array(v.length); o.forEach(function (e, k) { r[e[1]] = k + 1; }); return r; }
+    var rho = a.length >= 5 ? pearson(ranks(a.map(function (p) { return p.x; })), ranks(a.map(function (p) { return p.y; }))) : null;
+    var big = a.filter(function (p) { return p.x >= 1; }), small = a.filter(function (p) { return p.x < 1; });
+    var mr = function (arr) { return arr.length ? arr.reduce(function (z, p) { return z + p.y; }, 0) / arr.length : null; };
+    document.getElementById('int-note').textContent = '實心點 = 同日相關在多重檢定校正後顯著（q < 0.10），灰框是對照的 BTC、ETH。' +
+      (big.length && small.length ? '日均流量 ≥ 1 bp 的山寨幣，同日 r 平均 ' + rf(mr(big)) + '（' + big.length + ' 檔）；不到 1 bp 的平均 ' + rf(mr(small)) + '（' + small.length + ' 檔）。' : '') +
+      (rho != null ? '山寨幣之間兩者的等級相關 ' + rf(rho) + '，幣數少，只當描述。' : '') +
+      (skip.length ? '樣本還不夠、沒畫進來：' + skip.join('、') + '。' : '') + '點一個點看那個幣的細節。';
+  }
+
+  var flowCh = null, priceCh = null;
+  function renderDetail() {
+    var s = state.sel, st = coinStats(s), c = M.C[s], n = M.dates.length, isB = s === 'BTC', RB = M.C.BTC.R, meta = META[s];
+    var li0 = M.dates.findIndex(function (d) { return d >= meta.launch; }), fp0 = firstIdx(c.P);
+    var start0 = Math.min(st.fi >= 0 ? st.fi : n - 1, fp0 >= 0 ? (li0 >= 0 ? Math.max(fp0, li0 - 20) : fp0) : n - 1);
+    var lo = state.range ? Math.max(start0, n - state.range) : start0, hi = n - 1;
+    var ds = M.dates.slice(lo, hi + 1);
+    document.getElementById('dt-eyebrow').textContent = (REFS.indexOf(s) >= 0 ? '對照 · ' : '') + '首檔 ETF ' + meta.etf + ' · ' + meta.launch + ' 上市';
+    document.getElementById('dt-title').textContent = s + ' · ' + NAMES[s];
+    var gapTxt = (meta.gaps || []).map(function (g) { return g.from + ' 到 ' + g.to + ' 的來源合計不含 ' + g.fund; }).join('；');
+    document.getElementById('dt-sub').textContent = '流量來源：' + meta.source + '。' + (meta.full ? '從上市（或 2025-10-28）起完整。' : '流量資料自 ' + meta.flowFrom + ' 起，之後每日累積。') + (gapTxt ? gapTxt + '（那段期間的流量很小）。' : '') + '幣價是 ' + s + ' 在美東 16:00 的現貨價。';
+    // stats row
+    var sr = document.getElementById('dt-stats'); sr.replaceChildren();
+    var rng = fullTest(c.X, c.R, RB, lo, hi, state.mode, isB);
+    function stat(lab, val, sub) { var d = node('div', 'dstat'); d.appendChild(node('div', 'lab', lab)); d.appendChild(node('div', 'val', val)); if (sub) d.appendChild(node('div', 'sub', sub)); sr.appendChild(d); }
+    stat('最新一天', st.v == null ? '—' : money(st.v), st.date ? md(st.date) + '（' + wk(st.date) + '）' + (st.lastBp != null ? ' · 占市值 ' + bpf(st.lastBp, true) : '') + (st.pend ? ' · 不含 ' + st.pend : '') : '');
+    stat('近 5 日', st.w5 ? money(st.w5.s) : '—', st.w20 ? '近 20 日 ' + money(st.w20.s) : '');
+    stat(REFS.indexOf(s) >= 0 ? '2025-10-28 起' : (meta.full ? '上市以來' : '資料起累積'), st.cum != null ? money(st.cum) : '—', (st.cumPct != null ? '占市值 ' + pct(st.cumPct, 2) + ' · ' : '') + (st.q90 != null ? '大額門檻 ' + money(st.q90) : '大額門檻需 60 天'));
+    stat('期間相關', rng ? rf(rng.r) : '—', rng ? 'n ' + rng.n + (rng.small ? ' · 樣本少，不檢定' : ' · p ' + pf(rng.p)) : '樣本不足');
+    stat('60 日 / 30 日', rf(st.r60now) + ' / ' + rf(st.r30now), st.r60wk != null ? '一週前 60 日 ' + rf(st.r60wk) : '');
+    stat(isB || state.mode === 'raw' ? '全期相關' : 'β（對 BTC）', isB || state.mode === 'raw' ? (st.full ? rf(st.full.r) : '—') : (st.full ? st.full.beta.toFixed(2) : '—'), st.full ? '全期 r ' + rf(st.full.r) + (st.full.small ? '（樣本少）' : '，p ' + pf(st.full.p)) : '');
+    // flows + price (synced)
+    var F = c.F.slice(lo, hi + 1), Pp = c.P.slice(lo, hi + 1), fu = c.funds.slice(lo, hi + 1), pe = c.pend.slice(lo, hi + 1);
+    var xFmt = function (d) { return md(d); };
+    flowCh = barChart(document.getElementById('ch-flow'), {
+      labels: ds, values: F, height: 200, crosshair: true, xFmt: xFmt,
+      yFmt: function (v) { return v === 0 ? '0' : (v > 0 ? '+' : '−') + Math.abs(v).toLocaleString('zh-TW'); },
+      tipHead: function (i) { return ds[i] + '（' + wk(ds[i]) + '）'; },
+      tipRows: function (i) {
+        var rows = [];
+        rows.push({ color: F[i] == null ? null : (F[i] >= 0 ? 'var(--pos)' : 'var(--neg)'), value: F[i] == null ? '無資料' : s1(F[i]) + ' 百萬美元', label: pe[i] ? '淨流量（不含 ' + pe[i] + '）' : '淨流量' });
+        var mci = c.MC[lo + i]; if (F[i] != null && mci) rows.push({ value: bpf(F[i] / mci * 1e4, true), label: '占市值' });
+        if (fu[i]) Object.keys(fu[i]).sort(function (a, b) { return Math.abs(fu[i][b]) - Math.abs(fu[i][a]); }).slice(0, 4).forEach(function (t) { rows.push({ value: s1(fu[i][t]), label: t }); });
+        var r = c.R[lo + i]; if (r != null) rows.push({ value: pct((Math.exp(r) - 1) * 100, 2), label: s + ' 當日漲跌' });
+        return rows;
+      },
+      onCross: function (i) { if (priceCh) priceCh.setCross(i); }, aria: s + ' 每日淨流量，左右鍵逐日查看'
+    });
+    var pIdx = firstIdx(Pp);
+    document.getElementById('price-sub').textContent = s + ' · 美元，美東 16:00' + (pIdx >= 0 && lastIdx(Pp) >= 0 ? ' · 期間 ' + pct((Pp[lastIdx(Pp)] / Pp[pIdx] - 1) * 100) : '') + (li0 > lo && li0 <= hi ? ' · 直線 = ' + meta.etf + ' 上市' : '');
+    priceCh = lineChart(document.getElementById('ch-price'), {
+      x: ds, height: 170, xFmt: xFmt, rightPad: 14,
+      series: [{ name: s + ' 幣價', color: 'var(--price)', y: Pp }], vline: li0 > lo && li0 <= hi ? li0 - lo : null,
+      yFmt: function (v) { return v >= 100 ? v.toFixed(0) : (v >= 10 ? v.toFixed(1) : v.toFixed(2)); },
+      tipHead: function (i) { return ds[i] + '（' + wk(ds[i]) + '）' + (lo + i === li0 ? ' · ' + meta.etf + ' 上市' : ''); }, tipFmt: function (v) { return '$' + price(v); },
+      onCross: function (i) { if (flowCh) flowCh.setCross(i); }, aria: s + ' 幣價，左右鍵逐日查看'
+    });
+    // rolling correlation
+    var r60 = st.r60.slice(lo, hi + 1), r30 = st.r30.slice(lo, hi + 1), band = 1.96 / Math.sqrt(60);
+    var rollHost = document.getElementById('ch-roll');
+    if (!r60.some(function (v) { return v != null; }) && !r30.some(function (v) { return v != null; })) {
+      rollHost.replaceChildren(node('p', 'empty', '樣本還不夠：30 日相關要 20 個有資料的交易日、其中至少 5 天有流量；60 日要 40 天、至少 10 天有流量。'));
+    } else {
+      lineChart(rollHost, {
+        x: ds, height: 200, xFmt: xFmt, domain: [-1, 1], band: [-band, band], rightPad: 14,
+        series: [{ name: '30 日', color: 'var(--stat-2)', y: r30, width: 1.5, dot: false }, { name: '60 日', color: 'var(--stat)', y: r60 }],
+        yFmt: function (v) { return v === 0 ? '0' : (v < 0 ? '−' : '') + Math.abs(v).toFixed(1); }, tipFmt: function (v) { return rf(v); },
+        tipHead: function (i) { return ds[i] + ' 為止'; }, aria: '滾動相關係數'
+      });
+    }
+    var ln = st.r60now == null ? '60 日相關需要至少 40 個交易日的資料。' : '最新 60 日相關 ' + rf(st.r60now) + (st.r60wk != null ? '，一週前 ' + rf(st.r60wk) : '') + '。';
+    document.getElementById('roll-note').textContent = ln + ' 每個視窗各自估 β；灰帶是 ±1.96/√60，沒考慮自相關，只當參考線。';
+    // lead-lag on the selected range
+    var ll = leadLag(c.X, c.R, RB, lo, hi, 5, state.mode, isB), llHost = document.getElementById('ch-ll');
+    if (!ll.length || !ll.some(function (e) { return e.r != null; })) { llHost.replaceChildren(node('p', 'empty', '這段期間有流量和價格的天數少於 10 天，或有流量的日子少於 5 天，算不出來。')); document.getElementById('ll-note').textContent = ''; }
+    else {
+      var lim = Math.max(0.3, Math.max.apply(null, ll.map(function (e) { return Math.abs(e.r || 0); })) + 0.05);
+      barChart(llHost, {
+        labels: ll.map(function (e) { return String(e.k); }), values: ll.map(function (e) { return e.r; }), height: 200, domain: [-lim, lim], color: 'var(--stat)', left: 40,
+        opacityAt: function (i) { var e = ll[i]; return e.r != null && Math.abs(e.r) > 1.96 / Math.sqrt(e.n) ? 1 : 0.35; },
+        xShow: function () { return true; }, xFmt: function (l) { return +l > 0 ? '+' + l : l; },
+        yFmt: function (v) { return rf(v); },
+        tipHead: function (i) { var k = ll[i].k; return k === 0 ? '同一天' : (k > 0 ? '流量在前 ' + k + ' 天' : '報酬在前 ' + (-k) + ' 天'); },
+        tipRows: function (i) { var e = ll[i]; return [{ color: 'var(--stat)', value: 'r = ' + rf(e.r), label: 'k = ' + e.k }, { value: 'n = ' + e.n, label: '±' + (1.96 / Math.sqrt(e.n)).toFixed(2) + ' 內和 0 分不開' }]; },
+        after: function (svg, g) { var e0 = ll.filter(function (e) { return e.k === 0; })[0], b = 1.96 / Math.sqrt(Math.max(e0 ? e0.n : 10, 1)); [b, -b].forEach(function (v) { var l = el('line', { x1: g.m.l, x2: g.W - g.m.r, y1: g.y(v), y2: g.y(v) }, svg); l.style.stroke = 'var(--muted)'; l.style.strokeWidth = 1; l.style.opacity = 0.5; }); },
+        aria: '領先落後相關'
+      });
+      var e0 = ll.filter(function (e) { return e.k === 0; })[0], e1 = ll.filter(function (e) { return e.k === 1; })[0], em = ll.filter(function (e) { return e.k === -1; })[0];
+      document.getElementById('ll-note').textContent = 'k > 0：今天的流量對之後幾天的報酬（預測力）；k < 0：之前的報酬對今天的流量（追漲）。這段期間同日 ' + rf(e0 && e0.r) + '、流量→隔日 ' + rf(e1 && e1.r) + '、報酬→隔日流量 ' + rf(em && em.r) + '。實心長條 = 超出 ±1.96/√n 的落差。';
+    }
+    // funds table
+    var fp = document.getElementById('funds-panel'), li = st.li;
+    var tickers = {}; c.funds.forEach(function (f) { if (f) Object.keys(f).forEach(function (t) { tickers[t] = 1; }); });
+    var tk = Object.keys(tickers);
+    if (!tk.length) {
+      document.getElementById('funds-title').textContent = '各檔 ETF';
+      document.getElementById('tb-funds').replaceChildren();
+      document.getElementById('funds-note').textContent = ['LTC', 'HBAR', 'TRX'].indexOf(s) >= 0 ? '目前只有 Canary 一檔（' + meta.etf + '），上面的數字就是它的流量。' : '這個幣的來源只有合計數字，沒有分基金明細。';
+    } else {
+      document.getElementById('funds-title').textContent = '各檔 ETF · ' + (st.date ? md(st.date) : '');
+      function sumT(t, w) { var s2 = 0; for (var i = Math.max(0, li - w + 1); i <= li; i++) { var f = c.funds[i]; if (f && f[t] != null) s2 += f[t]; } return s2; }
+      function cumT(t) { var s2 = 0; for (var i = 0; i <= li; i++) { var f = c.funds[i]; if (f && f[t] != null) s2 += f[t]; } return s2; }
+      var rows = tk.map(function (t) { var lv = c.funds[li] && c.funds[li][t]; return { t: t, v: lv == null ? 0 : lv, w5: sumT(t, 5), w20: sumT(t, 20), cum: cumT(t) }; });
+      rows.sort(function (a, b) { return Math.abs(b.w20) - Math.abs(a.w20) || Math.abs(b.cum) - Math.abs(a.cum); });
+      table(document.getElementById('tb-funds'), ['代號', '最新一天', '近 5 日', '近 20 日', REFS.indexOf(s) >= 0 ? '2025-10-28 起' : '上市以來'], rows.map(function (r) { return [r.t, (st.pend && r.t === st.pend) ? '待補' : s1(r.v), s1(r.w5), s1(r.w20), s1(r.cum)]; }));
+      document.getElementById('funds-note').textContent = '百萬美元。依近 20 日淨流量的絕對值排序。' + (st.pend ? st.pend + ' 是 Canary 的基金，申購日資料隔天才有。' : '');
+    }
+    // per-day table (latest first)
+    var drows = [];
+    for (var i = hi; i >= lo; i--) {
+      var r = c.R[i], ab = (r != null && RB[i] != null && !isB && st.full) ? r - st.full.beta * RB[i] : null;
+      drows.push([M.dates[i] + '（' + wk(M.dates[i]) + '）', c.F[i] == null ? (c.pend[i] ? '待補' : '—') : s1(c.F[i]) + (c.pend[i] ? '*' : ''), price(c.P[i]), r == null ? '—' : pct((Math.exp(r) - 1) * 100, 2), isB ? '—' : (ab == null ? '—' : pct(ab * 100, 2))]);
+    }
+    table(document.getElementById('tb-days'), ['日期', '淨流量（百萬美元）', s + ' 幣價（美元）', '漲跌', '扣除 BTC 後'], drows);
+  }
+
+
+  // ---------------------------------------------------------------- trading research tab
+  var BK_NAME = { BH: '一直持有', BTCFLOW5: 'BTC ETF 5 日流量 > 0', ALTFLOW5: '山寨 ETF 5 日流量 > 0', TR20: '籃子價格 20 日趨勢', TF: '趨勢＋山寨流量' };
+  var BK_COLOR = { BH: 'var(--price)', BTCFLOW5: 'var(--s-btc)', ALTFLOW5: 'var(--pos)', TR20: 'var(--s-xrp)' };
+  function computeTrading() {
+    if (M.trading) return M.trading;
+    var n = M.dates.length, RB = M.C.BTC.R, res = { coins: {}, tests: [], basket: {} }, d, j;
+    ALL.forEach(function (s) {
+      var c = M.C[s], isB = s === 'BTC', sig = ruleSignals(c.K, c.P, c.lag), H = isB ? c.RL : hedged(c.RL, RB), rules = {};
+      RULES.forEach(function (rule) {
+        var bt = backtest(sig[rule], c.RL), pn = perf(bt.net); if (!pn) return;
+        var vals = sig[rule].filter(function (v) { return v != null; }), on = 0; vals.forEach(function (v) { on += v; });
+        rules[rule] = { net: pn, bh: perf(bt.bh), exposure: on / vals.length, timing: timing(sig[rule], c.RL), timingH: timing(sig[rule], H), bt: bt, sig: sig[rule] };
+        if (ALTS.indexOf(s) >= 0 && rules[rule].timing) res.tests.push({ name: s + ' ' + rule, group: s, sig: sig[rule], Y: c.RL, t: rules[rule].timing.t, res: rules[rule].timing });
+      });
+      res.coins[s] = rules;
+    });
+    var Rb = basketRet(ALTS.map(function (s) { return M.C[s].RL; }));
+    var agg = new Array(n).fill(null);
+    for (d = 1; d < n; d++) { var v = 0, cnt = 0; ALTS.forEach(function (s) { var x = M.C[s]; if (x.lag === 1 && x.K[d - 1] != null) { v += x.K[d - 1]; cnt++; } }); agg[d] = cnt ? v : null; }
+    var btcK = M.C.BTC.K, lvl = new Array(n).fill(null), cum = 0;
+    for (var i = 0; i < n; i++) { if (Rb[i] != null) cum += Rb[i]; lvl[i] = Math.exp(cum); }
+    var bs = {}; ['BH', 'ALTFLOW5', 'BTCFLOW5', 'TR20', 'TF'].forEach(function (k) { bs[k] = new Array(n).fill(null); });
+    for (d = 0; d < n; d++) {
+      bs.BH[d] = 1;
+      if (d >= 5) { var ok = true, sm = 0; for (j = Math.max(0, d - 4); j <= d; j++) { if (agg[j] == null) { ok = false; break; } sm += agg[j]; } if (ok) bs.ALTFLOW5[d] = sm > 0 ? 1 : 0; }
+      if (d >= 5) { var okb = true, sb = 0; for (j = d - 5; j < d; j++) { if (btcK[j] == null) { okb = false; break; } sb += btcK[j]; } if (okb) bs.BTCFLOW5[d] = sb > 0 ? 1 : 0; }
+      if (d >= 20) bs.TR20[d] = lvl[d] / lvl[d - 20] > 1 ? 1 : 0;
+      if (bs.TR20[d] != null && bs.ALTFLOW5[d] != null) bs.TF[d] = bs.TR20[d] * bs.ALTFLOW5[d];
+    }
+    Object.keys(bs).forEach(function (k) {
+      var bt = backtest(bs[k], Rb), vals = bs[k].filter(function (x) { return x != null; }), on = 0; vals.forEach(function (x) { on += x; });
+      res.basket[k] = { net: perf(bt.net), bh: perf(bt.bh), exposure: vals.length ? on / vals.length : null, timing: k === 'BH' ? null : timing(bs[k], Rb), bt: bt, sig: bs[k] };
+    });
+    ['ALTFLOW5', 'BTCFLOW5', 'TR20', 'TF'].forEach(function (k) { var tt = res.basket[k].timing; if (tt) res.tests.push({ name: '籃子 ' + k, group: 'basket', sig: bs[k], Y: Rb, t: tt.t, res: tt }); });
+    var qs = bh(res.tests.map(function (t) { return t.res.p; })); res.tests.forEach(function (t, k) { t.q = qs[k]; });
+    res.Rb = Rb; res.lvl = lvl; res.rc = null;
+    // what each rule says for the next session (latest published flows, latest close as the trend proxy)
+    function aggAt(t) { var v = 0, cnt = 0; ALTS.forEach(function (s) { var x = M.C[s]; if (x.lag === 1 && x.K[t] != null) { v += x.K[t]; cnt++; } }); return cnt ? v : null; }
+    var w = [], okn = true; for (j = n - 5; j < n; j++) { var a = j >= 0 ? aggAt(j) : null; if (a == null) okn = false; w.push(a); }
+    var wb = [], okbn = true; for (j = n - 5; j < n; j++) { if (j < 0 || btcK[j] == null) okbn = false; wb.push(j >= 0 ? btcK[j] : null); }
+    var sumArr = function (arr) { var t = 0; arr.forEach(function (x) { t += x; }); return t; };
+    var trn = n > 20 ? lvl[n - 1] / lvl[n - 21] - 1 : null;
+    res.nextBasket = {
+      ALTFLOW5: okn ? { on: sumArr(w) > 0, v: money(sumArr(w)) } : null,
+      BTCFLOW5: okbn ? { on: sumArr(wb) > 0, v: money(sumArr(wb)) } : null,
+      TR20: trn == null ? null : { on: trn > 0, v: pct(trn * 100) }
+    };
+    res.nextBasket.TF = res.nextBasket.TR20 && res.nextBasket.ALTFLOW5 ? { on: res.nextBasket.TR20.on && res.nextBasket.ALTFLOW5.on, v: '' } : null;
+    M.trading = res; return res;
+  }
+  function nextSig(c) {
+    var n = c.P.length, t = n - c.lag, out = {};
+    var k = t >= 0 ? c.K[t] : null, z = t >= 0 ? zscoreAt(c.K, t) : null, s5 = t >= 0 ? sum5(c.K, t) : null;
+    var tr = (n > 20 && c.P[n - 1] != null && c.P[n - 21] != null) ? c.P[n - 1] / c.P[n - 21] - 1 : null;
+    out.FF = k == null ? null : { on: k > 0, v: money(k) };
+    out.FZ = z == null ? null : { on: z > 1, v: 'z ' + (z < 0 ? '−' : '+') + Math.abs(z).toFixed(1) };
+    out.FM5 = s5 == null ? null : { on: s5 > 0, v: money(s5) };
+    out.TR20 = tr == null ? null : { on: tr > 0, v: pct(tr * 100) };
+    out.TF = out.TR20 && out.FM5 ? { on: out.TR20.on && out.FM5.on, v: '' } : null;
+    out.t = t >= 0 ? M.dates[t] : null;
+    return out;
+  }
+  function sigCell(x) {
+    if (!x) return '—';
+    var w = node('span', 'sigchip'); w.appendChild(node('span', 'st' + (x.on ? ' on' : ''), x.on ? '持有' : '空手'));
+    if (x.v) w.appendChild(node('span', 'v', x.v));
+    return { node: w };
+  }
+  function sh(v) { return v == null ? '—' : (v < 0 ? '−' : '') + Math.abs(v).toFixed(2); }
+  function pctDay(v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v * 100).toFixed(2) + '%'; }
+  function ruleCell(rr, q) {
+    if (!rr) return '—';
+    var w = node('span', 'cellr'), t = rr.timing;
+    var top = node('span', 'r');
+    top.appendChild(node('i', t && q != null && q < 0.10 ? 'sig' : 'no'));
+    top.appendChild(document.createTextNode(t ? pctDay(t.diff) + ' · p ' + pf(t.p) : '樣本不足'));
+    w.appendChild(top);
+    w.appendChild(node('span', 'q', '年化 ' + pct(rr.net.ann_ret * 100, 0)));
+    w.title = '扣成本年化 ' + pct(rr.net.ann_ret * 100, 0) + '，夏普 ' + sh(rr.net.sharpe) + '，最大回撤 ' + pct(rr.net.max_dd * 100, 0) + '，持有天數 ' + Math.round(rr.exposure * 100) + '%；同期一直持有年化 ' + (rr.bh ? pct(rr.bh.ann_ret * 100, 0) : '—');
+    return { node: w };
+  }
+  function renderTrading() {
+    var T = computeTrading(), n = M.dates.length;
+    var qmap = {}; T.tests.forEach(function (t) { qmap[t.name] = t.q; });
+    // conclusion
+    var minq = T.tests.reduce(function (m, t) { return t.q != null && t.q < m ? t.q : m; }, 1);
+    var best = T.tests.slice().sort(function (a, b) { return Math.abs(b.t) - Math.abs(a.t); })[0];
+    var nSig = T.tests.filter(function (t) { return t.q != null && t.q < 0.10; }).length;
+    function thesis() {
+      var rc = T.rc, t = nSig ? '有 ' + nSig + ' 個檢定在多重檢定校正後顯著，需要在前瞻紀錄裡確認。' : '目前不行。';
+      t += '5 條事先定好的規則放在各個山寨幣和山寨幣籃子上，一共 ' + T.tests.length + ' 個擇時檢定，扣掉成本後' + (nSig ? '' : '沒有一個在多重檢定校正後顯著（最小 q = ' + pf(minq) + '）') + '。';
+      if (best) t += '表現最好的是「' + best.name + '」（|t| = ' + Math.abs(best.t).toFixed(2) + '）' + (rc ? '，但試了這麼多條，光靠運氣就出現這種成績的機率' + (rc.p_adjusted >= 0.995 ? '超過 99%' : '是 ' + Math.round(rc.p_adjusted * 100) + '%') + '。' : '，正在計算它是不是運氣……');
+      return t;
+    }
+    document.getElementById('tr-thesis').textContent = thesis();
+    if (!T.rc) setTimeout(function () { if (!M.trading || M.trading !== T) return; T.rc = rotationCheck(T.tests, 500, 20261005); if (state.tab === 'trading') document.getElementById('tr-thesis').textContent = thesis(); }, 30);
+    // findings
+    var fh = document.getElementById('tr-findings'); fh.replaceChildren();
+    function finding(h, fig, p) { var f = node('div', 'finding'); f.appendChild(node('h3', null, h)); f.appendChild(node('div', 'fig', fig)); f.appendChild(node('p', null, p)); fh.appendChild(f); }
+    var leaders = ALL.filter(function (s) { return verdict(s).some(function (t) { return t.cls === 'lead'; }); });
+    function xrpEv() {
+      var e = D.event_reg && D.event_reg.XRP && D.event_reg.XRP.post_p1_p5 && D.event_reg.XRP.post_p1_p5.top10;
+      if (!e || e.diff_vs_other_days == null) return '';
+      return '（研究資料截至 ' + (D.asof || '—') + '：XRP 流入最大的 10% 日子之後 5 天，扣除 BTC 的報酬比其他日子' + (e.diff_vs_other_days < 0 ? '低 ' : '高 ') + Math.abs(e.diff_vs_other_days).toFixed(1) + '%，p = ' + pf(e.p) + '，未過多重檢定）';
+    }
+    var Lg = D.trading_long || {};
+    finding('流量不領先幣價', '公布後可交易的預測力：' + (leaders.length ? leaders.join('、') : '0 個幣'),
+      '每日追蹤分頁的檢定：等資料公布再進場，之後 1 天、5 天的報酬和流量都沒有顯著關係。BTC 從 2024 年的長樣本也一樣（公布後 1 日 r = ' + (Lg.BTC ? rf(Lg.BTC.leadlag.tradable_1d.r) : '—') + '），流量反而是跟在價格後面（追漲 r = ' + (Lg.BTC ? rf(Lg.BTC.leadlag.chase_1d.r) : '—') + '）。');
+    var B = T.basket;
+    if (B.BH.net && B.BTCFLOW5.net) finding('看起來有效，其實是空頭時少持有', '最大回撤 ' + pct(B.BH.net.max_dd * 100, 0) + ' → ' + pct(B.BTCFLOW5.net.max_dd * 100, 0),
+      '「BTC ETF 5 日流量為正才持有」讓山寨幣籃子的年化從 ' + pct(B.BH.net.ann_ret * 100, 0) + ' 變成 ' + pct(B.BTCFLOW5.net.ann_ret * 100, 0) + '，但擇時檢定 p = ' + (B.BTCFLOW5.timing ? pf(B.BTCFLOW5.timing.p) : '—') + '。同一條規則放在 2024 年 BTC 多頭裡，反而比一直持有差：它只是在下跌時減少曝險，不是看得出漲跌。');
+    if (B.TR20.net) finding('單純看價格趨勢一樣好', '籃子 20 日趨勢：年化 ' + pct(B.TR20.net.ann_ret * 100, 0) + '，回撤 ' + pct(B.TR20.net.max_dd * 100, 0),
+      '不用任何流量資料、只看價格是不是比 20 天前高，效果和流量濾網差不多；在趨勢上再加流量條件（TF）也沒有更好。流量並沒有提供價格以外的資訊。');
+    finding('如果要用流量', '當背景，不當扳機',
+      '可以拿來確認一段已經出現的趨勢有沒有資金跟進、提醒自己大額流入當天不要追' + xrpEv() + '。部位大小和停損另外決定。下面的前瞻紀錄每天更新，哪條規則在沒看過的資料上開始穩定有效，這裡會反映出來。');
+    // next-session signals
+    var rows = [], used = null;
+    ALTS.concat(REFS).forEach(function (s) {
+      var c = M.C[s]; if (!Object.keys(T.coins[s]).length && !c.K.some(function (v) { return v != null; })) return;
+      var ns = nextSig(c); used = used || ns.t;
+      rows.push({ _cls: REFS.indexOf(s) >= 0 ? 'ref' : '', cells: [coinCell(s, META[s].etf), ns.t ? md(ns.t) : '—'].concat(RULES.map(function (r) { return sigCell(ns[r]); })) });
+    });
+    rows.push({ _cls: 'group', cells: ['山寨幣籃子', '', '', '', '', '', ''] });
+    rows.push({ cells: ['BTC ETF 5 日流量 > 0', used ? md(used) : '—', '', '', sigCell(T.nextBasket.BTCFLOW5), '', ''] });
+    rows.push({ cells: ['山寨 ETF 5 日流量 > 0', used ? md(used) : '—', '', '', sigCell(T.nextBasket.ALTFLOW5), sigCell(T.nextBasket.TR20), sigCell(T.nextBasket.TF)] });
+    table(document.getElementById('tb-signals'), ['幣種', '用到的流量日', 'FF 跟著流入', 'FZ 強流入', 'FM5 5 日流量', 'TR20 價格趨勢', 'TF 趨勢＋流量'], rows, { textCols: [1, 2, 3, 4, 5, 6] });
+    var nd = M.dates[n - 1];
+    document.getElementById('sig-sub').textContent = '依據截至 ' + nd + ' 的資料，規則在下一個交易日收盤的部位。沒有一條通過顯著性檢定，請當研究紀錄看，不要當成買賣建議。LTC、HBAR、TRX 的流量晚一天公布，所以用的是前一個交易日。';
+    // basket chart + table
+    var keys = ['BH', 'BTCFLOW5', 'ALTFLOW5', 'TR20'], i0 = -1;
+    for (var i = 0; i < n; i++) if (B.BH.bt.net[i] != null) { i0 = i; break; }
+    var lg = document.getElementById('bk-legend'); lg.replaceChildren();
+    keys.forEach(function (k) { var sp = node('span'); var ky = node('span', 'key'); ky.style.background = BK_COLOR[k]; sp.appendChild(ky); sp.appendChild(document.createTextNode(BK_NAME[k])); lg.appendChild(sp); });
+    if (i0 >= 0) {
+      var xs = M.dates.slice(i0), series = keys.map(function (k) {
+        var c2 = 0, ys = []; for (var ii = i0; ii < n; ii++) { var v = B[k].bt.net[ii]; if (v != null) c2 += v; ys.push(Math.exp(c2) * 100); }
+        return { name: BK_NAME[k], color: BK_COLOR[k], y: ys, width: k === 'BH' ? 2 : 2 };
+      });
+      lineChart(document.getElementById('ch-basket'), { x: xs, height: 240, series: series, xFmt: function (d) { return md(d); }, yFmt: function (v) { return String(Math.round(v)); },
+        tipHead: function (ii) { return xs[ii] + '（起點 = 100）'; }, tipFmt: function (v) { return v.toFixed(1); }, aria: '山寨幣籃子四種做法的累積報酬，起點 100' });
+    }
+    var brows = ['BH', 'BTCFLOW5', 'ALTFLOW5', 'TR20', 'TF'].map(function (k) {
+      var b = B[k], t = b.timing, q = qmap['籃子 ' + k];
+      return [BK_NAME[k], b.net ? pct(b.net.ann_ret * 100, 0) : '—', b.net ? sh(b.net.sharpe) : '—', b.net ? pct(b.net.max_dd * 100, 0) : '—', b.exposure == null ? '—' : Math.round(b.exposure * 100) + '%', t ? pctDay(t.diff) : '—', t ? pf(t.p) : '—', q == null ? '—' : pf(q)];
+    });
+    table(document.getElementById('tb-basket'), ['做法', '年化（扣成本）', '夏普', '最大回撤', '持有天數', '擇時差／日', 'p', 'q'], brows, { textCols: [] });
+    document.getElementById('bk-note').textContent = '籃子從 ' + (i0 >= 0 ? M.dates[i0] : '—') + ' 起算，每個幣在它的 ETF 上市後才加入。擇時差 = 規則說持有的隔天平均報酬減掉說空手的隔天平均報酬；p 越小越不像運氣，q 是和所有規則一起校正後的值。';
+    // per-coin rules table
+    var rrows = [];
+    ALTS.concat(REFS).forEach(function (s) {
+      var rr = T.coins[s]; if (!Object.keys(rr).length) return;
+      var first = rr.FF || rr.TR20 || rr[Object.keys(rr)[0]];
+      rrows.push({ _cls: REFS.indexOf(s) >= 0 ? 'ref' : '', cells: [coinCell(s, META[s].etf)].concat(RULES.map(function (r) { return ruleCell(rr[r], qmap[s + ' ' + r]); })).concat([first && first.bh ? pct(first.bh.ann_ret * 100, 0) : '—']) });
+    });
+    table(document.getElementById('tb-rules'), ['幣種', 'FF 跟著流入', 'FZ 強流入', 'FM5 5 日流量', 'TR20 價格趨勢', 'TF 趨勢＋流量', '一直持有年化'], rrows, { textCols: [] });
+    var hp = []; ALTS.forEach(function (s) { Object.keys(T.coins[s]).forEach(function (r) { var h = T.coins[s][r].timingH; if (h) hp.push({ name: s + ' ' + r, p: h.p }); }); });
+    var hq = bh(hp.map(function (h) { return h.p; })), hmin = hq.reduce(function (m, q) { return q != null && q < m ? q : m; }, 1);
+    var skipped = ALTS.filter(function (s) { return !Object.keys(T.coins[s]).length; });
+    var priceOnly = ALTS.filter(function (s) { var rr = T.coins[s]; return rr.TR20 && !rr.FF; });
+    document.getElementById('rules-note').textContent = '實心點 = 多重檢定校正後 q < 0.10。滑過格子看夏普、最大回撤、持有天數。' + (priceOnly.length ? priceOnly.join('、') + ' 有流量的日子太少，只能測 TR20。' : '') + (skipped.length ? skipped.join('、') + ' 的 ETF 上市還不夠久（回測至少要 20 個可交易日，趨勢規則另需 20 天暖身），暫不列出。' : '') + '改用扣除 BTC 後的報酬做同樣的擇時檢定，最小 q = ' + pf(hmin) + '，結論相同。BTC、ETH 是對照，不算進校正。';
+    // forward record
+    var fi = M.dates.findIndex(function (d) { return d >= FWD_START; }), frows = [];
+    function fwd(bt) { var sN = 0, sB = 0, k = 0; for (var ii = fi; ii < n; ii++) { if (bt.net[ii] != null) { sN += bt.net[ii]; sB += bt.bh[ii]; k++; } } return { k: k, net: Math.expm1(sN), bh: Math.expm1(sB) }; }
+    if (fi >= 0) {
+      ['BTCFLOW5', 'ALTFLOW5', 'TR20', 'TF'].forEach(function (k) { var f = fwd(B[k].bt); frows.push(['籃子：' + BK_NAME[k], String(f.k), pct(f.net * 100), pct(f.bh * 100), pct((f.net - f.bh) * 100)]); });
+      ALTS.concat(REFS).forEach(function (s) { RULES.forEach(function (r) { var rr = T.coins[s][r]; if (!rr) return; var f = fwd(rr.bt); if (f.k) frows.push([s + ' ' + r, String(f.k), pct(f.net * 100), pct(f.bh * 100), pct((f.net - f.bh) * 100)]); }); });
+    }
+    table(document.getElementById('tb-forward'), ['規則', '交易日數', '規則報酬', '同期一直持有', '差'], frows);
+    document.getElementById('fwd-note').textContent = fi < 0 ? '從 2026-10-05（一）收盤開始累積，目前還沒有樣本外的交易日。每天更新後，這裡會列出每條規則自定案以來的報酬。' : '自 ' + FWD_START + ' 起的樣本外結果，已扣成本。樣本外的天數夠多（至少一兩個月）之前，差距多半是雜訊。';
+    // long sample (static, research as of 2026-10-02)
+    var lrows = [];
+    ['BTC', 'ETH'].forEach(function (s) {
+      var L = Lg[s]; if (!L) return;
+      lrows.push({ _cls: 'group', cells: [s + '（' + L.period[0] + ' 起，' + (L.rules.FF ? L.rules.FF.net.n : '') + ' 天）', '', '', '', '', '', ''] });
+      RULES.forEach(function (r) {
+        var v = L.rules[r]; if (!v) return;
+        lrows.push([RULE_NAME[r] + '（' + r + '）', v.timing ? pctDay(v.timing.diff) : '—', v.timing ? pf(v.timing.p) : '—', pct(v.net.ann_ret * 100, 0), sh(v.net.sharpe), pct(v.net.max_dd * 100, 0), pct(v.bh.ann_ret * 100, 0) + '／' + sh(v.bh.sharpe) + '／' + pct(v.bh.max_dd * 100, 0)]);
+      });
+    });
+    table(document.getElementById('tb-long'), ['規則', '擇時差／日', 'p', '年化', '夏普', '最大回撤', '一直持有（年化／夏普／回撤）'], lrows, { textCols: [] });
+    var sp = D.trading_split || {};
+    document.getElementById('long-note').textContent = '長樣本的領先落後：BTC 同日 r ' + (Lg.BTC ? rf(Lg.BTC.leadlag.same_day.r) : '—') + '、隔日 ' + (Lg.BTC ? rf(Lg.BTC.leadlag.next_day.r) : '—') + '（含公布前的時段）、公布後 1 日 ' + (Lg.BTC ? rf(Lg.BTC.leadlag.tradable_1d.r) : '—') + '、追漲 ' + (Lg.BTC ? rf(Lg.BTC.leadlag.chase_1d.r) : '—') + '。' + (sp.text || '');
+  }
+
+  function renderAll() {
+    if (!M) buildModel();
+    renderStatus(); renderKPIs(); renderCards(); renderCorr(); renderDetail();
+  }
+  function select(s, scroll) {
+    state.sel = s; remember();
+    renderCards(); renderCorr(); renderDetail();
+    if (scroll) { var d = document.getElementById('detail'); var r = d.getBoundingClientRect(); if (r.top > window.innerHeight * 0.6 || r.top < 0) d.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
+  }
+
+  // controls
+  function pressGroup(btns, on) { btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b === on)); }); }
+  var rangeBtns = Array.prototype.slice.call(document.querySelectorAll('[data-range]'));
+  rangeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.range === state.range)); b.addEventListener('click', function () { state.range = +b.dataset.range; pressGroup(rangeBtns, b); remember(); renderDetail(); }); });
+  var sortBtns = Array.prototype.slice.call(document.querySelectorAll('[data-sort]'));
+  sortBtns.forEach(function (b) { b.addEventListener('click', function () { state.sort = b.dataset.sort; pressGroup(sortBtns, b); renderCards(); }); });
+  var mAbn = document.getElementById('mode-abn'), mRaw = document.getElementById('mode-raw');
+  function setMode(mode) { state.mode = mode; pressGroup([mAbn, mRaw], mode === 'abn' ? mAbn : mRaw); document.getElementById('mode-note').textContent = mode === 'abn' ? '扣除 BTC 後 = 幣的報酬減掉 β × BTC 報酬，看的是這個幣自己的漲跌' : '原始漲跌 = 幣價（美東 16:00 到 16:00）的當日報酬，包含跟著 BTC 一起動的部分'; remember(); renderKPIs(); renderCards(); renderCorr(); renderDetail(); }
+  mAbn.addEventListener('click', function () { setMode('abn'); }); mRaw.addEventListener('click', function () { setMode('raw'); });
+  pressGroup([mAbn, mRaw], state.mode === 'abn' ? mAbn : mRaw);
+
+  // ---------------------------------------------------------------- live database (written by the daily job)
+  buildModel();
+  var pendingRender = null;
+  function scheduleRender() { clearTimeout(pendingRender); pendingRender = setTimeout(function () { buildModel(); if (state.tab === 'track') renderAll(); else if (state.tab === 'trading') { renderStatus(); renderTrading(); } else renderStatus(); }, 120); }
+  (async function () {
+    var db = null;
+    if (SITE) { dbState = 'site'; renderStatus(); return; }
+    try { db = (window.claude && window.claude.use) ? await window.claude.use('db') : null; } catch (e) { db = null; }
+    if (!db) { dbState = 'offline'; renderStatus(); return; }
+    try {
+      db.collection('daily').orderBy('date', 'desc').limit(1000).onSnapshot(function (snap) {
+        var m = {};
+        snap.docs.forEach(function (doc) { var b = doc.data(); if (b && typeof b.date === 'string' && b.coins && typeof b.coins === 'object') m[b.date] = b.coins; });
+        dbByDate = m; dbState = 'live'; scheduleRender();
+      }, function () { dbState = 'error'; renderStatus(); });
+      db.doc('meta/status').onSnapshot(function (s) { if (s.exists) { var b = s.data() || {}; lastRun = b.last_run_sgt || null; renderStatus(); } }, function () { });
+    } catch (e) { dbState = 'error'; renderStatus(); }
+  })();
+
+  // ---------------------------------------------------------------- research tab (static results as of 2026-10-02)
+  var COLOR = { SOL: 'var(--s-sol)', XRP: 'var(--s-xrp)', BTC: 'var(--s-btc)' };
+  var researchDrawn = false;
+  function drawCCF() {
+    [['SOL', 'ch-ccf-sol'], ['XRP', 'ch-ccf-xrp'], ['BTC', 'ch-ccf-btc']].forEach(function (p) {
+      var c = D.study[p[0]].ccf;
+      barChart(document.getElementById(p[1]), {
+        labels: c.map(function (e) { return String(e.k); }), values: c.map(function (e) { return e.r; }), color: COLOR[p[0]], height: 170, left: 40,
+        domain: [-0.2, 0.55], yFmt: function (v) { return v.toFixed(1); },
+        opacityAt: function (i) { return c[i].q < 0.10 ? 1 : 0.38; },
+        xShow: function () { return true; }, xFmt: function (l) { return l > 0 ? '+' + l : l; },
+        tipRows: function (i) { return [{ color: COLOR[p[0]], value: 'r = ' + c[i].r.toFixed(3), label: 'k = ' + c[i].k }, { value: 't = ' + c[i].t.toFixed(2), label: 'HAC' }, { value: 'q = ' + pf(c[i].q), label: 'BH 校正' }]; }
+      });
+    });
+    var rows = []; for (var i = 0; i < 11; i++) rows.push([String(D.study.SOL.ccf[i].k), D.study.SOL.ccf[i].r.toFixed(3), pf(D.study.SOL.ccf[i].q), D.study.XRP.ccf[i].r.toFixed(3), pf(D.study.XRP.ccf[i].q), D.study.BTC.ccf[i].r.toFixed(3), pf(D.study.BTC.ccf[i].q)]);
+    table(document.getElementById('tb-ccf'), ['k（天）', 'SOL r', 'SOL q', 'XRP r', 'XRP q', 'BTC r', 'BTC q'], rows);
+  }
+  function cum(arr) { var s = 0; return arr.map(function (v) { s += v; return +s.toFixed(3); }); }
+  function drawEvent() {
+    var xs = []; for (var k = -5; k <= 5; k++) xs.push(k);
+    var sol = cum(D.study.SOL.event.inflow_top10.path), xrp = cum(D.study.XRP.event.inflow_top10.path);
+    lineChart(document.getElementById('ch-event'), {
+      x: xs, height: 230, includeZero: true, vline: 5, rightPad: 64,
+      series: [{ name: 'SOL', color: COLOR.SOL, y: sol, endLabel: 'SOL ' + pct(sol[10]) }, { name: 'XRP', color: COLOR.XRP, y: xrp, endLabel: 'XRP ' + pct(xrp[10]) }],
+      yFmt: function (v) { return (v > 0 ? '+' : '') + v + '%'; }, xFmt: function (k) { return (k > 0 ? '+' : '') + k; }, xShow: function () { return true; },
+      tipHead: function (i) { return '第 ' + (xs[i] > 0 ? '+' : '') + xs[i] + ' 天（累積）'; }, tipFmt: function (v) { return pct(v, 2); }, aria: '大額流入日前後的累積超額報酬'
+    });
+    var w = function (c, k) { var x = D.study[c].event.inflow_top10.win[k]; return pct(x.mean, 2) + '  [' + pct(x.lo, 1) + ', ' + pct(x.hi, 1) + ']'; };
+    var r = function (c, k) { var x = D.event_reg[c][k].top10; return pct(x.diff_vs_other_days, 2) + '  (p ' + pf(x.p) + ')'; };
+    table(document.getElementById('tb-event'), ['視窗', 'SOL 平均 [bootstrap 95%]', 'SOL 迴歸差異', 'XRP 平均 [bootstrap 95%]', 'XRP 迴歸差異'], [
+      ['前 5 天（−5 ~ −1）', w('SOL', 'pre_m5_m1'), r('SOL', 'pre_m5_m1'), w('XRP', 'pre_m5_m1'), r('XRP', 'pre_m5_m1')],
+      ['當天（0）', w('SOL', 'day0'), r('SOL', 'day0'), w('XRP', 'day0'), r('XRP', 'day0')],
+      ['後 5 天（+1 ~ +5）', w('SOL', 'post_p1_p5'), r('SOL', 'post_p1_p5'), w('XRP', 'post_p1_p5'), r('XRP', 'post_p1_p5')]
+    ]);
+  }
+  var lvCoin = 'SOL';
+  function drawLevels() {
+    var s = D.series[lvCoin], p0 = s.p[0];
+    var idx = s.p.map(function (v) { return +(v / p0 * 100).toFixed(2); }), cf = cum(s.f);
+    var dfmt = function (d) { return d.slice(2, 7).replace('-', '/'); };
+    var ch2;
+    var ch1 = lineChart(document.getElementById('ch-lv-price'), {
+      x: s.d, height: 170, rightPad: 44, series: [{ name: lvCoin + ' 幣價指數（ETF 上市日 = 100）', color: COLOR[lvCoin], y: idx, endLabel: String(Math.round(idx[idx.length - 1])) }],
+      yFmt: function (v) { return v; }, xFmt: dfmt, xEvery: 40, tipFmt: function (v) { return v.toFixed(1); },
+      onCross: function (i) { if (ch2) ch2.setCross(i); }, aria: '幣價指數'
+    });
+    ch2 = lineChart(document.getElementById('ch-lv-cum'), {
+      x: s.d, height: 170, rightPad: 44, includeZero: true, series: [{ name: lvCoin + ' 累積淨流入（百萬美元）', color: COLOR[lvCoin], y: cf, area: true, endLabel: f1(cf[cf.length - 1] / 1000) + 'B' }],
+      yFmt: function (v) { return v.toLocaleString('zh-TW'); }, xFmt: dfmt, xEvery: 40, tipFmt: function (v) { return s1(v) + ' 百萬'; },
+      onCross: function (i) { ch1.setCross(i); }, aria: '累積淨流入'
+    });
+    var st = D.study[lvCoin];
+    document.getElementById('lv-note').textContent = lvCoin + '：累積淨流入 ' + f1(st.desc.cum_flow_musd) + ' 百萬美元（約市值 ' + st.desc.cum_flow_pct_mcap.toFixed(1) + '%），同期幣價 ' + pct(st.desc.ret_total_pct) + '。水平相關 ' + st.levels.corr_logprice_cumflow.toFixed(2) + '，Engle–Granger 共整合 p = ' + st.levels.engle_granger_p.toFixed(2) + '（不成立）；改看每日變化，相關是 ' + st.levels.corr_dlogprice_dcumflow.toFixed(2) + '。';
+  }
+  function drawCross() {
+    var x = D.cross;
+    ciChart(document.getElementById('ch-x-usd'), ['SOL', 'XRP', 'BTC'].map(function (k) { return { name: k, color: COLOR[k], v: x[k].per_100m, lo: x[k].per_100m_lo, hi: x[k].per_100m_hi }; }), function (v) { return (v > 0 ? '+' : '') + v.toFixed(1) + '%'; });
+    ciChart(document.getElementById('ch-x-bp'), ['SOL', 'XRP', 'BTC'].map(function (k) { return { name: k, color: COLOR[k], v: x[k].per_bp, lo: x[k].per_bp_lo, hi: x[k].per_bp_hi }; }), function (v) { return (v > 0 ? '+' : '') + v.toFixed(2) + '%'; });
+  }
+  function drawLaunch() {
+    var rows = D.launch.table.map(function (r) {
+      return { cells: [coinCell(r.coin, r.etf), r.launch, pct(r.d20_rel), pct(r.d60_rel), pct(r.d120_rel), r.n_days >= 20 ? pct(r.todate_rel) : pct(r.todate_rel) + '（' + r.n_days + ' 天）', pct(r.todate_raw)] };
+    });
+    var t = D.launch.tests;
+    rows.push({ _cls: 'group', cells: ['跑輸 BTC 的幣數', '', t.d20.n_negative + ' / ' + t.d20.n, t.d60.n_negative + ' / ' + t.d60.n, t.d120.n_negative + ' / ' + t.d120.n, t.todate.n_negative + ' / ' + t.todate.n, ''] });
+    rows.push({ _cls: 'ref', cells: ['中位數', '', pct(t.d20.median_rel), pct(t.d60.median_rel), pct(t.d120.median_rel), pct(t.todate.median_rel), ''] });
+    rows.push({ _cls: 'ref', cells: [coinCell('BTC（2024）', 'IBIT'), '2024-01-11', '≈ ' + pct(D.launch.ref.BTC_2024.w4) + '*', '≈ ' + pct(D.launch.ref.BTC_2024.w12) + '*', '—', '—', ''] });
+    rows.push({ _cls: 'ref', cells: [coinCell('ETH（2024）', 'ETHA'), '2024-07-23', '≈ ' + pct(D.launch.ref.ETH_2024.w4) + '*', '≈ ' + pct(D.launch.ref.ETH_2024.w12) + '*', '—', '—', ''] });
+    table(document.getElementById('tb-launch'), ['幣種', '上市日', '+20 交易日', '+60 交易日', '+120 交易日', '至今', '至今（原始）'], rows, { textCols: [1] });
+  }
+  function drawTests() {
+    var names = { H1: '同日：流量與報酬', H2: '流量 → 隔日報酬', H3: '流量 → 隔日超額報酬', H4: '流量 → 未來 5 日超額報酬', H5: '過去報酬 → 今天流量（追漲）', H6: 'Granger：流量 → 報酬', H7: 'Granger：報酬 → 流量', H8: '共整合：價格水準 ~ 累積流量' };
+    var cell = function (c, h) { var x = D.study[c].heads[h]; var s = node('span'); s.style.display = 'inline-flex'; s.style.gap = '8px'; s.style.alignItems = 'center'; s.appendChild(node('span', null, pf(x.p))); s.appendChild(chip('q ' + pf(x.q), x.q < 0.10).node); return { node: s }; };
+    var rows = Object.keys(names).map(function (h) { return [names[h], cell('SOL', h), cell('XRP', h), cell('BTC', h)]; });
+    table(document.getElementById('tb-tests'), ['假設', 'SOL', 'XRP', 'BTC'], rows);
+    var lab = { baseline: '基準', winsorised_1_99: '流量縮尾 1%/99%', drop_first_10_days: '去掉上市前 10 天', flow_days_only: '只看有流量的日子', first_half: '前半段樣本', second_half: '後半段樣本', usd_per_100m: '改用美元（每 1 億）' };
+    var rr = Object.keys(lab).map(function (k) { var a = D.study.SOL.robust[k], b = D.study.XRP.robust[k]; return [lab[k], a.b.toFixed(3), pf(a.p), b.b.toFixed(3), pf(b.p)]; });
+    table(document.getElementById('tb-robust'), ['設定', 'SOL 斜率', 'SOL p', 'XRP 斜率', 'XRP p'], rr);
+  }
+  function drawResearch() { drawCCF(); drawEvent(); drawLevels(); drawCross(); drawLaunch(); drawTests(); researchDrawn = true; }
+  document.getElementById('lv-sol').addEventListener('click', function () { lvCoin = 'SOL'; this.setAttribute('aria-pressed', 'true'); document.getElementById('lv-xrp').setAttribute('aria-pressed', 'false'); drawLevels(); });
+  document.getElementById('lv-xrp').addEventListener('click', function () { lvCoin = 'XRP'; this.setAttribute('aria-pressed', 'true'); document.getElementById('lv-sol').setAttribute('aria-pressed', 'false'); drawLevels(); });
+
+  // ---------------------------------------------------------------- tabs
+
+  // ---------------------------------------------------------------- BTC study tab (static results, see the eyebrow for the period)
+  function drawBTC() {
+    var B = D.btc; if (!B) return;
+    var S = B.scale, Mu = B.multiplier, BK = B.buckets, LL = B.leadlag, MV = B.multivariate, W = B.weekly, Y = S.by_year;
+    function bn(x) { return (x < 0 ? '−' : '') + '$' + (Math.abs(x) >= 100 ? Math.abs(x).toFixed(0) : Math.abs(x).toFixed(1)) + 'B'; }
+    function f2(x) { return x == null ? '—' : x.toFixed(2); }
+    function pEq(p) { return p != null && p < 0.001 ? 'p < 0.001' : 'p = ' + pf(p); }
+    function pc0(x) { return Math.round(x * 100) + '%'; }
+    function wan(x) { return (x / 1e4).toFixed(1) + ' 萬顆'; }
+    var ccf = {}; LL.ccf.forEach(function (e) { ccf[e.k] = e; });
+    var tr1 = LL.tradable.next_intraday, tr5 = LL.tradable.next5, on = LL.tradable.overnight;
+    var top = BK.rows[6], bot = BK.rows[0], hit = BK.hit;
+    document.getElementById('btc-eyebrow').textContent = 'BTC 研究 · ' + B.period[0] + ' 到 ' + B.period[1] + ' · ' + S.n + ' 個交易日';
+    document.getElementById('btc-bp-usd').textContent = Math.round(S.bp_usd_m_range[0]) + '–' + Math.round(S.bp_usd_m_range[1]) + ' 百萬美元（看當時市值）';
+    document.getElementById('btc-thesis').textContent = '流量占市值越大，BTC 當天的漲跌越明顯：淨流入超過 3 bp 的 ' + top.n + ' 天裡 ' + pc0(top.up_share) + ' 收漲，淨流出超過 3 bp 的 ' + bot.n + ' 天只有 ' + pc0(bot.up_share) + ' 收漲；流入不到 1 bp 的日子，收漲的比例只有 ' + pc0(hit.inflow_small.up_share) + '，跟擲硬幣差不多，所以「流入占市值小，沒漲甚至跌」很正常。問題是這幾乎都是同時發生：前一天的漲幅和今天流量的相關（' + rf(ccf[-1].r) + '）跟同一天（' + rf(ccf[0].r) + '）差不多高，而資料公布之後，流量對接下來 1 天、5 天、4 週的 BTC 都沒有預測力。把美股、美元、期貨基差、穩定幣、交易所鏈上流量、Strategy 買幣放進同一個模型，ETF 流量仍是當天最重要的因素之一，但大部分的漲跌來自別處。';
+    // findings
+    var fh = document.getElementById('btc-findings'); fh.replaceChildren();
+    function finding(h, fig, p) { var f = node('div', 'finding'); f.appendChild(node('h3', null, h)); f.appendChild(node('div', 'fig', fig)); f.appendChild(node('p', null, p)); fh.appendChild(f); }
+    finding('流量相對市值很小', '中位數 ' + S.median_abs_bps.toFixed(1) + ' bp ≈ $' + Math.round(S.median_abs_usd_m) + 'M／天',
+      '這段期間 BTC 市值 ' + (S.mcap_min_bn / 1000).toFixed(1) + '–' + (S.mcap_max_bn / 1000).toFixed(1) + ' 兆美元，90% 的日子淨流量在 ±' + S.p90_abs_bps.toFixed(1) + ' bp 內，最大一天流入 ' + S.max_in_bps.toFixed(1) + ' bp。累積淨流入 ' + bn(S.cum_flow_bn) + '，買進約 ' + wan(S.cum_btc) + '，占流通量 ' + S.cum_pct_supply.toFixed(1) + '%。但相對現貨成交量並不小：中位數約是 Coinbase＋Binance 近 20 日日均成交的 ' + Math.round(S.fv_median_abs) + '%。');
+    finding('大流量日幾乎都跟著大漲跌', '流入 > 3 bp：' + pc0(top.up_share) + ' 收漲 · 流入 < 1 bp：' + pc0(hit.inflow_small.up_share),
+      '流量越大，當天平均漲跌越大（見下圖）。不過效果大致是線性的：大流量日和小流量日，每 1 bp 對應的漲幅差異不顯著（' + pEq(BK.interaction_p) + '），沒有明顯的門檻；小流量日只是效果小，被其他波動蓋過。');
+    finding('但流量跟著價格走', '前一天報酬 → 今天流量 r = ' + rf(ccf[-1].r),
+      '前 2–4 天的漲幅也都和今天的流量正相關（追漲）。反過來，資料公布後的隔天（美東 10:00 到收盤）r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '），之後 5 天 r = ' + rf(tr5.r) + '（' + pEq(tr5.p) + '）。週資料、20 日、60 日累積也一樣：同期高度相關，下一期沒有。');
+    finding('換算成乘數，大到不像是錢推價格', '$1 淨流入 ↔ $' + Math.round(Mu.M) + ' 市值（控制其他因素後 $' + Math.round(MV.M_with_controls) + '）',
+      '同日迴歸的斜率換算成乘數是 ' + Math.round(Mu.M_lo) + '–' + Math.round(Mu.M_hi) + ' 倍（95% 區間）。學術上對美股大盤的估計約 5 倍（Gabaix 與 Koijen 的「無彈性市場」），這麼大的數字比較像是價格先動、投資人跟著申購，或兩者同時受消息影響。VAR 裡把流量排第一，最多解釋 BTC 波動的 ' + Math.round(B.var.flow_first * 100) + '%；排最後只剩 ' + Math.round(B.var.flow_last * 100) + '%。');
+    var shap = MV.shapley.slice().sort(function (a, b) { return b.r2 - a.r2; });
+    var short = function (t) { return t.label.replace(/（.*）/, ''); };
+    var sigF = MV.table.filter(function (t) { return t.key !== 'f' && t.q != null && t.q < 0.10; }).map(short);
+    var nsF = MV.table.filter(function (t) { return t.key !== 'f' && !(t.q != null && t.q < 0.10); }).map(short);
+    finding('其他因素一樣重要', '解釋力：' + shap.slice(0, 3).map(function (g) { return g.group.replace(/（.*）/, '') + ' ' + f2(g.r2); }).join(' · '),
+      '校正後仍顯著的還有' + sigF.join('、') + '；' + nsF.join('、') + '不顯著。整個模型 R² ' + f2(MV.r2_full) + '，只放流量是 ' + f2(MV.r2_flow_alone) + '，拿掉流量剩 ' + f2(MV.r2_without_flow) + '。控制其他因素後，流量的係數從 ' + f2(MV.flow_beta_alone) + ' 降到 ' + f2(MV.flow_beta_with_controls) + '，仍然顯著。');
+    var y4 = Y['2024'], y5 = Y['2025'], y6 = Y['2026'];
+    finding('流入多不保證上漲', '2024 流入 ' + y4.pct_supply.toFixed(1) + '% 流通量 → ' + pct(y4.ret, 0) + ' · 2025 流入 ' + y5.pct_supply.toFixed(1) + '% → ' + pct(y5.ret, 0),
+      '2025 年 ETF 淨買進約 ' + wan(y5.btc) + '，BTC 還是下跌，代表同期其他賣盤更大。2026 年到 ' + B.period[1] + ' 淨流量接近 0（' + bn(y6.flow_bn) + '），BTC ' + pct(y6.ret, 0) + '。流入要看相對市值的大小，也要看同時有多少人在賣。');
+    // 1. size buckets
+    var labs = ['< −3', '−3～−1', '−1～−0.3', '±0.3', '0.3～1', '1～3', '> 3'];
+    var bkHost = document.getElementById('ch-btc-bk'), narrow = (bkHost.clientWidth || 600) < 560;
+    var labsShort = narrow ? ['<−3', '−3~−1', '−1~−.3', '±.3', '.3~1', '1~3', '>3'] : labs;
+    barChart(bkHost, {
+      labels: labsShort, values: BK.rows.map(function (r) { return r.r_mean; }), height: 220, left: narrow ? 42 : 46,
+      xShow: function () { return true; }, yFmt: function (v) { return pct(v, 1); },
+      tipHead: function (i) { return '淨流量 ' + labs[i] + ' bp'; },
+      tipRows: function (i) { var r = BK.rows[i]; return [{ color: r.r_mean >= 0 ? 'var(--pos)' : 'var(--neg)', value: pct(r.r_mean, 2), label: '當天平均漲跌' }, { value: pc0(r.up_share), label: '收漲比例' }, { value: String(r.n), label: '天數' }]; },
+      after: function (svg, g) { BK.rows.forEach(function (r, i) { var v = r.r_mean, yy = v >= 0 ? g.y(v) - 6 : g.y(0) - 6; txt(svg, g.m.l + i * g.band + g.band / 2, yy, pc0(r.up_share), { size: 10.5, color: 'var(--ink-2)' }); }); },
+      aria: '依流量占市值大小分組的 BTC 當天平均漲跌'
+    });
+    table(document.getElementById('tb-btc-bk'), ['淨流量（bp）', '天數', '平均流量', '當天平均', '收漲比例', '公布後當天', '公布後 5 天'],
+      BK.rows.map(function (r, i) { return [labs[i], String(r.n), bpf(r.f_mean, true), pct(r.r_mean, 2), pc0(r.up_share), pct(r.next_id, 2), pct(r.next5, 2)]; }));
+    document.getElementById('btc-bk-note').textContent = '「公布後當天」= 隔天美東 10:00 到收盤，「公布後 5 天」= 隔天 10:00 到第 5 個收盤，都是看到流量資料之後才進得去的報酬。這兩欄沒有一致的方向：大額流入之後當天 ' + pct(top.next_id, 2) + '、5 天 ' + pct(top.next5, 2) + '；大額流出之後 ' + pct(bot.next_id, 2) + '、' + pct(bot.next5, 2) + '（只有 ' + bot.n + ' 天）。';
+    // 2. lead / lag
+    var ks = LL.ccf;
+    barChart(document.getElementById('ch-btc-ll'), {
+      labels: ks.map(function (e) { return String(e.k); }), values: ks.map(function (e) { return e.r; }), height: 220, domain: [-0.1, 0.5], color: 'var(--stat)', left: 40,
+      opacityAt: function (i) { return ks[i].q != null && ks[i].q < 0.10 ? 1 : 0.35; },
+      xShow: function () { return true; }, xFmt: function (l) { return +l > 0 ? '+' + l : l; }, yFmt: function (v) { return rf(v); },
+      tipHead: function (i) { var k = ks[i].k; return k === 0 ? '同一天' : (k > 0 ? '流量在前 ' + k + ' 天' : '報酬在前 ' + (-k) + ' 天'); },
+      tipRows: function (i) { var e = ks[i]; return [{ color: 'var(--stat)', value: 'r = ' + rf(e.r), label: 'k = ' + e.k }, { value: 'p ' + pf(e.p) + ' · q ' + pf(e.q), label: 'n = ' + e.n }]; },
+      aria: 'BTC 流量與報酬的領先落後相關'
+    });
+    document.getElementById('btc-ll-note').textContent = '實心 = 校正後 q < 0.10。k = +1 的 ' + rf(ccf[1].r) + ' 是收盤到收盤，裡面有一段在資料公布前：拆開看，夜間（美東 16:00 到隔天 10:00）r = ' + rf(on.r) + '（' + pEq(on.p) + '），資料公布後的 10:00 到收盤 r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '）。用每天 16:00 的 BTC 價格做的 Granger 檢定兩個方向都顯著（流量→價格 ' + pEq(B.var.granger_flow_to_price_p) + '，價格→流量 ' + pEq(B.var.granger_price_to_flow_p) + '），但前者靠的就是這段公布前的夜間。';
+    table(document.getElementById('tb-btc-h'), ['累積天數', '同期相關', '乘數', '下一期相關', 'p'],
+      B.horizons.map(function (h) { return [h.h + ' 天', rf(h.corr), '$' + Math.round(h.M), rf(h.next_corr), pf(h.next_p)]; }));
+    document.getElementById('btc-h-note').textContent = '把 h 天的流量加總（占期初市值），和同期、下一期的 BTC 報酬比較。時間拉長後同期相關越來越高（20 天 ' + rf(B.horizons[2].corr) + '、60 天 ' + rf(B.horizons[3].corr) + '），下一期的相關卻都很小：1 天的 ' + rf(B.horizons[0].next_corr) + ' 是收盤到收盤，含資料公布前的夜間（見左圖說明），5、20、60 天都不顯著。視窗有重疊，標準誤用 h 期 Newey–West。';
+    var dz = B.dose20;
+    table(document.getElementById('tb-btc-dose'), ['20 日流量（五等分）', '視窗', '同期 BTC', '收漲', '下一個 20 日'],
+      dz.rows.map(function (r) { return [bpf(r.f_lo, true) + ' ～ ' + bpf(r.f_hi, true), String(r.n), pct(r.r_mean, 1), pc0(r.up), pct(r.rn_mean, 1)]; }));
+    document.getElementById('btc-dose-note').textContent = dz.n + ' 個不重疊的 20 日視窗。流入最多的五分之一，同期 BTC 平均 ' + pct(dz.rows[4].r_mean, 1) + '、全部收漲；流出最多的五分之一平均 ' + pct(dz.rows[0].r_mean, 1) + '。但下一個 20 日和這 20 日的流量無關（r = ' + rf(dz.next_corr.r) + '，' + pEq(dz.next_corr.p) + '）。';
+    // 3. factors
+    var sh = document.getElementById('btc-shap'); sh.replaceChildren();
+    var mx = shap.length ? shap[0].r2 : 1;
+    shap.forEach(function (g) {
+      var row = node('div', 'hbar'); row.appendChild(node('div', 'lab', g.group));
+      var tk = node('div', 'track'), fl = node('div', 'fill' + (g.group === 'ETF 流量' ? ' flow' : '')); fl.style.width = Math.max(1, g.r2 / mx * 100) + '%'; tk.appendChild(fl); row.appendChild(tk);
+      row.appendChild(node('div', 'v', f2(g.r2))); sh.appendChild(row);
+    });
+    document.getElementById('btc-shap-note').textContent = '合計 R² = ' + f2(MV.r2_full) + '（' + MV.n + ' 天），剩下的 ' + Math.round((1 - MV.r2_full) * 100) + '% 是這些變數解釋不了的波動。Shapley 分解把彼此相關的因素公平分攤，例如流量和那斯達克同時上漲時的重疊部分各分一半。';
+    table(document.getElementById('tb-btc-f'), ['變數', 'β', 'p', 'q'],
+      MV.table.map(function (t) { return [t.label, (t.beta < 0 ? '−' : '+') + Math.abs(t.beta).toFixed(2), pf(t.p), chip(pf(t.q), t.q != null && t.q < 0.10)]; }));
+    document.getElementById('btc-f-note').textContent = 'β = 變數變動 1 個標準差，BTC 當天報酬變動幾個標準差。基差變化、Coinbase 溢價和價格同時動，比較像是同一件事的不同面向；Strategy 買幣的時點只能攤在公告前的交易日，日資料看不出效果，週資料也不顯著。';
+    // 4. years and regimes
+    table(document.getElementById('tb-btc-y'), ['年', '淨流入', '買進 BTC', '占流通量', 'BTC 漲跌', '市值變動'],
+      Object.keys(Y).sort().map(function (k) { var y = Y[k]; return [k + (k === B.period[1].slice(0, 4) ? '（到 ' + B.period[1].slice(5) + '）' : ''), bn(y.flow_bn), wan(y.btc), pct(y.pct_supply, 2), pct(y.ret, 0), (y.mcap_change_bn < 0 ? '−' : '+') + '$' + Math.round(Math.abs(y.mcap_change_bn)) + 'B']; }));
+    document.getElementById('btc-y-note').textContent = '2024 年市值增加約 ' + Math.round(y4.mcap_change_bn / y4.flow_bn) + ' 倍的淨流入；2025 年流入 ' + bn(y5.flow_bn) + '，市值反而減少。年度只有 3 個點，只當描述。';
+    var rq = bh(B.regimes.map(function (r) { return r.next_p; }));
+    table(document.getElementById('tb-btc-reg'), ['分段', '天數', '同日相關', '乘數', '公布後當天', 'q'],
+      B.regimes.map(function (r, i) { return [r.label, String(r.n), rf(r.corr), '$' + Math.round(r.M), rf(r.next_corr), chip(pf(rq[i]), rq[i] != null && rq[i] < 0.10)]; }));
+    var hi = B.regimes.filter(function (r) { return r.label.indexOf('基差高') === 0; })[0], lw = B.regimes.filter(function (r) { return r.label.indexOf('基差低') === 0; })[0];
+    var edge = B.regimes.map(function (r, i) { return { r: r, q: rq[i] }; }).filter(function (e) { return e.q != null && e.q < 0.10; });
+    document.getElementById('btc-reg-note').textContent = '每一段的同日關係都顯著。' + (hi && lw ? '基差高的日子同日相關較弱（' + rf(hi.corr) + ' 對 ' + rf(lw.corr) + '），符合「部分買盤是對沖的」，但差異不顯著（' + pEq(B.basis_interaction.p) + '）。' : '') +
+      (edge.length ? '公布後當天的相關，在' + edge.map(function (e) { return e.r.label.replace(/（.*）/, ''); }).join('、') + '這幾段有小幅延續（相關 ' + edge.map(function (e) { return rf(e.r.next_corr); }).join('、') + '，' + B.regimes.length + ' 段一起校正後 q < 0.10）。' + (B.regime_check ? '基差低和下跌趨勢的日子重疊約 ' + Math.round(B.regime_check.overlap_of_low * 100) + '%，拿掉 2026 年仍在（' + rf(B.regime_check.low_ex2026.r) + '、' + rf(B.regime_check.down_ex2026.r) + '）。' : '') + '這是值得之後追蹤的邊緣訊號：在下跌、基差低的市況，流量公布後當天有小幅延續，但解釋力只有 2% 左右，全樣本不顯著。' : '公布後當天的相關，在所有分段校正後都不顯著。');
+    var ro = B.rolling;
+    lineChart(document.getElementById('ch-btc-roll'), {
+      x: ro.map(function (r) { return r.d; }), height: 200, includeZero: true, rightPad: 14, xFmt: function (d) { return d.slice(2, 7).replace('-', '/'); },
+      series: [{ name: '120 日相關', color: 'var(--stat)', y: ro.map(function (r) { return r.corr; }) }],
+      yFmt: function (v) { return rf(v); }, tipFmt: function (v) { return rf(v); }, tipHead: function (i) { return ro[i].d + ' 為止'; }, aria: 'BTC 流量與當天報酬的 120 日滾動相關'
+    });
+    // 5. basis trade
+    var se = W.series;
+    lineChart(document.getElementById('ch-btc-cme'), {
+      x: se.map(function (r) { return r.d; }), height: 220, includeZero: true, rightPad: 14, xFmt: function (d) { return d.slice(2, 7).replace('-', '/'); },
+      series: [{ name: 'ETF 累積淨買進', color: 'var(--accent)', y: se.map(function (r) { return r.cum_etf / 1e3; }) }, { name: 'CME 槓桿基金淨空單', color: 'var(--neg)', y: se.map(function (r) { return r.lev / 1e3; }) }],
+      yFmt: function (v) { return v.toFixed(0) + 'k'; }, tipFmt: function (v) { return (v * 1e3).toLocaleString('zh-TW', { maximumFractionDigits: 0 }) + ' 顆'; },
+      tipHead: function (i) { return se[i].d + '（週二）'; }, aria: 'ETF 累積淨買進的 BTC 與 CME 槓桿基金淨空單'
+    });
+    document.getElementById('btc-cme-note').textContent = '2024 年 ETF 買進約 ' + wan(W.etf_btc_2024) + '，同期槓桿基金在 CME 的淨空單增加約 ' + wan(W.lev_short_2024_change_btc) + '，就算全部都是基差交易，也只占 ETF 買盤的 ' + Math.round(W.lev_short_2024_change_btc / W.etf_btc_2024 * 100) + '%；淨空單在 ' + W.lev_short_peak_date + ' 達到 ' + wan(W.lev_short_peak_btc) + ' 後回落到 ' + wan(W.lev_short_last_btc) + '。週資料裡，ETF 每買 1 顆對應 ' + W.hedge_ratio.b.toFixed(2) + ' 顆新增空單，但控制當週漲跌後只剩 ' + W.hedge_ratio_given_return.b.toFixed(2) + '（' + pEq(W.hedge_ratio_given_return.p) + '）：空單主要是跟著價格和基差走。所以大部分 ETF 買盤是有方向的，基差交易不是流量和價格脫鉤的主因。';
+  }
+  var TABS = { track: ['tab-track', 'view-track'], btc: ['tab-btc', 'view-btc'], trading: ['tab-trading', 'view-trading'], research: ['tab-research', 'view-research'] };
+  function showTab(t, push) {
+    state.tab = t;
+    Object.keys(TABS).forEach(function (k) { document.getElementById(TABS[k][0]).setAttribute('aria-selected', String(k === t)); document.getElementById(TABS[k][1]).hidden = k !== t; });
+    if (t === 'research') drawResearch(); else if (t === 'trading') renderTrading(); else if (t === 'btc') drawBTC(); else renderAll();
+    if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { /* ignore */ } }
+  }
+  var tabIds = Object.keys(TABS);
+  tabIds.forEach(function (k, i) {
+    var b = document.getElementById(TABS[k][0]);
+    b.addEventListener('click', function () { showTab(k, true); });
+    b.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var o = document.getElementById(TABS[tabIds[(i + (e.key === 'ArrowRight' ? 1 : tabIds.length - 1)) % tabIds.length]][0]); o.focus(); o.click(); e.preventDefault();
+    });
+  });
+
+  buildModel();
+  document.getElementById('ans-btc-link').addEventListener('click', function (e) { e.preventDefault(); showTab('btc', true); var b = document.getElementById('tab-btc'); b.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
+  showTab(TABS[location.hash.slice(1)] ? location.hash.slice(1) : 'track', false);
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (state.tab === 'research') drawResearch(); else if (state.tab === 'trading') renderTrading(); else if (state.tab === 'btc') drawBTC(); else { renderKPIs(); renderCards(); renderIntensity(); renderDetail(); } }, 150); });
+  window.addEventListener('scroll', hideTip, { passive: true });
+})();
+</script>
