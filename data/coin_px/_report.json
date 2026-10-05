@@ -1,0 +1,186 @@
+{
+ "coins": {
+  "AVAX": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "AVAX-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "BNB": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 697,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "BNB-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "BTC": {
+   "backfill": true,
+   "days": 712,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2023-12-01",
+   "last": "2026-10-02",
+   "pair": "BTC-USD",
+   "source": "coinbase",
+   "with_16": 712
+  },
+  "DOGE": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "DOGE-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "DOT": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "DOT-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "ETH": {
+   "backfill": true,
+   "days": 712,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2023-12-01",
+   "last": "2026-10-02",
+   "pair": "ETH-USD",
+   "source": "coinbase",
+   "with_16": 712
+  },
+  "HBAR": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "HBAR-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "HYPE": {
+   "backfill": true,
+   "days": 586,
+   "errors": {
+    "binance": "no candles",
+    "hyperliquid": "no candles"
+   },
+   "filled_hours": 0,
+   "first": "2026-02-05",
+   "last": "2026-10-02",
+   "pair": "HYPE-USD",
+   "source": "coinbase",
+   "with_16": 166
+  },
+  "LINK": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "LINK-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "LTC": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "LTC-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "NEAR": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "NEAR-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "SOL": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "SOL-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "SUI": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "SUI-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "TRX": {
+   "backfill": true,
+   "days": 586,
+   "errors": {
+    "coinbase": "HTTPError: HTTP Error 404: Not Found"
+   },
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "TRXUSDT",
+   "source": "binance",
+   "with_16": 586
+  },
+  "XRP": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "XRP-USD",
+   "source": "coinbase",
+   "with_16": 586
+  },
+  "ZEC": {
+   "backfill": true,
+   "days": 586,
+   "errors": null,
+   "filled_hours": 0,
+   "first": "2024-06-03",
+   "last": "2026-10-02",
+   "pair": "ZEC-USD",
+   "source": "coinbase",
+   "with_16": 586
+  }
+ },
+ "run_at": "2026-10-05T08:31:46Z"
+}
