@@ -15,7 +15,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,6 +36,10 @@ jobs:
         run: python scripts/fetch_mcap.py
         continue-on-error: true
         timeout-minutes: 6
+      - name: Fetch each coin's own price (10:00 / 16:00 New York)
+        run: python scripts/fetch_coin_px.py
+        continue-on-error: true
+        timeout-minutes: 20
       - name: Fetch Canary primary data (shares outstanding x NAV)
         run: python scripts/fetch_canary.py
         continue-on-error: true
