@@ -1,11 +1,200 @@
 {
- "run_at": "2026-10-04T14:29:53Z",
+ "run_at": "2026-10-05T01:02:43Z",
  "sources": {
   "coinmetrics": {
-   "ok": false,
-   "secs": 1.6,
-   "error": "ValueError: could not convert string to float: 'flash'",
-   "trace": "Traceback (most recent call last):\n  File \"/home/runner/work/altcoin-etf-flows/altcoin-etf-flows/research/fetch_factors.py\", line 72, in run\n    info = fn() or {}\n           ^^^^\n  File \"/home/runner/work/altcoin-etf-flows/altcoin-etf-flows/research/fetch_factors.py\", line 130, in coinmetrics\n    out[d] = {k: (float(v) if v not in (None, \"\") else None) for k, v in r.items() if k not in (\"asset\", \"time\")}\n                  ^^^^^^^^\nValueError: could not convert string to float: 'flash'\n"
+   "ok": true,
+   "secs": 19.3,
+   "assets": {
+    "btc": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "FlowInExUSD",
+      "FlowOutExUSD",
+      "HashRate",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "SplyExNtv",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "eth": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "FlowInExUSD",
+      "FlowOutExUSD",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "SplyExNtv",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "sol": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "xrp": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "doge": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "HashRate",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "ltc": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "HashRate",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "link": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "avax": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "dot": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "hbar": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "trx": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "bnb": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "sui": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "near": {
+     "days": 1040,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "zec": {
+     "days": 1040,
+     "metrics": [
+      "AdrActCnt",
+      "CapMVRVCur",
+      "CapMrktCurUSD",
+      "CapMrktEstUSD",
+      "HashRate",
+      "IssTotNtv",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "SplyCur",
+      "volume_reported_spot_usd_1d"
+     ]
+    },
+    "hype": {
+     "days": 713,
+     "metrics": [
+      "CapMrktEstUSD",
+      "PriceUSD",
+      "ReferenceRateUSD",
+      "volume_reported_spot_usd_1d"
+     ]
+    }
+   }
   },
   "stablecoins": {
    "ok": true,
@@ -131,6 +320,29 @@
     "TRX": 365,
     "ZEC": 365
    }
+  },
+  "binance_quarterly": {
+   "ok": true,
+   "secs": 391.0,
+   "BTCUSDT_240329": 120,
+   "BTCUSDT_240628": 185,
+   "BTCUSDT_240927": 183,
+   "BTCUSDT_241227": 183,
+   "BTCUSDT_250328": 183,
+   "BTCUSDT_250627": 183,
+   "BTCUSDT_250926": 183,
+   "BTCUSDT_251226": 188,
+   "BTCUSDT_260327": 187,
+   "BTCUSDT_260626": 183,
+   "BTCUSDT_260925": 183,
+   "BTCUSDT_261225": 100,
+   "BTCUSDT_270326": 9
+  },
+  "binance_spot_recent": {
+   "ok": true,
+   "secs": 19.7,
+   "1d": 1038,
+   "1h": 24912
   }
  }
 }
