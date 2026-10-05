@@ -4,7 +4,7 @@ Keep both implementations identical; scripts/check_stats.py compares them.
 Definitions
 - r_t      log return of the coin's reference ETF close, previous trading day to t
 - rb_t     same for IBIT (BTC)
-- x_t      net flow / previous close  (proportional to flow as a share of market cap)
+- x_t      net flow / the coin's market cap at about the previous close, in basis points
 - y_t      'abn': r_t - beta * rb_t, beta = OLS slope of r on rb over the same sample
            (for BTC itself y = r);  'raw': r_t
 - corr     Pearson over days where x, r, rb are all present (days whose Canary part is

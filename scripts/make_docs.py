@@ -92,7 +92,8 @@ def coin_maps(daily):
             for d, v in zip(c["dates"], arr):
                 if v not in (None, 0, 0.0):
                     funds.setdefault(d, {})[tk] = v
-        out[sym] = {"flow": flows, "funds": funds, "pending": pend,
+        mcap = {d: v for d, v in zip(c["dates"], c.get("mcap") or []) if isinstance(v, (int, float)) and v > 0}
+        out[sym] = {"flow": flows, "funds": funds, "pending": pend, "mcap": mcap,
                     "pending_fund": (c.get("pending") or {}).get("fund")}
     return out
 
@@ -116,6 +117,8 @@ def build_docs(daily, closes, dates):
                 e["pending"] = m["pending_fund"]
             if d in closes.get(sym, {}):
                 e["close"] = round(closes[sym][d], 4)
+            if d in m["mcap"]:
+                e["mcap"] = m["mcap"][d]  # US$ millions, about the previous US close
             if e:
                 coins[sym] = e
         if coins:
@@ -129,7 +132,9 @@ def series_for(sym, daily, closes, cal):
     Pc = [closes[sym].get(d) for d in cal]
     pend = [d in m["pending"] for d in cal]
     R = [None] + [math.log(Pc[i] / Pc[i - 1]) if Pc[i] and Pc[i - 1] else None for i in range(1, len(cal))]
-    X = [None] + [F[i] / Pc[i - 1] if (F[i] is not None and Pc[i - 1] and not pend[i]) else None for i in range(1, len(cal))]
+    # flow as a share of the market cap at about the previous close, in basis points
+    MC = [m["mcap"].get(d) for d in cal]
+    X = [None] + [F[i] / MC[i] * 1e4 if (F[i] is not None and MC[i] and not pend[i]) else None for i in range(1, len(cal))]
     return F, Pc, R, X, pend
 
 
