@@ -127,7 +127,15 @@ def coinmetrics():
         out = {}
         for r in rows:
             d = r["time"][:10]
-            out[d] = {k: (float(v) if v not in (None, "") else None) for k, v in r.items() if k not in ("asset", "time")}
+            rec = {}
+            for k, v in r.items():
+                if k in ("asset", "time") or v in (None, ""):
+                    continue
+                try:
+                    rec[k] = float(v)
+                except (TypeError, ValueError):
+                    pass  # status flags such as "flash" / "reviewed"
+            out[d] = rec
         save(f"coinmetrics_{a}.json", out)
         got[a] = {"days": len(out), "metrics": sorted({k for v in out.values() for k in v})}
     return {"assets": got}
@@ -262,6 +270,81 @@ def binance_vision():
     return {"funding": len(fund), "k1d": len(k1d), "k1h": len(k1h), "missing": miss[:12], "n_missing": len(miss)}
 
 
+QUARTERLY = ["240329", "240628", "240927", "241227", "250328", "250627", "250926", "251226",
+             "260327", "260626", "260925", "261225", "270326"]
+
+
+def bv_rows(path, sym, interval, y, m):
+    """Klines for one month from data.binance.vision: the monthly file, or the daily files when the
+    monthly one is not published yet. Rows: [open ms, o, h, l, c, base vol, quote vol, taker-buy quote]."""
+    ym = f"{y}-{m:02d}"
+    try:
+        txts = [binance_zip(f"https://data.binance.vision/data/{path}/monthly/klines/{sym}/{interval}/{sym}-{interval}-{ym}.zip")]
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+        txts = []
+        d = dt.date(y, m, 1)
+        while d.month == m and d < NOW.date():
+            try:
+                txts.append(binance_zip(f"https://data.binance.vision/data/{path}/daily/klines/{sym}/{interval}/{sym}-{interval}-{d.isoformat()}.zip"))
+            except urllib.error.HTTPError:
+                pass
+            d += dt.timedelta(days=1)
+            time.sleep(0.1)
+    out = []
+    for txt in txts:
+        for row in csv.reader(io.StringIO(txt)):
+            if not row or not row[0].strip().isdigit():
+                continue
+            t = int(row[0])
+            t = t // 1000 if t > 10 ** 14 else t
+            out.append([t, float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[7]), float(row[10])])
+    return out
+
+
+@source("binance_quarterly")
+def binance_quarterly():
+    """USDT-margined quarterly futures daily klines (for the term basis versus spot BTCUSDT)."""
+    got, series = {}, {}
+    for q in QUARTERLY:
+        sym = f"BTCUSDT_{q}"
+        exp = dt.date(2000 + int(q[:2]), int(q[2:4]), int(q[4:]))
+        first = max(START, (exp.replace(day=1) - dt.timedelta(days=280)).replace(day=1))
+        last = min(exp, NOW.date())
+        rows = []
+        for y, m in months(first, last):
+            try:
+                rows += bv_rows("futures/um", sym, "1d", y, m)
+            except Exception:
+                pass
+            time.sleep(0.15)
+        series[sym] = {"expiry": exp.isoformat(), "rows": sorted({r[0]: r for r in rows}.values())}
+        got[sym] = len(series[sym]["rows"])
+    save("binance_btc_quarterly_1d.json", series)
+    return got
+
+
+@source("binance_spot_recent")
+def binance_spot_recent():
+    """Spot BTCUSDT 1d and 1h klines for the latest months (monthly files lag a few days)."""
+    got = {}
+    for interval in ("1d", "1h"):
+        path = os.path.join(OUT, f"binance_BTCUSDT_{interval}.json")
+        rows = json.load(open(path)) if os.path.exists(path) else []
+        have = {r[0] for r in rows}
+        start = (NOW.date().replace(day=1) - dt.timedelta(days=40)).replace(day=1)
+        for y, m in months(start, NOW.date()):
+            for r in bv_rows("spot", "BTCUSDT", interval, y, m):
+                if r[0] not in have:
+                    rows.append(r)
+                    have.add(r[0])
+        rows.sort()
+        save(f"binance_BTCUSDT_{interval}.json", rows)
+        got[interval] = len(rows)
+    return got
+
+
 @source("coinbase")
 def coinbase():
     got = {}
@@ -364,11 +447,28 @@ def fred():
     return got
 
 
+ALL = {"coinmetrics": coinmetrics, "stablecoins": stablecoins, "funding_hyperliquid": funding_hyperliquid,
+       "funding_bitmex": funding_bitmex, "binance_vision": binance_vision, "binance_quarterly": binance_quarterly,
+       "binance_spot_recent": binance_spot_recent, "coinbase": coinbase, "deribit": deribit, "cftc_tff": cftc_tff,
+       "fred": fred, "coingecko": coingecko}
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
-    for fn in (coinmetrics, stablecoins, funding_hyperliquid, funding_bitmex, binance_vision, coinbase, deribit, cftc_tff, fred, coingecko):
-        fn()
-    json.dump(REPORT, open(os.path.join(OUT, "_report.json"), "w"), indent=1)
+    want = None
+    lst = os.path.join(ROOT, "research", "fetch_sources.txt")
+    if os.path.exists(lst):
+        want = [l.strip() for l in open(lst) if l.strip() and not l.startswith("#")]
+    rep_path = os.path.join(OUT, "_report.json")
+    try:
+        old = json.load(open(rep_path)).get("sources", {})
+    except (OSError, ValueError):
+        old = {}
+    for name, fn in ALL.items():
+        if want is None or name in want:
+            fn()
+    REPORT["sources"] = {**old, **REPORT["sources"]}
+    json.dump(REPORT, open(rep_path, "w"), indent=1)
 
 
 if __name__ == "__main__":
