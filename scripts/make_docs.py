@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Turn data/daily.json + ETF closes into the dashboard database documents
-(collection "daily", one document per US trading day) and a short summary.
+"""Turn data/daily.json + each coin's own price (data/coin_px, 16:00 New York) into the
+dashboard database documents (collection "daily", one document per US trading day) and a
+short summary. Returns and every statistic use the coin price; the first ETF's close is
+stored too, for reference only.
 
 Usage
   python3 scripts/make_docs.py --out OUT [--days 8 | --all] [--ibkr DIR] [--db DIR]
@@ -82,6 +84,29 @@ def load_closes(daily, ibkr_dir=None, existing=None):
     return closes
 
 
+def load_px(daily):
+    """Each coin's own USD price at 16:00 New York time per trading day (data/coin_px, fetched by
+    the repo's workflow): the price the statistics use. Kept from the dashboard window start, so
+    a coin's first ETF day has the previous day's price for its return."""
+    out = {}
+    for sym in daily["coins"]:
+        j = load_json_file(P("data", "coin_px", f"{sym}.json")) or {}
+        out[sym] = {d: v[1] for d, v in (j.get("rows") or {}).items()
+                    if d >= daily["window_start"] and isinstance(v, list) and len(v) > 1 and isinstance(v[1], (int, float))}
+    return out
+
+
+def load_json_file(path):
+    try:
+        return json.load(open(path))
+    except (OSError, ValueError):
+        return None
+
+
+def sig6(v):
+    return float(f"{v:.6g}")
+
+
 def coin_maps(daily):
     out = {}
     for sym, c in daily["coins"].items():
@@ -98,7 +123,7 @@ def coin_maps(daily):
     return out
 
 
-def build_docs(daily, closes, dates):
+def build_docs(daily, closes, dates, px=None):
     maps = coin_maps(daily)
     now = dt.datetime.now(SGT).isoformat(timespec="seconds")
     docs = {}
@@ -116,7 +141,9 @@ def build_docs(daily, closes, dates):
             if d in m["pending"]:
                 e["pending"] = m["pending_fund"]
             if d in closes.get(sym, {}):
-                e["close"] = round(closes[sym][d], 4)
+                e["close"] = round(closes[sym][d], 4)  # the coin's first ETF (reference only)
+            if px and d in px.get(sym, {}):
+                e["px"] = sig6(px[sym][d])  # the coin's own price at 16:00 New York
             if d in m["mcap"]:
                 e["mcap"] = m["mcap"][d]  # US$ millions, about the previous US close
             if e:
@@ -126,10 +153,11 @@ def build_docs(daily, closes, dates):
     return docs
 
 
-def series_for(sym, daily, closes, cal):
+def series_for(sym, daily, px, cal):
+    """Flows, the coin's own 16:00 ET price, log returns, flow as bp of market cap, pending flags."""
     m = coin_maps(daily)[sym]
     F = [m["flow"].get(d) for d in cal]
-    Pc = [closes[sym].get(d) for d in cal]
+    Pc = [px[sym].get(d) for d in cal]
     pend = [d in m["pending"] for d in cal]
     R = [None] + [math.log(Pc[i] / Pc[i - 1]) if Pc[i] and Pc[i - 1] else None for i in range(1, len(cal))]
     # flow as a share of the market cap at about the previous close, in basis points
@@ -158,12 +186,14 @@ def known_flows(sym, daily, cal):
     return out
 
 
-def significance(daily, closes, cal):
+def significance(daily, px, cal):
     """Two summary lines: who leads / lags (q < 0.10 across all coins) and the rule tests."""
     ser = {}
     for s in ALTS + REFS:
-        F, Pc, R, X, pend = series_for(s, daily, closes, cal)
-        ser[s] = dict(P=Pc, R=R, X=X, K=known_flows(s, daily, cal), lag=2 if s in CANARY_ONLY else 1)
+        F, Pc, R, X, pend = series_for(s, daily, px, cal)
+        launch = daily["coins"][s]["launch"]
+        RL = [r if (r is not None and d >= launch) else None for r, d in zip(R, cal)]  # trading counts from the ETF launch
+        ser[s] = dict(P=Pc, R=R, RL=RL, X=X, K=known_flows(s, daily, cal), lag=2 if s in CANARY_ONLY else 1)
     RB = ser["BTC"]["R"]
     coins = ALTS + REFS
     lt = {s: S.leadlag_tests(ser[s]["X"], ser[s]["R"], RB, ser[s]["lag"], "abn", s == "BTC") for s in coins}
@@ -189,13 +219,13 @@ def significance(daily, closes, cal):
         c = ser[s]
         sg = T.signals(c["K"], c["P"], c["lag"])
         for rule in T.RULES:
-            net, _ = T.backtest(sg[rule], c["R"])
+            net, _ = T.backtest(sg[rule], c["RL"])
             if T.perf(net) is None:
                 continue
-            tt = T.timing(sg[rule], c["R"])
+            tt = T.timing(sg[rule], c["RL"])
             if tt is not None:
                 tests.append(tt["p"])
-    Rb = T.basket([ser[s]["R"] for s in ALTS])
+    Rb = T.basket([ser[s]["RL"] for s in ALTS])
     n = len(cal)
     agg = [None] * n
     for d in range(1, n):
@@ -265,10 +295,10 @@ def api_status():
     return state, None
 
 
-def summary(daily, closes):
+def summary(daily, px):
     allds = sorted({d for c in daily["coins"].values() for d in c["dates"]})
     cal = trading_days(daily["window_start"], allds[-1])
-    _, _, RB, _, _ = series_for("BTC", daily, closes, cal)
+    _, _, RB, _, _ = series_for("BTC", daily, px, cal)
     D = max(daily["coins"][s]["dates"][-1] for s in ALTS if daily["coins"][s]["dates"])
     di = cal.index(D)
     lines = []
@@ -278,7 +308,7 @@ def summary(daily, closes):
     missing = []
     per = {}
     for s in ALTS + REFS:
-        F, Pc, R, X, pend = series_for(s, daily, closes, cal)
+        F, Pc, R, X, pend = series_for(s, daily, px, cal)
         v = F[di]
         last5 = [f for f in F[max(0, di - 4):di + 1] if f is not None]
         last20 = [f for f in F[max(0, di - 19):di + 1] if f is not None]
@@ -335,7 +365,7 @@ def summary(daily, closes):
     except Exception:  # the API check must never block the summary
         pass
     try:
-        lines.extend(significance(daily, closes, cal))
+        lines.extend(significance(daily, px, cal))
     except Exception as e:  # never block the daily summary on the statistics
         lines.append(f"（顯著性檢定這次沒有算出來：{type(e).__name__}）")
     lines.append("儀表板：山寨幣 ETF 資金流")
@@ -353,10 +383,11 @@ def main():
     daily = json.load(open(P("data", "daily.json")))
     existing = db_export(a.db)
     closes = load_closes(daily, a.ibkr, existing)
+    px = load_px(daily)
     allds = sorted({d for c in daily["coins"].values() for d in c["dates"]})
     cal = trading_days(daily["window_start"], allds[-1])
     dates = cal if a.all else cal[-a.days:]
-    docs = build_docs(daily, closes, dates)
+    docs = build_docs(daily, closes, dates, px)
     os.makedirs(os.path.join(a.out, "docs"), exist_ok=True)
     entries, unchanged = [], []
     for d, doc in sorted(docs.items()):
@@ -373,7 +404,7 @@ def main():
         entries.append(e)
     for k in range(0, len(entries), 50):
         json.dump(entries[k:k + 50], open(os.path.join(a.out, f"batch_{k // 50 + 1}.json"), "w"), indent=1)
-    text, D, per = summary(daily, closes)
+    text, D, per = summary(daily, px)
     if existing and D in existing and not entries:
         dd = dt.date.fromisoformat(D)
         text = (f"山寨幣 ETF 資金流：沒有新的美股交易日（最新仍是 {dd.month}/{dd.day}），資料已核對、沒有修正。\n"
@@ -383,6 +414,7 @@ def main():
     report = {"latest_date": D, "written": [e["doc_id"] for e in entries], "unchanged": unchanged,
               "existing_need_version": [e["doc_id"] for e in entries if e.get("needs_if_version")],
               "missing_close_on_latest": [daily["coins"][s]["etf"] for s, ok in last_closes.items() if not ok],
+              "missing_px_on_latest": [s for s in daily["coins"] if px[s].get(D) is None],
               "api": api_status()[0]}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1, ensure_ascii=False)
     short = dict(report, written=f"{len(report['written'])} docs" + (f" ({report['written'][0]} .. {report['written'][-1]})" if report["written"] else ""),
