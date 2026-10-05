@@ -26,7 +26,7 @@ On a Debian or Ubuntu server (for example a Linode Nanode), run as root:
 curl -fsSL https://raw.githubusercontent.com/cornell880503/altcoin-etf-flows/main/deploy/install.sh | sudo bash
 ```
 
-It installs Caddy and a systemd timer that fetches the page at :07 and :37 every hour, checks it and swaps it in. The server needs no keys or tokens. Running it again is safe. Optional settings go before `bash`:
+It installs Caddy and a systemd timer that fetches the page at :07 and :37 every hour, checks it and swaps it in. The server needs no keys or tokens. Running it again is safe; it rewrites the web server config from the settings given on that run. Optional settings go before `bash`:
 
 | Setting | Effect |
 |---|---|

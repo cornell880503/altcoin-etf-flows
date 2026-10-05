@@ -219,7 +219,7 @@ elif command -v firewall-cmd >/dev/null && firewall-cmd --state >/dev/null 2>&1;
 fi
 
 # ------------------------------------------------------------------ done
-IP="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i <= NF; i++) if ($i == "src") { print $(i + 1); exit }}')"
+IP="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i <= NF; i++) if ($i == "src") { print $(i + 1); exit }}')" || IP=""
 say "Done"
 echo "Open:  http://${IP:-<this server>}/"
 if [ -n "$DOMAIN" ]; then echo "       https://${DOMAIN}/  (once its DNS A record points to ${IP:-this server})"; fi
