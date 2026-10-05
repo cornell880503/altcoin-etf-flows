@@ -1,112 +1,45 @@
 {
  "assets": {
-  "AVAX": {
-   "bytes": 242650,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
-  "BNB": {
-   "bytes": 242040,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
   "BTC": {
-   "bytes": 522159,
+   "bytes": 522151,
    "dated_arrays": [
     "historical"
    ],
    "historical_mentions": 2,
    "used": "historical"
-  },
-  "DOGE": {
-   "bytes": 241825,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
-  "DOT": {
-   "bytes": 242371,
-   "dated_arrays": [],
-   "historical_mentions": 1
   },
   "ETH": {
-   "bytes": 456386,
+   "bytes": 456378,
    "dated_arrays": [
     "historical"
    ],
    "historical_mentions": 2,
    "used": "historical"
-  },
-  "HBAR": {
-   "bytes": 241906,
-   "dated_arrays": [],
-   "historical_mentions": 1
   },
   "HYPE": {
-   "bytes": 324632,
+   "bytes": 324624,
    "dated_arrays": [
     "historical"
    ],
    "historical_mentions": 2,
    "used": "historical"
-  },
-  "LINK": {
-   "bytes": 242461,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
-  "LTC": {
-   "bytes": 241764,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
-  "NEAR": {
-   "bytes": 226301,
-   "dated_arrays": [],
-   "historical_mentions": 1
   },
   "SOL": {
-   "bytes": 353976,
+   "bytes": 353968,
    "dated_arrays": [
     "historical"
    ],
    "historical_mentions": 2,
    "used": "historical"
-  },
-  "SUI": {
-   "bytes": 242104,
-   "dated_arrays": [],
-   "historical_mentions": 1
-  },
-  "TRX": {
-   "bytes": 226299,
-   "dated_arrays": [],
-   "historical_mentions": 1
   },
   "XRP": {
-   "bytes": 332135,
+   "bytes": 332127,
    "dated_arrays": [
     "historical"
    ],
    "historical_mentions": 2,
    "used": "historical"
-  },
-  "ZEC": {
-   "bytes": 226334,
-   "dated_arrays": [],
-   "historical_mentions": 1
   }
  },
- "failures": [
-  "LINK: no dated flow array",
-  "HBAR: no dated flow array",
-  "AVAX: no dated flow array",
-  "DOGE: no dated flow array",
-  "LTC: no dated flow array",
-  "SUI: no dated flow array",
-  "DOT: no dated flow array",
-  "BNB: no dated flow array",
-  "NEAR: no dated flow array",
-  "TRX: no dated flow array",
-  "ZEC: no dated flow array"
- ]
+ "failures": []
 }
