@@ -8,7 +8,7 @@ Inputs (all in this repo):
   site/research.json     fixed research results (SOL/XRP/BTC study, BTC flow study, rule tests)
 
 Usage: python3 scripts/build_site.py --out DIR
-Writes DIR/index.html and DIR/health.json. Standard library only. Exits non-zero, without
+Writes DIR/index.html, DIR/health.json and DIR/.nojekyll (for GitHub Pages). Standard library only. Exits non-zero, without
 writing, when the data look wrong, so a broken build never replaces a good page."""
 import argparse
 import datetime as dt
@@ -134,6 +134,7 @@ def main():
     health = {"built_at": built_at, "latest_date": snap["asof"], "trading_days": len(snap["dates"]),
               "missing_price_on_latest": missing, "bytes": len(html.encode())}
     json.dump(health, open(os.path.join(a.out, "health.json"), "w"), indent=1)
+    open(os.path.join(a.out, ".nojekyll"), "w").close()  # GitHub Pages: serve the files as they are
     print(json.dumps(health, ensure_ascii=False))
 
 
