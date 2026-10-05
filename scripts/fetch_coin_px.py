@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Each coin's own USD price at 10:00 and 16:00 New York time on every US trading day.
-
-16:00 ET is when the spot ETFs strike NAV, so it is the coin price on the same clock as the
-day's creations and redemptions; 10:00 ET is shortly after the flow figures are published
-(used for "after publication" returns). Sources, the first one that has the pair:
+"""Each coin's own USD price on every US trading day, at three times:
+  10:00 New York   shortly after the flow figures are published ("after publication" returns)
+  16:00 New York   when the spot ETFs strike NAV
+  daily close      00:00 UTC of the next calendar day (08:00 Singapore): the close of that UTC
+                   day's daily candle, the convention crypto venues use. Statistics use this one.
+The UTC day of a US trading date contains its whole US session. Sources, the first one that has
+the pair:
   1. Coinbase Exchange   <SYM>-USD   1h candles (public API)
   2. Binance spot        <SYM>USDT   1h klines (data.binance.vision archive)
   3. Hyperliquid         <SYM> perp  1h candles (public info API)
 Hours the primary source misses are filled from the next one (counted in the report).
 
-data/coin_px/<SYM>.json = {"source", "pair", "rows": {date: [p10, p16]}}. The first run
-backfills from START; later runs refresh the last REFRESH_DAYS days."""
+data/coin_px/<SYM>.json = {"source", "pair", "schema": 2, "rows": {date: [p10, p16, p_close]}}.
+The first run (or a file in the old two-column layout) backfills from START; later runs refresh
+the last REFRESH_DAYS days."""
 import datetime as dt
 import io
 import json
@@ -142,6 +145,16 @@ def et_ts(day, hour):
     return int(dt.datetime(d.year, d.month, d.day, hour, tzinfo=NY).timestamp())
 
 
+def utc_close_ts(day):
+    """End of the UTC calendar day `day` (00:00 UTC next day = 08:00 Singapore)."""
+    d = dt.date.fromisoformat(day) + dt.timedelta(days=1)
+    return int(dt.datetime(d.year, d.month, d.day, tzinfo=UTC).timestamp())
+
+
+def points(day):
+    return [et_ts(day, 10), et_ts(day, 16), utc_close_ts(day)]
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     now = int(time.time())
@@ -153,24 +166,23 @@ def main():
             store = json.load(open(path))
         except (OSError, ValueError):
             store = {"rows": {}}
-        backfill = len(store["rows"]) < 30
+        backfill = len(store["rows"]) < 30 or store.get("schema") != 2
         start = START.get(sym, DEFAULT_START) if backfill else \
             (dt.date.fromisoformat(today) - dt.timedelta(days=REFRESH_DAYS)).isoformat()
         days = [d for d in trading_days(start, today) if et_ts(d, 16) <= now - 120]
         if not days:
             continue
-        t0, t1 = et_ts(days[0], 9), et_ts(days[-1], 16)
-        need = [(d, h) for d in days for h in (10, 16)]
+        need = [ts for d in days for ts in points(d) if ts <= now - 120]  # candles ending at these times
         order = SOURCES[:]
         if store.get("source"):  # keep the venue a coin already uses as its primary
             order.sort(key=lambda s: s[0] != store["source"])
         hours, used, filled, errors = {}, None, 0, {}
         for name, fn, pair in order:
-            missing = [x for x in need if (et_ts(x[0], x[1]) - 3600) not in hours]
+            missing = [ts for ts in need if (ts - 3600) not in hours]
             if not missing:
                 break
             try:
-                got = fn(sym, min(et_ts(d, h) for d, h in missing) - 3600, max(et_ts(d, h) for d, h in missing))
+                got = fn(sym, min(missing) - 3600, max(missing))
             except Exception as e:  # pair not listed there, or the venue is down
                 errors[name] = f"{type(e).__name__}: {str(e)[:100]}"
                 continue
@@ -181,26 +193,32 @@ def main():
             if used is None:
                 used = (name, pair(sym))
             else:
-                filled += sum(1 for d, h in missing if (et_ts(d, h) - 3600) in new)
+                filled += sum(1 for ts in missing if (ts - 3600) in new)
             hours.update(new)
         if used is None:
             report["coins"][sym] = {"error": errors}
             continue
+        rows = {} if backfill else store["rows"]
+        if backfill:  # keep earlier values the venues no longer serve (e.g. Hyperliquid's short history)
+            for d, v in store["rows"].items():
+                rows[d] = (list(v) + [None, None, None])[:3]
         for d in days:
-            p10, p16 = hours.get(et_ts(d, 10) - 3600), hours.get(et_ts(d, 16) - 3600)
-            if p16 is not None or p10 is not None:
-                old = store["rows"].get(d, [None, None])
-                store["rows"][d] = [p10 if p10 is not None else old[0], p16 if p16 is not None else old[1]]
-        store["rows"] = {k: store["rows"][k] for k in sorted(store["rows"])}
+            got3 = [hours.get(ts - 3600) for ts in points(d)]
+            if any(v is not None for v in got3):
+                old = (list(rows.get(d) or []) + [None, None, None])[:3]
+                rows[d] = [g if g is not None else o for g, o in zip(got3, old)]
+        store["rows"] = {k: (list(rows[k]) + [None, None, None])[:3] for k in sorted(rows)}
         store.update(source=store.get("source") or used[0], pair=store.get("pair") or used[1], unit="USD (USDT on Binance)",
-                     clock="close of the 1h candle ending at 10:00 and 16:00 America/New_York")
+                     schema=2, clock=["10:00 America/New_York", "16:00 America/New_York",
+                                      "daily close: 00:00 UTC of the next day (08:00 Singapore)"],
+                     how="close of the 1h candle ending at each time")
         json.dump(store, open(path, "w"), separators=(",", ":"))
-        have = [d for d in days if store["rows"].get(d, [None, None])[1] is not None]
+        have = [d for d in days if store["rows"].get(d, [None] * 3)[2] is not None]
         report["coins"][sym] = {"source": store["source"], "pair": store["pair"], "backfill": backfill, "days": len(days),
-                                "with_16": len(have), "filled_hours": filled, "first": next(iter(store["rows"]), None),
+                                "with_close": len(have), "filled_hours": filled, "first": next(iter(store["rows"]), None),
                                 "last": have[-1] if have else None, "errors": errors or None}
     json.dump(report, open(os.path.join(OUT, "_report.json"), "w"), indent=1, sort_keys=True)
-    print(json.dumps({k: {kk: v.get(kk) for kk in ("source", "with_16", "days", "filled_hours", "error")} for k, v in report["coins"].items()}))
+    print(json.dumps({k: {kk: v.get(kk) for kk in ("source", "with_close", "days", "filled_hours", "error")} for k, v in report["coins"].items()}))
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 Keep both implementations identical; scripts/check_stats.py compares them.
 
 Definitions
-- r_t      log return of the coin's own price at 16:00 New York (data/coin_px), previous
+- r_t      log return of the coin's own daily close (00:00 UTC, data/coin_px), previous
            trading day to t; the ETF's price is not used
 - rb_t     same for BTC
 - x_t      net flow / the coin's market cap at about the previous close, in basis points

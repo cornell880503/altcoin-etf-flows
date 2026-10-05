@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Turn data/daily.json + each coin's own price (data/coin_px, 16:00 New York) into the
+"""Turn data/daily.json + each coin's own daily close (data/coin_px, 00:00 UTC) into the
 dashboard database documents (collection "daily", one document per US trading day) and a
 short summary. Returns and every statistic use the coin price; the first ETF's close is
 stored too, for reference only.
@@ -84,15 +84,20 @@ def load_closes(daily, ibkr_dir=None, existing=None):
     return closes
 
 
+PX_CLOSE = 2  # column of data/coin_px rows: [10:00 New York, 16:00 New York, daily close 00:00 UTC]
+
+
 def load_px(daily):
-    """Each coin's own USD price at 16:00 New York time per trading day (data/coin_px, fetched by
-    the repo's workflow): the price the statistics use. Kept from the dashboard window start, so
-    a coin's first ETF day has the previous day's price for its return."""
+    """Each coin's own daily close per US trading day: the price at 00:00 UTC after that date
+    (08:00 Singapore), i.e. the close of the UTC day whose daily candle holds the whole US session
+    (data/coin_px, fetched by the repo's workflow). The price every statistic uses. Kept from the
+    dashboard window start, so a coin's first ETF day has the previous day's close for its return."""
     out = {}
     for sym in daily["coins"]:
         j = load_json_file(P("data", "coin_px", f"{sym}.json")) or {}
-        out[sym] = {d: v[1] for d, v in (j.get("rows") or {}).items()
-                    if d >= daily["window_start"] and isinstance(v, list) and len(v) > 1 and isinstance(v[1], (int, float))}
+        out[sym] = {d: v[PX_CLOSE] for d, v in (j.get("rows") or {}).items()
+                    if d >= daily["window_start"] and isinstance(v, list) and len(v) > PX_CLOSE
+                    and isinstance(v[PX_CLOSE], (int, float))}
     return out
 
 
@@ -143,7 +148,7 @@ def build_docs(daily, closes, dates, px=None):
             if d in closes.get(sym, {}):
                 e["close"] = round(closes[sym][d], 4)  # the coin's first ETF (reference only)
             if px and d in px.get(sym, {}):
-                e["px"] = sig6(px[sym][d])  # the coin's own price at 16:00 New York
+                e["px"] = sig6(px[sym][d])  # the coin's own daily close (00:00 UTC = 08:00 Singapore)
             if d in m["mcap"]:
                 e["mcap"] = m["mcap"][d]  # US$ millions, about the previous US close
             if e:
@@ -154,7 +159,7 @@ def build_docs(daily, closes, dates, px=None):
 
 
 def series_for(sym, daily, px, cal):
-    """Flows, the coin's own 16:00 ET price, log returns, flow as bp of market cap, pending flags."""
+    """Flows, the coin's own daily close (00:00 UTC), log returns, flow as bp of market cap, pending flags."""
     m = coin_maps(daily)[sym]
     F = [m["flow"].get(d) for d in cal]
     Pc = [px[sym].get(d) for d in cal]

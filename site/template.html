@@ -357,7 +357,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <span class="legend"><span><span class="sq" style="background:var(--pos)"></span>流入</span><span><span class="sq" style="background:var(--neg)"></span>流出</span></span></div>
         <div class="chart" id="ch-flow" role="img" aria-label="每日淨流量長條圖"></div>
         <div class="chart-title">幣價 <span class="sub" id="price-sub"></span></div>
-        <div class="chart" id="ch-price" role="img" aria-label="幣價走勢（美東 16:00）"></div>
+        <div class="chart" id="ch-price" role="img" aria-label="幣價走勢（每日收盤，新加坡 08:00）"></div>
       </div>
       <div class="grid2">
         <div class="panel">
@@ -388,7 +388,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <ul class="method">
             <li>流量：cryptoetf.today。BTC、ETH、SOL、XRP、HYPE 用網站的分基金歷史；其他幣用網站流量頁載入的上市以來合計（2026-10-04 擷取一次），之後每天接官方 API。Canary 旗下 XRPC、SOLC、LTCC、HBR、TRXS、SUIS 改用 Canary 官網的每日流通單位 × NAV 自己算。</li>
             <li>來源早期有兩段合計不完整：SUI 在 2026-08-21 前不含 21Shares 的 TSUI（Canary 的 SUIS 已用官網資料補上），AVAX 在 2026-03-12 到 07-24 不含 VanEck 的 VAVX。這兩檔那段時間的流量都很小。</li>
-            <li>幣價：每個美股交易日美東 16:00 的現貨價，也就是 ETF 計算淨值、決定當天申購贖回的同一時間。來源以 Coinbase 的美元報價為主，Coinbase 沒有的幣用 Binance（USDT）或 Hyperliquid。週一的報酬包含週末。</li>
+            <li>幣價：每個美股交易日的每日收盤價，取 UTC 0:00（新加坡時間隔天早上 8 點），也就是交易所日 K 的收盤；這根日 K 涵蓋當天整個美股交易時段。來源以 Coinbase 的美元報價為主，Coinbase 沒有的幣用 Binance（USDT）或 Hyperliquid。週一的報酬包含週末。</li>
             <li>一律用申購日記帳。Canary 的表以交割日記帳，這裡往前移一天，所以最新一天的 XRPC、SOLC、SUIS 要隔天才補上，LTC、HBAR、TRX 整條晚一天。SoSoValue 等新聞把 Canary 記在隔天，對不上時差一天是正常的。</li>
             <li>來源有時把週五的流量拆到週六、週日，這裡加回週五（和來源先前版本逐筆相符）；假日重複的列刪除；上市前的種子資金不算。</li>
             <li>抓取程式公開在 <a href="https://github.com/cornell880503/altcoin-etf-flows" target="_blank" rel="noopener">github.com/cornell880503/altcoin-etf-flows</a>，每 3 小時跑一次。</li>
@@ -398,7 +398,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <h3>相關係數怎麼算、怎麼讀</h3>
           <ul class="method">
             <li>流量除以這個幣在前一個收盤時的市值（CoinGecko 每日 UTC 0 點的值，大約是前一個美股收盤後 4 小時），單位 bp（0.01%）。這樣不同大小的幣可以直接比較，幣價跌了一半時，同樣的錢也不會被看成一樣大。</li>
-            <li>報酬用幣價（美東 16:00 到隔一個交易日 16:00）的對數報酬，不是 ETF 的價格。「扣除 BTC 後」= 報酬 − β × BTC 報酬，β 在同一段樣本裡估計；BTC 自己用原始報酬。</li>
+            <li>報酬用幣價的每日收盤（UTC 0:00，新加坡 08:00）到下一個交易日收盤的對數報酬，不是 ETF 的價格。「扣除 BTC 後」= 報酬 − β × BTC 報酬，β 在同一段樣本裡估計；BTC 自己用原始報酬。</li>
             <li>相關是同一天的關聯，分不出因果：錢推價格、價格吸引錢都會讓它變大。「誰先誰後」圖的 k &gt; 0 才是預測力。</li>
             <li>研究分頁裡的 0.18、0.20 是美元流量對原始報酬；這裡改用占市值比例與扣除 BTC 的報酬，同一份資料 SOL、XRP 會略高，檢定結論不變。</li>
             <li>NEAR、TRX 上市不久，ZEC 也只有一個多月，樣本少於 30 天或有流量的日子少於 10 天不檢定。</li>
@@ -587,7 +587,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <h3>時間點和成本</h3>
           <ul class="method">
             <li>第 T 天的流量在 T+1 美股開盤前公布，規則在 T+1 收盤決定部位、持有到下一個收盤；Canary 的基金晚一天公布，所以 LTC、HBAR、TRX 在 T+2 才能用，SOL、XRP、SUI 裡 SOLC、XRPC、SUIS 那一塊也不算進 T+1 的訊號。</li>
-            <li>價格用幣本身在美東 16:00 的現貨價，假設在那個時間成交，每次改變部位扣 0.1%。每個幣只從它的第一檔 ETF 上市日起算。</li>
+            <li>價格用幣本身的每日收盤價（UTC 0:00，新加坡 08:00），假設在收盤成交，每次改變部位扣 0.1%。每個幣只從它的第一檔 ETF 上市日起算。</li>
             <li>所有門檻只用當時以前的資料（例如 z 分數用前 60 天），沒有偷看未來。</li>
           </ul>
         </div>
@@ -596,7 +596,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <ul class="method">
             <li>擇時檢定：把隔天報酬對「持有/空手」做迴歸，看兩組平均報酬差；標準誤取 Newey–West（5 期）和 OLS 兩者較大的。</li>
             <li>試了很多條規則，總會有一條看起來不錯，所以用兩道校正：Benjamini–Hochberg 的 q 值，以及旋轉檢定（把報酬和訊號錯開隨機天數重抽 500 次）算「最好那條」是不是運氣。</li>
-            <li>限制：山寨幣 ETF 最多不到一年、而且大多是空頭；規則在 16:00 決定、16:00 成交，沒有檢驗「資料一公布就進場」的做法（BTC 研究分頁有算公布後 10:00 進場的報酬）。</li>
+            <li>限制：山寨幣 ETF 最多不到一年、而且大多是空頭；規則在每日收盤決定、收盤成交，沒有檢驗「資料一公布就進場」的做法（BTC 研究分頁有算公布後立刻進場的報酬）。</li>
           </ul>
         </div>
       </div>
@@ -723,7 +723,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   </main>
 
   <footer>
-    <p>資料：cryptoetf.today、Canary Capital（流量）；Coinbase、Binance（幣價，美東 16:00）；CoinGecko（市值）。BTC 研究另用 Coin Metrics、DefiLlama、FRED、CFTC、strategy.com；研究結論另用 Farside Investors、CoinMarketCap、Interactive Brokers（ETF 收盤，只用於比對）。本頁是資料整理與統計，不是投資建議。</p>
+    <p>資料：cryptoetf.today、Canary Capital（流量）；Coinbase、Binance（幣價，每日收盤 UTC 0:00）；CoinGecko（市值）。BTC 研究另用 Coin Metrics、DefiLlama、FRED、CFTC、strategy.com；研究結論另用 Farside Investors、CoinMarketCap、Interactive Brokers（ETF 收盤，只用於比對）。本頁是資料整理與統計，不是投資建議。</p>
   </footer>
 </div>
 <div id="tip" hidden></div>
@@ -1300,7 +1300,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var siteAge = SITE ? (Date.now() - new Date(SNAP.built_at).getTime()) / 3600e3 : null;
     pulse.className = 'pulse' + (dbState === 'live' || (SITE && siteAge < 8) ? ' live' : '');
     var D0 = M ? latestAltDate() : null;
-    document.getElementById('status-asof').textContent = D0 ? '資料截至 ' + D0 + '（' + wk(D0) + '）美東收盤' : '';
+    document.getElementById('status-asof').textContent = D0 ? '流量資料截至 ' + D0 + '（' + wk(D0) + '）' : '';
     var sch = document.getElementById('status-sched'); if (sch) sch.textContent = SITE ? '' : '這一版已停止每日更新，最新資料在自架網站';
     if (SITE) st.textContent = '每 3 小時自動更新，最近一次 ' + sgtTime(SNAP.built_at) + '（新加坡時間）' + (siteAge > 12 ? '，已經 ' + Math.floor(siteAge) + ' 小時沒有更新' : '');
     else if (dbState === 'live') st.textContent = '資料庫最後寫入 ' + (lastRun || '—');
@@ -1539,7 +1539,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     document.getElementById('dt-eyebrow').textContent = (REFS.indexOf(s) >= 0 ? '對照 · ' : '') + '首檔 ETF ' + meta.etf + ' · ' + meta.launch + ' 上市';
     document.getElementById('dt-title').textContent = s + ' · ' + NAMES[s];
     var gapTxt = (meta.gaps || []).map(function (g) { return g.from + ' 到 ' + g.to + ' 的來源合計不含 ' + g.fund; }).join('；');
-    document.getElementById('dt-sub').textContent = '流量來源：' + meta.source + '。' + (meta.full ? '從上市（或 2025-10-28）起完整。' : '流量資料自 ' + meta.flowFrom + ' 起，之後每日累積。') + (gapTxt ? gapTxt + '（那段期間的流量很小）。' : '') + '幣價是 ' + s + ' 在美東 16:00 的現貨價。';
+    document.getElementById('dt-sub').textContent = '流量來源：' + meta.source + '。' + (meta.full ? '從上市（或 2025-10-28）起完整。' : '流量資料自 ' + meta.flowFrom + ' 起，之後每日累積。') + (gapTxt ? gapTxt + '（那段期間的流量很小）。' : '') + '幣價是 ' + s + ' 的每日收盤價（UTC 0:00，新加坡 08:00）。';
     // stats row
     var sr = document.getElementById('dt-stats'); sr.replaceChildren();
     var rng = fullTest(c.X, c.R, RB, lo, hi, state.mode, isB);
@@ -1568,7 +1568,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       onCross: function (i) { if (priceCh) priceCh.setCross(i); }, aria: s + ' 每日淨流量，左右鍵逐日查看'
     });
     var pIdx = firstIdx(Pp);
-    document.getElementById('price-sub').textContent = s + ' · 美元，美東 16:00' + (pIdx >= 0 && lastIdx(Pp) >= 0 ? ' · 期間 ' + pct((Pp[lastIdx(Pp)] / Pp[pIdx] - 1) * 100) : '') + (li0 > lo && li0 <= hi ? ' · 直線 = ' + meta.etf + ' 上市' : '');
+    document.getElementById('price-sub').textContent = s + ' · 美元，每日收盤（新加坡 08:00）' + (pIdx >= 0 && lastIdx(Pp) >= 0 ? ' · 期間 ' + pct((Pp[lastIdx(Pp)] / Pp[pIdx] - 1) * 100) : '') + (li0 > lo && li0 <= hi ? ' · 直線 = ' + meta.etf + ' 上市' : '');
     priceCh = lineChart(document.getElementById('ch-price'), {
       x: ds, height: 170, xFmt: xFmt, rightPad: 14,
       series: [{ name: s + ' 幣價', color: 'var(--price)', y: Pp }], vline: li0 > lo && li0 <= hi ? li0 - lo : null,
@@ -1837,7 +1837,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   var sortBtns = Array.prototype.slice.call(document.querySelectorAll('[data-sort]'));
   sortBtns.forEach(function (b) { b.addEventListener('click', function () { state.sort = b.dataset.sort; pressGroup(sortBtns, b); renderCards(); }); });
   var mAbn = document.getElementById('mode-abn'), mRaw = document.getElementById('mode-raw');
-  function setMode(mode) { state.mode = mode; pressGroup([mAbn, mRaw], mode === 'abn' ? mAbn : mRaw); document.getElementById('mode-note').textContent = mode === 'abn' ? '扣除 BTC 後 = 幣的報酬減掉 β × BTC 報酬，看的是這個幣自己的漲跌' : '原始漲跌 = 幣價（美東 16:00 到 16:00）的當日報酬，包含跟著 BTC 一起動的部分'; remember(); renderKPIs(); renderCards(); renderCorr(); renderDetail(); }
+  function setMode(mode) { state.mode = mode; pressGroup([mAbn, mRaw], mode === 'abn' ? mAbn : mRaw); document.getElementById('mode-note').textContent = mode === 'abn' ? '扣除 BTC 後 = 幣的報酬減掉 β × BTC 報酬，看的是這個幣自己的漲跌' : '原始漲跌 = 幣價每日收盤到下一個收盤的報酬，包含跟著 BTC 一起動的部分'; remember(); renderKPIs(); renderCards(); renderCorr(); renderDetail(); }
   mAbn.addEventListener('click', function () { setMode('abn'); }); mRaw.addEventListener('click', function () { setMode('raw'); });
   pressGroup([mAbn, mRaw], state.mode === 'abn' ? mAbn : mRaw);
 

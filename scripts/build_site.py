@@ -3,7 +3,7 @@
 
 Inputs (all in this repo):
   data/daily.json        cleaned daily net flows per coin and fund (scripts/build_daily.py)
-  data/coin_px/*.json    each coin's own price at 16:00 New York (scripts/fetch_coin_px.py)
+  data/coin_px/*.json    each coin's own daily close, 00:00 UTC (scripts/fetch_coin_px.py)
   site/template.html     the dashboard (statistics run in the browser, same code as make_docs)
   site/research.json     fixed research results (SOL/XRP/BTC study, BTC flow study, rule tests)
 
