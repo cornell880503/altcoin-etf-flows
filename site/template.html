@@ -244,6 +244,9 @@ tr.sigrow td { background: var(--accent-wash); }
 .mut { color: var(--muted); }
 #tb-sg-now td:last-child { min-width: 250px; }
 #tb-sg-now td:nth-child(4) { white-space: nowrap; }
+tr.mutrow td { color: var(--muted); }
+.negtxt { color: var(--neg); }
+#tb-sg-all td:nth-child(9) { white-space: nowrap; }
 .grid2 > .panel, .cols2 > .panel { align-content: start; }
 .hbars { display: grid; gap: 10px; }
 .hbar { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 4.2em; gap: 10px; align-items: center; font-size: 13px; }
@@ -440,7 +443,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div class="tablewrap"><table id="tb-sg-now"></table></div>
         <div class="chart-title">今天觸發、而且過去有跡象的訊號</div>
         <ul class="sglist" id="sg-now-hits"></ul>
-        <p class="note">「累積」= 這個幣最近 5 或 20 個交易日的淨流量加總，換算成占市值的 bp（0.01%），括號裡是它在自己歷史裡的排名（0–100）。訊號標籤裡的「5/20日」= 5 日和 20 日兩種窗口都觸發，「1日」= 單日。有跡象 = 過去未校正 p &lt; 0.10，不等於有效；研究用，不是買賣建議。</p>
+        <p class="note" id="sg-now-note">「累積」= 這個幣最近 5 或 20 個交易日的淨流量加總，換算成占市值的 bp（0.01%），括號裡是它在自己歷史裡的排名（0–100）。訊號標籤裡的「5/20日」= 5 日和 20 日兩種窗口都觸發，「1日」= 單日。有跡象 = 過去輪換檢定 p &lt; 0.10，不等於有效；研究用，不是買賣建議。</p>
       </div>
     </section>
 
@@ -463,7 +466,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     <section aria-labelledby="h-sg-flip">
       <div class="sec-head"><div>
         <h2 id="h-sg-flip">從淨流出轉成淨流入，是不是反轉點？</h2>
-        <p>「轉正」= y 天淨流量加總由負轉正，而且前 3 天都是負的。圖上是轉正那天前後 20 個交易日的平均累積報酬（轉正當天 = 0）；灰線是只看價格的對照：y 天報酬由負轉正。</p>
+        <p>「轉正」= y 天淨流量加總由負轉正，而且前 3 天都是負的（完全沒有流量不算）。圖上是轉正那天前後 20 個交易日的平均累積報酬（轉正當天 = 0）；灰線是只看價格的對照：y 天報酬由負轉正。表格拿「隨便一天」當基準：如果轉正真的抓到低點，它應該比隨便一天更靠近低點、之後更少再破低。</p>
       </div></div>
       <div class="panel">
         <div class="sgctl">
@@ -480,7 +483,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     <section aria-labelledby="h-sg-all">
       <div class="sec-head"><div>
         <h2 id="h-sg-all">全部訊號的檢定</h2>
-        <p>每個訊號：觸發那天收盤進場、抱 h 天的平均報酬，對比其他日子。照 p 值排序，底色 = 未校正 p &lt; 0.05。</p>
+        <p>每個訊號：觸發那天收盤進場、抱 h 天的平均報酬，對比其他日子。照輪換檢定的 p 排序，底色 = 輪換 p &lt; 0.05（未校正）。</p>
       </div></div>
       <div class="panel">
         <div class="sgctl">
@@ -1426,29 +1429,34 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     });
   }
   function sgFam() { return (SG.tests || []).filter(function (t) { return t.q != null; }); }
+  function sgPr(t) { return t && t.p_rot != null ? t.p_rot : 1; }
   function sgSteady(t) {
     return !!(t.halves && t.halves[0] && t.halves[1] && t.halves.every(function (h) { return Math.sign(h.diff) === Math.sign(t.diff) && Math.abs(h.t) >= 0.5; }));
   }
+  function sgRobust(t) { return sgSteady(t) && !!(t.jk && t.jk.kept); }
+  function sgLuck(a) { return Math.round(sgFam().length * a); }  // how many tests pass by luck alone at level a
   function sgLeads() {
     var seen = {}, out = [];
-    sgFam().filter(function (t) { return t.p < 0.05 && t.p_rot != null && t.p_rot < 0.05 && sgSteady(t) && t.events >= 5; })
-      .sort(function (a, b) { return a.p - b.p; })
+    sgFam().filter(function (t) { return sgPr(t) < 0.05 && sgRobust(t) && t.events >= 5; })
+      .sort(function (a, b) { return sgPr(a) - sgPr(b) || Math.abs(b.t) - Math.abs(a.t); })
       .forEach(function (t) { var k = t.sample + '|' + t.signal.split(' ')[0]; if (!seen[k]) { seen[k] = 1; out.push(t); } });
     return out;
   }
   function sgLine(t) {
     return SG_LABEL[t.sample] + '：' + sgName(t.signal) + '，之後 ' + t.h + ' 天平均 ' + pct(t.mean_on) + '（其他時候 ' + pct(t.mean_off) + '），' +
-      t.events + ' 段，' + sgPe(t.p) + '，前後兩段同方向';
+      t.events + ' 段，輪換 ' + sgPe(t.p_rot);
   }
+  function sgWho(s) { return s === 'ALTS' ? '山寨幣' : s; }
   function drawSignals() {
     var none = !SG || !SG.tests;
     document.getElementById('sg-thesis').textContent = none ? '這次建置沒有算出訊號研究，下一次更新會再試。' : '';
     if (none) return;
     var fam = sgFam(), hits = fam.filter(function (t) { return t.q < 0.10; }), R = SG.reality || {};
+    var nRot = fam.filter(function (t) { return sgPr(t) < 0.05; }).length;
     document.getElementById('sg-eyebrow').textContent = '訊號研究 · 每次更新都用最新資料重算 · 流量至 ' + (SG.samples.BTC ? SG.samples.BTC.flows_to : '');
     var th = hits.length ? ('有 ' + hits.length + ' 個組合在多重檢定校正後顯著（q < 0.10），見下方表格；但它們仍要在之後的新資料上站得住，才算可用的訊號。')
-      : ('還不能單獨當交易訊號。' + fam.length + ' 個「訊號 × 持有天數」組合（BTC、ETH、山寨幣合併、BTC 流量對山寨幣），多重檢定校正後沒有一個顯著；就算流量和之後的漲跌完全無關，最好的那一個也有 ' +
-        Math.round((R.p_best || 0) * 100) + '% 的機率強成這樣。流量比較像確認訊號，不是扳機。下面是你問的兩件事，和幾個值得繼續追蹤的模式。');
+      : ('還不能單獨當交易訊號。' + fam.length + ' 個「訊號 × 持有天數」組合（BTC、ETH、山寨幣合併、BTC 流量對山寨幣），多重檢定校正後沒有一個顯著；輪換檢定 p < 0.05 的有 ' + nRot +
+        ' 個，純運氣大約也會有 ' + sgLuck(0.05) + ' 個；最好的那一個，就算流量和之後的漲跌完全無關，也有約 ' + Math.round((R.p_best || 0) * 10) + ' 成機率強成這樣。流量比較像背景，不是扳機。下面先回答你問的兩件事。');
     document.getElementById('sg-thesis').textContent = th;
 
     // findings
@@ -1458,33 +1466,48 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var thrB = SG.thresholds.BTC && SG.thresholds.BTC.x20, mcB = SG.today.BTC && SG.today.BTC.mcap;
     var thrE = SG.thresholds.ETH && SG.thresholds.ETH.x20, mcE = SG.today.ETH && SG.today.ETH.mcap;
     var t1 = '20 日累積淨流入排到自己歷史前 20%' + (thrB ? '（BTC 約 ≥ ' + bpf(thrB.p80, true) + '，以現在市值約 ' + sgUsd(thrB.p80 / 1e4 * mcB) + (thrE ? '；ETH 約 ≥ ' + bpf(thrE.p80, true) + '，約 ' + sgUsd(thrE.p80 / 1e4 * mcE) : '') + '）' : '') + '之後 20 天：';
-    ['BTC', 'ETH'].forEach(function (s) { var t = c20[s]; if (t) t1 += s + ' 平均 ' + pct(t.mean_on) + '（其他時候 ' + pct(t.mean_off) + '，' + t.events + ' 段，' + sgPe(t.p) + '）；'; });
+    ['BTC', 'ETH'].forEach(function (s) { var t = c20[s]; if (t) t1 += s + ' 平均 ' + pct(t.mean_on) + '（其他時候 ' + pct(t.mean_off) + '，' + t.events + ' 段獨立行情，輪換 ' + sgPe(t.p_rot) + '）；'; });
     var ta = c20.ALTS;
-    t1 += ta ? '山寨幣合併 ' + pct(ta.mean_on) + '（其他時候 ' + pct(ta.mean_off) + '，' + sgPe(ta.p) + '）。' : '山寨幣樣本不足。';
-    t1 += ' BTC、ETH 有「大量流入之後續漲」的方向，但大流入只發生過寥寥幾段，校正後不顯著；山寨幣沒有這個效果。分組細節見下方圖。';
-    card('累積流入很多，之後會漲嗎？', '之後 20 天：' + ['BTC', 'ETH', 'ALTS'].map(function (s) { return (s === 'ALTS' ? '山寨幣 ' : s + ' ') + (c20[s] ? pct(c20[s].mean_on) : '—'); }).join(' · '), t1);
+    t1 += ta ? '山寨幣合併 ' + pct(ta.mean_on) + '（其他時候 ' + pct(ta.mean_off) + '，輪換 ' + sgPe(ta.p_rot) + '）。' : '山寨幣樣本不足。';
+    var few = ['BTC', 'ETH'].filter(function (s) { return c20[s] && c20[s].diff > 0; });
+    t1 += few.length ? ' ' + few.join('、') + ' 在大量流入之後平均是漲的，但這種大流入只發生過 ' + few.map(function (s) { return c20[s].events; }).join('、') + ' 段，和運氣分不開' : '';
+    t1 += (ta && Math.abs(ta.diff) < 2) ? '；山寨幣沒有這個效果。' : '。';
+    t1 += ' 分組細節見下方圖。';
+    card('累積流入很多，之後會漲嗎？', '之後 20 天：' + ['BTC', 'ETH', 'ALTS'].map(function (s) { return sgWho(s) + ' ' + (c20[s] ? pct(c20[s].mean_on) : '—'); }).join(' · '), t1);
 
-    var fl = ['BTC', 'ETH', 'ALTS'].map(function (s) { return [s, SG.flips[s + '|FLIPUP 5'], sgT(s, 'FLIPUP 5', 10), sgT(s, 'FLIPUP 5', 20)]; }).filter(function (x) { return x[1]; });
-    var days = fl.map(function (x) { return x[1].days_since_low_median; });
-    var t2 = '5 日淨流量由負轉正時，價格通常已離開 20 日低點 ' + fl.map(function (x) { return (x[0] === 'ALTS' ? '山寨幣' : x[0]) + ' ' + x[1].days_since_low_median + ' 天'; }).join('、') +
-      '，從低點反彈了 ' + fl.map(function (x) { return pct(x[1].gain_from_low_median, 0); }).join('、') + '；剛好落在低點前後 2 天內的只有 ' +
-      fl.map(function (x) { return Math.round(x[1].share_within2 * 100) + '%'; }).join('、') + '。轉正之後 10 天：' +
-      fl.map(function (x) { return x[2] ? (x[0] === 'ALTS' ? '山寨幣' : x[0]) + ' ' + pct(x[2].diff) + '（' + sgPe(x[2].p) + '）' : ''; }).filter(Boolean).join('、') + '（和其他日子的差）。';
-    var a20 = fl.filter(function (x) { return x[0] === 'ALTS' && x[3] && x[3].p < 0.05; })[0];
-    if (a20) t2 += ' 山寨幣合併在轉正後 20 天平均 ' + pct(a20[3].mean_on) + '（其他時候 ' + pct(a20[3].mean_off) + '，' + a20[3].events + ' 次，未校正 ' + sgPe(a20[3].p) + '），值得追蹤，但次數太少。';
-    t2 += ' 結論：它比較像確認反彈已經開始，不是抓到反轉點。';
-    card('淨流出轉成淨流入，是反轉點嗎？', days.length ? '低點後 ' + Math.min.apply(null, days) + '–' + Math.max.apply(null, days) + ' 天才轉正' : '', t2);
+    var B = SG.swing_any_day || {};
+    var fl = ['BTC', 'ETH', 'ALTS'].map(function (s) { return [s, SG.flips[s + '|FLIPUP 5'], sgT(s, 'FLIPUP 5', 10), B[s]]; }).filter(function (x) { return x[1] && x[3]; });
+    var nd = function (v) { return v == null ? '—' : (Math.round(v * 2) / 2).toString(); };
+    var t2 = '5 日淨流量由負轉正、能進場的那個收盤（資料隔天才公布），價格離 20 日最低收盤已經 ' +
+      fl.map(function (x) { return sgWho(x[0]) + ' ' + nd(x[1].days_since_low_median) + ' 天'; }).join('、') + '（隨便一天是 ' + fl.map(function (x) { return nd(x[3].days_since_low_median); }).join('、') + ' 天），' +
+      '從低點漲了 ' + fl.map(function (x) { return pct(x[1].gain_from_low_median, 0); }).join('、') + '（隨便一天 ' + fl.map(function (x) { return pct(x[3].gain_from_low_median, 0); }).join('、') + '）；' +
+      '之後 20 天內又跌破那個低點的比例 ' + fl.map(function (x) { return x[1].share_new_low == null ? '—' : Math.round(x[1].share_new_low * 100) + '%'; }).join('、') +
+      '（隨便一天 ' + fl.map(function (x) { return x[3].share_new_low == null ? '—' : Math.round(x[3].share_new_low * 100) + '%'; }).join('、') + '）。';
+    var tested = fl.filter(function (x) { return x[2]; }), untested = fl.filter(function (x) { return !x[2]; });
+    if (tested.length) t2 += ' 轉正之後 10 天和其他日子比：' + tested.map(function (x) { return sgWho(x[0]) + ' ' + pct(x[2].diff) + '（輪換 ' + sgPe(x[2].p_rot) + '）'; }).join('、') + '。';
+    if (untested.length) t2 += ' ' + untested.map(function (x) { return sgWho(x[0]); }).join('、') + '的轉正只有 ' + untested.map(function (x) { return x[1].n; }).join('、') + ' 次，不夠檢定。';
+    var turn = fl.some(function (x) { return x[1].share_new_low != null && x[3].share_new_low != null && x[1].share_new_low < x[3].share_new_low - 0.15 && x[2] && x[2].diff > 0 && sgPr(x[2]) < 0.05; });
+    t2 += turn ? ' 有一組轉正之後明顯較少再破低、報酬也較好，值得追蹤，但還沒通過多重檢定。' : ' 結論：轉正通常在低點之後約一週以上才出現，之後再破低的機會和隨便一天差不多，報酬也沒有比較好，所以它不是反轉點，也不是更好的進場時機。';
+    var dmin = Math.min.apply(null, fl.map(function (x) { return x[1].days_since_low_median; })), dmax = Math.max.apply(null, fl.map(function (x) { return x[1].days_since_low_median; }));
+    card('淨流出轉成淨流入，是反轉點嗎？', fl.length ? '低點後 ' + nd(dmin) + (dmax > dmin ? '–' + nd(dmax) : '') + ' 天才轉正' : '', t2);
 
     var leads = sgLeads();
     card('比較有跡象、值得追蹤的模式', leads.length ? leads.length + ' 個（都未過校正）' : '目前沒有',
-      leads.length ? leads.slice(0, 3).map(sgLine).join('。') + '。條件：未校正 p < 0.05、輪換檢定 p < 0.05、樣本前後兩半同方向；它們仍然可能是運氣。' : '沒有任何訊號同時通過未校正 p < 0.05、輪換檢定和前後兩半同方向這三個條件。');
+      leads.length ? leads.slice(0, 3).map(sgLine).join('。') + '。條件：輪換 p < 0.05、至少 5 段、前後兩半同方向、去掉任何連續兩個月也同方向。這種程度的結果，' + fam.length + ' 個檢定裡純運氣也會出現約 ' + sgLuck(0.05) + ' 個，所以只是觀察名單。'
+        : '沒有任何訊號同時通過輪換 p < 0.05、至少 5 段、前後兩半同方向、去掉任何連續兩個月也同方向這幾個條件。');
     card('怎麼把流量放進交易', '背景，不是扳機',
-      '流量多半跟著價格走（追漲），公布之後才進場已經吃不到同一天的漲跌。比較實際的用法是當過濾或確認：價格訊號出現時，看流量是否同向；山寨幣在連續淨流入一段時間後反而偏弱、BTC 下跌時 ETF 仍在買之後較強，這類模式網站每次更新都會重算，看它們在新資料上是否站得住。研究用，不是買賣建議。');
+      '流量多半跟著價格走（追漲），而且資料隔天才公布，同一天的漲跌已經吃不到。比較實際的用法是當過濾或確認：價格訊號出現時，看流量是否同向，不要單獨拿流量進出場。上面的觀察名單每次更新都用新資料重算，等它們在之後的新資料上還站得住，才值得放進策略。研究用，不是買賣建議。');
 
     // today
     var order = ['BTC', 'ETH'].concat(SG.pool || []).concat(Object.keys(SG.today).filter(function (s) { return s !== 'BTC' && s !== 'ETH' && (SG.pool || []).indexOf(s) < 0; }));
     var any = SG.today.BTC || SG.today[order[0]];
-    document.getElementById('sg-now-sub').textContent = any ? '依據到 ' + sgDay(any.flow_through) + ' 為止公布的流量，下一個決策點是 ' + sgDay(any.decision_day) + ' 的每日收盤（新加坡時間隔天 08:00）。' : '';
+    var late = Object.keys(SG.today).filter(function (s) { return SG.today[s].lag === 2; });
+    var sub = any ? '依據到 ' + sgDay(any.flow_through) + ' 為止公布的流量，下一個決策點是 ' + sgDay(any.decision_day) + ' 的每日收盤（新加坡時間隔天 08:00）' + (late.length ? '；' + late.join('、') + ' 的資料晚一天公布，決策點也晚一天' : '') + '。' : '';
+    if (any && SG.generated) {
+      var due = new Date(any.flow_through + 'T00:00:00Z').getTime() + 38 * 3600e3;  // the next day 14:00 UTC: usually complete by then
+      if (new Date(SG.generated).getTime() < due) sub += ' 最新一天的流量各發行商還在陸續公布，數字可能再變。';
+    }
+    document.getElementById('sg-now-sub').textContent = sub;
     // every active flow state, one chip per family ("5/20日流入前20%"); the x-day net-flow sign is in the columns
     var FAMS = [['CUMTOP', '流入前20%'], ['CUMBOT', '流入後20%'], ['FLIPUP', '轉正'], ['FLIPDN', '轉負'], ['DIPBUY', '跌時淨流入'], ['RALLYSELL', '漲時淨流出']];
     var rows = order.filter(function (s) { return SG.today[s]; }).map(function (s) {
@@ -1498,17 +1521,17 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       var run = t.states['STREAK 5'] === 1 ? 5 : (t.states['STREAK 3'] === 1 ? 3 : 0);
       if (run) w.appendChild(chip('連' + run + '天流入', true).node);
       if (!w.childNodes.length) w.appendChild(node('span', 'mut', '—'));
-      var sub = sgNote(s);
+      var note = sgNote(s);
       var cum = function (x) { var v = t.values['cum' + x], p = t.pct['cum' + x]; return v == null ? '—' : bpf(v, true) + (p == null ? '' : '（' + Math.round(p * 100) + '）'); };
       var dir = { '1': '淨流入 ', '-1': '淨流出 ', '0': '沒有流量 ' }[String(t.inflow10)];
-      return { cells: [coinCell(s, sub || null), cum(5), cum(20), dir ? dir + t.inflow10_days + ' 天' : '—', { node: w }] };
+      return { cells: [coinCell(s, note || null), cum(5), cum(20), dir ? dir + t.inflow10_days + ' 天' : '—', { node: w }] };
     });
     table(document.getElementById('tb-sg-now'), ['幣', '5 日累積（百分位）', '20 日累積（百分位）', '10 日淨流向持續', '觸發中的訊號'], rows, { textCols: [3, 4] });
     var ul = document.getElementById('sg-now-hits'); ul.replaceChildren();
     var groups = {};
     function addHit(coin, samp, k) {
       var best = null;
-      [10, 20].forEach(function (h) { var r = sgT(samp, k, h); if (r && r.p < 0.10 && (!best || r.p < best.p)) best = r; });
+      [5, 10, 20].forEach(function (h) { var r = sgT(samp, k, h); if (r && sgPr(r) < 0.10 && r.events >= 3 && (!best || sgPr(r) < sgPr(best))) best = r; });
       if (!best) return;
       var key = samp + '|' + k;
       if (!groups[key]) groups[key] = { r: best, samp: samp, k: k, coins: [] };
@@ -1517,21 +1540,21 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     order.forEach(function (s) {
       var t = SG.today[s]; if (!t) return;
       var isRef = s === 'BTC' || s === 'ETH';
-      if (!isRef && !(SG.samples[s] || {}).in_pool) return;  // pooled evidence only for the coins in the pool
+      if (!isRef && !t.in_pool) return;  // pooled evidence only for the coins in the pool
       Object.keys(t.states).forEach(function (k) {
         if (t.states[k] !== 1) return;
         addHit(s, isRef ? s : 'ALTS', k);
         if (s === 'BTC') addHit('BTC', 'BTC>ALTS', k);
       });
     });
-    var lines = Object.keys(groups).map(function (key) { return groups[key]; }).sort(function (a, b) { return a.r.p - b.r.p; });
-    if (!lines.length) ul.appendChild(node('li', null, '今天沒有觸發任何過去有跡象（未校正 p < 0.10）的訊號。'));
+    var lines = Object.keys(groups).map(function (key) { return groups[key]; }).sort(function (a, b) { return sgPr(a.r) - sgPr(b.r); });
+    if (!lines.length) ul.appendChild(node('li', null, '今天沒有觸發任何過去有跡象（輪換 p < 0.10、至少 3 段）的訊號。'));
     lines.slice(0, 6).forEach(function (g) {
       var r = g.r, li = node('li', 'hint');
       var who = g.samp === 'BTC>ALTS' ? 'BTC 的流量（看山寨幣）' : g.coins.join('、');
-      var b = node('b', null, who + '：'); li.appendChild(b);
-      li.appendChild(document.createTextNode(sgName(g.k) + ' → 過去' + (g.samp === 'ALTS' ? '山寨幣合併' : g.samp === 'BTC>ALTS' ? '山寨幣合併' : '') + '在這種狀態之後 ' + r.h + ' 天平均 ' + pct(r.mean_on) + '，其他時候 ' + pct(r.mean_off) +
-        '（' + r.events + ' 段，' + sgPe(r.p) + '，校正後 ' + sgPe(r.q, 'q') + '）'));
+      li.appendChild(node('b', null, who + '：'));
+      li.appendChild(document.createTextNode(sgName(g.k) + ' → 過去' + (g.samp === 'ALTS' || g.samp === 'BTC>ALTS' ? '山寨幣合併' : '') + '在這種狀態之後 ' + r.h + ' 天平均 ' + pct(r.mean_on) + '，其他時候 ' + pct(r.mean_off) +
+        '（' + r.events + ' 段，輪換 ' + sgPe(r.p_rot) + '，校正後 ' + sgPe(r.q, 'q') + (sgRobust(r) ? '' : '，前後或去掉某兩個月方向會變') + '）'));
       ul.appendChild(li);
     });
 
@@ -1565,14 +1588,16 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var loPos = false, thrLo = coins.map(function (s) { var t = SG.thresholds[s] && SG.thresholds[s]['x' + st.doseX]; if (t && t.p20 > 0) loPos = true; return t ? s + ' ≤ ' + bpf(t.p20, true) : null; }).filter(Boolean);
     var top = sgT(st.doseS, 'CUMTOP ' + st.doseX, st.doseH), bot = sgT(st.doseS, 'CUMBOT ' + st.doseX, st.doseH);
     document.getElementById('sg-dose-note').textContent = '「流入最多」= ' + st.doseX + ' 日累積排在自己歷史前 20%，目前的門檻：' + (thr.join('、') || '—') + '；「流入最少」= 後 20%：' + (thrLo.join('、') || '—') + (loPos ? '（正數代表那幾個幣連後 20% 都還是淨流入）' : '') + '。' +
-      (top ? ' 和其他日子比：流入最多組之後 ' + st.doseH + ' 天 ' + pct(top.diff) + '（' + top.events + ' 段，p = ' + sgP(top.p) + '，校正後 q = ' + sgP(top.q) + '）' : '') +
-      (bot ? '；流入最少組 ' + pct(bot.diff) + '（p = ' + sgP(bot.p) + '）。' : '。') + ' 天數重疊（同一段行情會被算很多天），段數才是獨立的次數。';
+      (top ? ' 和其他日子比：流入最多組之後 ' + st.doseH + ' 天 ' + pct(top.diff) + '（' + top.events + ' 段，輪換 ' + sgPe(top.p_rot) + '，校正後 ' + sgPe(top.q, 'q') + '）' : '') +
+      (bot ? '；流入最少組 ' + pct(bot.diff) + '（輪換 ' + sgPe(bot.p_rot) + '）。' : '。') + ' 天數彼此重疊（同一段行情會被算很多天），「段」才接近獨立的次數：相隔不到 ' + st.doseH + ' 天的觸發日算同一段。' +
+      (st.doseS === 'ALTS' ? ' 山寨幣只算每個幣進入合併樣本（有 60 天流量、不到六成是 0）之後的日子。' : '');
   }
   function drawSgFlip() {
     var st = sgState;
     sgSeg('sg-flip-s', [['BTC', 'BTC'], ['ETH', 'ETH'], ['ALTS', '山寨幣合併']], st.flipS, function (v) { st.flipS = v; drawSgFlip(); });
     sgSeg('sg-flip-y', [[5, '5 日'], [10, '10 日'], [20, '20 日']], st.flipY, function (v) { st.flipY = v; drawSgFlip(); });
     var f = SG.flips[st.flipS + '|FLIPUP ' + st.flipY], pf2 = SG.flips[st.flipS + '|PFLIPUP ' + st.flipY], fd = SG.flips[st.flipS + '|FLIPDN ' + st.flipY];
+    var base = (SG.swing_any_day || {})[st.flipS];
     var xs = []; for (var k = -20; k <= 20; k++) xs.push(k);
     var series = [];
     if (f) series.push({ name: '流量轉正（' + f.n + ' 次）', color: 'var(--accent)', y: f.path });
@@ -1584,39 +1609,51 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       xFmt: function (v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v); }, yFmt: function (v) { return v + '%'; }, tipFmt: function (v) { return pct(v, 2); },
       tipHead: function (i) { return '第 ' + xs[i] + ' 天'; }, aria: '轉正前後的平均累積報酬'
     }); else document.getElementById('ch-sg-flip').replaceChildren();
-    var rowsF = [['FLIPUP', '流量轉正', f, 'low'], ['PFLIPUP', '報酬轉正（對照）', pf2, 'low'], ['FLIPDN', '流量轉負（看高點）', fd, 'high']].map(function (r) {
-      var nm = r[0] + ' ' + st.flipY, x = r[2], hi = r[3] === 'high';
-      var cell = function (h) { var t = sgT(st.flipS, nm, h); return t ? pct(t.diff) + '（p ' + sgP(t.p) + '）' : '—'; };
-      var dd = x ? (hi ? x.days_since_high_median : x.days_since_low_median) : null, sw = x ? (hi ? x.share_within2_high : x.share_within2) : null, mv = x ? (hi ? x.drop_from_high_median : x.gain_from_low_median) : null;
-      return [r[1], x ? String(x.n) : '—', dd != null ? dd + ' 天' : '—', sw != null ? Math.round(sw * 100) + '%' : '—', mv != null ? pct(mv) : '—', cell(5), cell(10), cell(20)];
+    var nd = function (v) { return v == null ? '—' : (Math.round(v * 2) / 2) + ' 天'; };
+    var sh = function (v) { return v == null ? '—' : Math.round(v * 100) + '%'; };
+    var rowsF = [['FLIPUP', '流量轉正', f, false], ['PFLIPUP', '報酬轉正（對照）', pf2, false], [null, '隨便一天', base, false],
+                 ['FLIPDN', '流量轉負（看高點）', fd, true], [null, '隨便一天（看高點）', base, true]].map(function (r) {
+      var nm = r[0] ? r[0] + ' ' + st.flipY : null, x = r[2], hi = r[3];
+      var cell = function (h) { var t = nm ? sgT(st.flipS, nm, h) : null; return t ? pct(t.diff) + (t.p_rot != null ? ' · p ' + sgP(t.p_rot) : ' · p≈' + sgP(t.p)) : '—'; };
+      if (!x) return [r[1], '—', '—', '—', '—', '—', cell(5), cell(10), cell(20)];
+      return { _cls: r[0] ? '' : 'mutrow', cells: [r[1], String(x.n), nd(hi ? x.days_since_high_median : x.days_since_low_median), sh(hi ? x.share_within2_high : x.share_within2),
+        x[hi ? 'drop_from_high_median' : 'gain_from_low_median'] != null ? pct(x[hi ? 'drop_from_high_median' : 'gain_from_low_median']) : '—', sh(hi ? x.share_new_high : x.share_new_low),
+        r[0] ? cell(5) : '—', r[0] ? cell(10) : '—', r[0] ? cell(20) : '—'] };
     });
-    table(document.getElementById('tb-sg-flip'), ['事件', '次數', '距 20 日低點／高點', '低點／高點就在前 2 天內', '離低點／高點已經', '之後 5 天 vs 平常', '10 天', '20 天'], rowsF);
-    document.getElementById('sg-flip-note').textContent = '轉正看離前 20 個交易日最低收盤多遠，轉負看離最高收盤多遠（中位數）。後三欄是事件後 5、10、20 天的平均報酬減掉其他日子的平均（未校正 p）。第 0 天是流量所屬的交易日，資料隔天才公布，所以最早只能在第 +1 天的收盤進場。';
+    table(document.getElementById('tb-sg-flip'), ['事件', '次數', '距低點／高點', '在其後 2 天內', '已漲／已跌', '20 天內又破低／創高', '之後 5 天', '10 天', '20 天'], rowsF);
+    document.getElementById('sg-flip-note').textContent = '都在「能進場的那個收盤」量：流量隔天才公布，所以是事件後第一個收盤。轉正看離前 20 個交易日最低收盤多遠，轉負看離最高收盤多遠（中位數）；「又破低／創高」= 之後 20 天內收盤跌破那個低點／漲過那個高點的比例。「隨便一天」是樣本裡每一天的同樣數字，轉正要比它更靠近低點、更少再破低，才算抓到反轉。後三欄是事件後 5、10、20 天的平均報酬減掉其他日子的平均，p 是輪換檢定的 p（未校正；只看價格的對照不在檢定家族裡，p≈ 是常態近似的 p）。' +
+      (st.flipS === 'ALTS' ? ' 山寨幣只算每個幣進入合併樣本之後的事件。' : '');
   }
   function drawSgAll() {
     var st = sgState;
     sgSeg('sg-all-s', [['BTC', 'BTC'], ['ETH', 'ETH'], ['ALTS', '山寨幣合併'], ['BTC>ALTS', 'BTC 流量 → 山寨幣']], st.allS, function (v) { st.allS = v; drawSgAll(); });
     sgSeg('sg-all-h', [[1, '之後 1 天'], [5, '5 天'], [10, '10 天'], [20, '20 天']], st.allH, function (v) { st.allH = v; drawSgAll(); });
-    var list = (SG.tests || []).filter(function (t) { return t.sample === st.allS && t.h === st.allH && t.q != null; }).sort(function (a, b) { return a.p - b.p; });
+    var list = (SG.tests || []).filter(function (t) { return t.sample === st.allS && t.h === st.allH && t.q != null; }).sort(function (a, b) { return sgPr(a) - sgPr(b) || a.p - b.p; });
     var rows = list.map(function (t) {
       var hv = (t.halves || []).map(function (h) { return h ? pct(h.diff) : '—'; }).join(' / ');
-      return { _cls: t.p < 0.05 ? 'sigrow' : '', cells: [sgName(t.signal), t.n_on + '（' + t.events + ' 段）', pct(t.mean_on), pct(t.mean_off), pct(t.diff), sgP(t.p), sgP(t.q), sgP(t.p_rot), hv || '—', t.vs_price ? sgP(t.vs_price.p) : '—'] };
+      var jk = t.jk ? node('span', t.jk.kept ? null : 'negtxt', pct(t.jk.worst_diff) + (t.jk.kept ? '' : ' 變號')) : null;
+      if (jk) jk.title = '去掉 ' + t.jk.worst + ' 之後';
+      return { _cls: sgPr(t) < 0.05 ? 'sigrow' : '', cells: [sgName(t.signal), t.n_on + '（' + t.events + ' 段）', pct(t.mean_on) + ' / ' + pct(t.mean_off), pct(t.diff), sgP(t.p_rot), sgP(t.q), sgP(t.p), hv || '—', jk ? { node: jk } : '—', t.vs_price ? sgP(t.vs_price.p) : '—'] };
     });
-    table(document.getElementById('tb-sg-all'), ['訊號', '觸發天數', '觸發後平均', '其他時候', '差', 'p', '校正後 q', '輪換 p', '前半 / 後半', '扣掉價格後 p'], rows);
-    var half = SG.halves_at && SG.halves_at[st.allS];
-    document.getElementById('sg-all-note').textContent = 'q = 全部 ' + sgFam().length + ' 個組合一起做 Benjamini–Hochberg 校正；輪換 p = 把訊號和報酬錯開隨機天數重算 ' + (SG.reality ? SG.reality.iters : '') + ' 次，|t| 不小於實際值的比例（不依賴常態假設）。前半 / 後半以 ' + (half || '—') +
-      ' 切開。扣掉價格後 p = 同時放入只看價格的對照訊號（例如 y 日報酬為正）之後，流量訊號本身的 p。' + (st.allS === 'BTC>ALTS' ? ' 這一頁的訊號都是 BTC 的流量，報酬是山寨幣合併的報酬。' : '');
+    table(document.getElementById('tb-sg-all'), ['訊號', '天數（段）', '觸發後 / 其他時候', '差', '輪換 p', '校正後 q', '常態 p', '前半 / 後半', '去掉兩個月', '扣價格後 p'], rows);
+    var half = SG.halves_at && SG.halves_at[st.allS], R = SG.reality || {}, bs = (R.by_sample || {})[st.allS];
+    document.getElementById('sg-all-note').textContent = '輪換 p = 把每個幣的訊號和它自己的報酬錯開隨機天數（至少 25 天）重算 ' + (R.iters || '') + ' 次，|t| 不小於實際值的比例；它保留兩邊各自的持續性，只打亂時間對應，是這裡主要的證據。' +
+      'q = 用同一批輪換結果估的偽發現率，全部 ' + sgFam().length + ' 個組合一起校正。常態 p = Newey–West 標準誤的 p，對這種持續好幾天、段數很少的訊號偏樂觀：輪換之下約 ' + (R.null_rate_196 != null ? Math.round(R.null_rate_196 * 100) : '—') + '% 的 |t| 超過 1.96（應該是 5%）。' +
+      (bs ? ' 只看這一頁的 ' + bs.n_tests + ' 個組合，最好那個是運氣的機率約 ' + Math.round(bs.p_best * 100) + '%。' : '') +
+      ' 段 = 相隔不到 h 天的觸發日算同一段（合併樣本裡同一天不同幣也算同一段）。前半 / 後半以 ' + (half || '—') + ' 切開（只是穩定度檢查，不是樣本外）；「去掉兩個月」= 輪流去掉每兩個連續月份，差最接近 0（或變號）的那次，滑鼠移上去看是哪兩個月。扣價格後 p = 同時放入只看價格的對照訊號（例如 y 日報酬為正）之後，流量訊號本身的 p。' +
+      (st.allS === 'BTC>ALTS' ? ' 這一頁的訊號都是 BTC 的流量，報酬是山寨幣合併的報酬。' : '');
   }
   function drawSgMethod() {
-    var S = SG.samples, pool = (SG.pool || []).join('、');
+    var S = SG.samples, pool = (SG.pool || []).join('、'), ever = SG.pool_ever || {};
     var a = document.getElementById('sg-method-data'); a.replaceChildren();
-    ['時間點：交易日 t 的流量要到隔天才公布，所以第 t+1 天的每日收盤（UTC 0:00，新加坡時間隔天早上 8 點）才進場；Canary 只發行在晚一天公布的幣（LTC、HBAR、TRX）再晚一天。報酬一律是從進場收盤算起的 h 個交易日，所有門檻只用當時以前的資料。',
+    ['時間點：交易日 t 的流量要到隔天才公布，所以第 t+1 天的每日收盤（UTC 0:00，新加坡時間隔天早上 8 點）才進場；Canary 只發行在晚一天公布的幣（LTC、HBAR、TRX，以及分不出 Canary 那一檔的 SUI）再晚一天。報酬一律是從進場收盤算起的 h 個交易日，所有門檻只用當時以前的資料。',
       '流量換算成占市值的 bp。BTC 自 ' + (S.BTC ? S.BTC.from : '') + '、ETH 自 ' + (S.ETH ? S.ETH.from : '') + '（市值 = 前一天收盤 × Coin Metrics 流通量）；山寨幣自各自第一檔 ETF 上市（CoinGecko 市值）。',
-      '山寨幣合併：' + (pool || '—') + '。一個幣要有 60 個交易日的流量、而且不到 60% 的日子是 0 才放進來；很多小型 ETF 只是偶爾一次申購一大筆，日資料說明不了需求。其他幣只列出、不進檢定。',
+      '山寨幣合併：目前是 ' + (pool || '—') + '。一個幣要在「當時」已經有 60 個交易日的流量、而且不到六成的日子是 0，才從那天起放進來（' + Object.keys(ever).map(function (s) { return s + ' ' + ever[s]; }).join('、') + '），不用事後才知道的資訊挑幣；很多小型 ETF 只是偶爾一次申購一大筆，日資料說明不了需求。其他幣只列出、不進檢定。',
       'BTC 流量 → 山寨幣：拿 BTC 的流量訊號，看山寨幣合併之後的報酬，檢查 BTC 的資金是否帶動山寨幣。'].forEach(function (t) { a.appendChild(node('li', null, t)); });
     var b = document.getElementById('sg-method-stats'); b.replaceChildren();
+    var R = SG.reality || {};
     ['每個訊號是一個「是／否」狀態，比較觸發日和其他日子之後的平均報酬；標準誤用 Newey–West（落後 h 期，且不小於一般 OLS 的），山寨幣合併再用 Driscoll–Kraay（允許同一天各幣一起漲跌）並扣掉各幣自己的平均。',
-      '多重檢定：' + sgFam().length + ' 個流量組合一起做 Benjamini–Hochberg；再用輪換檢定估「試了這麼多個，最好那個是運氣」的機率（目前 ' + (SG.reality ? Math.round(SG.reality.p_best * 100) + '%' : '—') + '）。每個流量訊號也和只看價格的對照比較，並看樣本前後兩半是否同方向。',
+      '主要證據是輪換檢定：把訊號和報酬錯開隨機天數重算 ' + (R.iters || '') + ' 次，得到每個檢定的 p、全部 ' + sgFam().length + ' 個流量組合的校正後 q，以及「試了這麼多個，最好那個只是運氣」的機率（目前約 ' + Math.round((R.p_best || 0) * 100) + '%）。每個流量訊號也和只看價格的對照比較，並看樣本前後兩半、以及去掉任何連續兩個月之後是否同方向。',
       '限制：山寨幣 ETF 大多不到一年，只經歷過一輪大跌和之後的反彈，行情種類很少；20 天的報酬彼此重疊，獨立的「段數」遠少於天數；BTC、ETH 的大流入波段只有幾次。這些結果每 3 小時隨新資料重算，結論可能改變。研究用，不是買賣建議。'].forEach(function (t) { b.appendChild(node('li', null, t)); });
   }
 

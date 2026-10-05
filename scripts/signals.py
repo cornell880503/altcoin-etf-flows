@@ -12,9 +12,10 @@ Signals (each a yes/no state at the decision close; the "on" days are compared w
                60; expanding percentile, so the threshold only uses the past)
   CUMBOT x     the bottom 20 % (the weakest flows: outflows for BTC and ETH, often still small
                inflows for altcoins whose funds have mostly taken money in)
-  FLIPUP y     the y-day net flow turns from outflow to inflow after at least 3 outflow days
+  FLIPUP y     the y-day net flow turns positive after at least 3 days negative (a sum of exactly
+               zero, no flow at all, is neither)
   FLIPDN y     the reverse (y = 5, 10, 20)
-  INFLOW y     the y-day net flow is positive (a state, not an event)
+  INFLOW y     the y-day net flow is positive, against negative (no-flow days left out)
   STREAK n     n inflow days in a row (n = 3, 5)
   DIPBUY x     net inflow over x days while the price fell over the same x days (x = 5, 20)
   RALLYSELL x  net outflow while the price rose
@@ -24,21 +25,30 @@ turns positive / negative), PTOP x (top 20 % x-day return), PUP y (y-day return 
 Samples. BTC since 2024-01-11 and ETH since 2024-07-23 (data/daily_long.json; market cap =
 previous close x Coin Metrics supply); the altcoins since their first ETF day (data/daily.json,
 CoinGecko market caps), also pooled (each coin's own mean removed; Driscoll-Kraay standard
-errors, which let every coin move together on a day). A coin joins the pool once it has 60
-trading days of flows and at most 60 % of them are zero (most small altcoin ETFs create and
-redeem in occasional lumps, which says little about day-to-day demand).
+errors, which let every coin move together on a day). A coin counts in the pool from the decision
+close at which, with the flows public by then, it has 60 trading days of flows and at most 60 %
+of them zero (most small altcoin ETFs create and redeem in occasional lumps, which says little
+about day-to-day demand); no coin is chosen with hindsight.
 
 A fourth sample, BTC>ALTS, uses BTC's flow signals for the pooled altcoins' returns (does BTC
 ETF demand lead the altcoins?).
 
 Statistics. Mean forward return on minus off from an OLS with Newey-West standard errors (h lags,
-never below the classical ones). Benjamini-Hochberg q values over every flow test of the four
-main samples (BTC, ETH, pooled altcoins, BTC>ALTS) and all horizons. A rotation test: each sample's signals
-are shifted against its returns by a random number of days (keeping both series' own
-persistence, breaking only their timing), 200 times; it gives every test an assumption-light p
-value and the chance that the best of all tests is that good by luck. BTC's two halves and the
-altcoins' two halves as an out-of-sample check, and each flow signal re-tested next to its price
-twin, to see whether the flow adds anything.
+never below the classical ones). Those p values are optimistic for persistent signals with few
+episodes, so the main evidence is a rotation test: each signal is shifted against its own coin's
+returns by a random offset (at least 25 days from the true alignment), 200 times, which keeps
+both series' persistence and breaks only their timing. It gives every test a p value (draws in
+which a test is undefined are left out), q values for the whole family of flow tests of the four
+main samples (permutation FDR from the rotated |t|), and the chance that the best test of the
+family, or of each sample, is that strong by luck. Also: the BH q of the HAC p values (reference),
+the two halves of each sample, a leave-two-calendar-months-out check (is it one rally or crash?),
+and each flow signal next to its price twin, to see whether the flow adds anything. "Episodes"
+count the on-days in clusters: days at most h apart (overlapping forward windows) are one, and so
+is the same day in two coins.
+
+Flips. Where the price stood in its 20-day swing at the first close the flip could be acted on
+(days since the 20-day low and the rise from it, and whether a lower low followed within 20 days),
+next to the same measures on every day of the sample.
 
 Usage: python3 scripts/signals.py [--out FILE] [--iters N]   (needs numpy)"""
 import argparse
@@ -134,17 +144,21 @@ def coin_alt(sym, daily):
     px = closes(sym)
     cal = trading_days(c["dates"][0], c["dates"][-1])
     prior = [d for d in px if d < cal[0]]
-    lag = 2 if sym in CANARY_ONLY else 1
-    days = ([max(prior)] if prior else []) + cal
-    off = len(days) - len(cal)
-    nxt = next_days(c["dates"][-1], lag)  # the decision closes still to come for the newest flows
-    fl = dict(zip(c["dates"], c["flow"]))
-    mc = dict(zip(c["dates"], c.get("mcap") or []))
     funds = {}
     for tk, arr in (c.get("funds") or {}).items():
         for d, v in zip(c["dates"], arr):
             if v is not None:
                 funds.setdefault(d, {})[tk] = v
+    part = CANARY_PART.get(sym)
+    has_part = bool(part) and any(part in f for f in funds.values())
+    # Canary-only coins, and coins whose Canary part cannot be told apart (no per-fund split), are
+    # only known in full two trading days later
+    lag = 2 if sym in CANARY_ONLY or (part and not has_part) else 1
+    days = ([max(prior)] if prior else []) + cal
+    off = len(days) - len(cal)
+    nxt = next_days(c["dates"][-1], lag)  # the decision closes still to come for the newest flows
+    fl = dict(zip(c["dates"], c["flow"]))
+    mc = dict(zip(c["dates"], c.get("mcap") or []))
     pend = set((c.get("pending") or {}).get("dates", []))
     F, K, MC = [None] * off, [None] * off, [None] * off
     for d in cal:
@@ -154,17 +168,30 @@ def coin_alt(sym, daily):
         MC.append(m if isinstance(m, (int, float)) and m > 0 else None)
         if f is None:
             K.append(None)
-        elif sym in CANARY_PART:  # the Canary fund's part arrives a day later
-            K.append(f - ((funds.get(d) or {}).get(CANARY_PART[sym]) or 0.0))
+        elif has_part:  # the Canary fund's part arrives a day later
+            K.append(f - ((funds.get(d) or {}).get(part) or 0.0))
         else:
             K.append(None if d in pend else f)
     days += nxt
     F += [None] * len(nxt)
     K += [None] * len(nxt)
     MC += [None] * len(nxt)
+    # pool membership at each decision close, from the flows known by then (no hindsight): at least
+    # POOL_MIN_DAYS trading days of flows, at most POOL_MAX_ZERO of them zero
+    elig = np.zeros(len(days), bool)
+    cnt = zer = 0
+    upto = -1
+    for d in range(len(days)):
+        while upto < d - lag:
+            upto += 1
+            v = F[upto] if upto >= 0 else None
+            if v is not None:
+                cnt += 1
+                zer += abs(v) < 1e-9
+        elig[d] = cnt >= POOL_MIN_DAYS and zer <= POOL_MAX_ZERO * cnt
     zero = sum(1 for v in c["flow"] if v is not None and abs(v) < 1e-9) / max(1, sum(1 for v in c["flow"] if v is not None))
     return dict(sym=sym, days=days, P=[px.get(d) for d in days], F=F, K=K, MC=MC, lag=lag, launch=c["launch"],
-                sample="alt", zero_share=zero, flow_days=sum(1 for v in c["flow"] if v is not None))
+                sample="alt", zero_share=zero, flow_days=sum(1 for v in c["flow"] if v is not None), elig=elig)
 
 
 # ------------------------------------------------------------------ signals
@@ -209,20 +236,21 @@ def build_signals(c):
         sig[f"CUMTOP {x}"] = np.where(np.isfinite(pc), (pc >= 0.8).astype(float), NAN)
         sig[f"CUMBOT {x}"] = np.where(np.isfinite(pc), (pc < 0.2).astype(float), NAN)
 
-    def crossing(S):
+    def crossing(S, tol=1e-9):  # a sum of exactly zero (no flow at all) is neither inflow nor outflow
         up, dn = np.full(n, NAN), np.full(n, NAN)
         for d in range(3, n):
             w = S[d - 3:d + 1]
             if np.all(np.isfinite(w)):
-                up[d] = float(w[3] > 0 and np.all(w[:3] <= 0))
-                dn[d] = float(w[3] <= 0 and np.all(w[:3] > 0))
+                up[d] = float(w[3] > tol and np.all(w[:3] < -tol))
+                dn[d] = float(w[3] < -tol and np.all(w[:3] > tol))
         return up, dn
 
     start = ff + lag
     for y in FLIP_Y:
         S = cum[y]
         sig[f"FLIPUP {y}"], sig[f"FLIPDN {y}"] = crossing(S)
-        sig[f"INFLOW {y}"] = np.where(np.isfinite(S), (S > 0).astype(float), NAN)
+        # net inflow vs net outflow; days with no flow at all are left out
+        sig[f"INFLOW {y}"] = np.where(np.isfinite(S) & (np.abs(S) > 1e-9), (S > 0).astype(float), NAN)
         R = np.array([ret(d - y, d) if d >= start else NAN for d in range(n)])
         sig[f"PFLIPUP {y}"], sig[f"PFLIPDN {y}"] = crossing(R)
         sig[f"PUP {y}"] = np.where(np.isfinite(R), (R > 0).astype(float), NAN)
@@ -280,15 +308,20 @@ def hac_ols(y, X, lags, groups=None):
     return b, se
 
 
-def episodes(s):
-    s = np.nan_to_num(s)
-    return int(np.sum((s[1:] == 1) & (s[:-1] == 0)) + (1 if len(s) and s[0] == 1 else 0))
+def clusters(keys, h):
+    """Separate episodes among the "on" days (trading-day keys): days at most h apart, whose
+    h-day forward windows touch or overlap, are one episode; in the pool the same day in two
+    coins is one day."""
+    ks = sorted(set(int(k) for k in keys))
+    return (1 + sum(1 for a, b in zip(ks, ks[1:]) if b - a > max(h, 1))) if ks else 0
 
 
-def t_single(s, y, h, extra=None):
+def t_single(s, y, h, extra=None, mask=None):
     m = np.isfinite(s) & np.isfinite(y)
     if extra is not None:
         m &= np.isfinite(extra)
+    if mask is not None:
+        m &= mask
     on = int(s[m].sum())
     if on < MIN_ON or m.sum() - on < MIN_ON:
         return None
@@ -303,30 +336,35 @@ def test_single(s, y, h, extra=None):
     diff, t, m = r
     sv, yv = s[m], y[m]
     on, off = yv[sv == 1], yv[sv == 0]
-    return dict(diff=diff, t=t, p=norm_p(t), n=int(m.sum()), n_on=int(len(on)), events=episodes(s[m]),
+    return dict(diff=diff, t=t, p=norm_p(t), n=int(m.sum()), n_on=int(len(on)),
+                events=clusters(np.where(m & (s == 1))[0], h),
                 mean_on=float(on.mean()), mean_off=float(off.mean()),
                 hit_on=float((on > 0).mean()), hit_off=float((off > 0).mean()))
 
 
 class Pool:
-    """The pooled altcoins, as stacked arrays: date key, coin id, forward returns per h."""
+    """The pooled altcoins, as stacked arrays: date key, coin id, forward returns per h. A coin
+    counts only on the decision days it was in the pool by then (c["elig"])."""
 
     def __init__(self, coins):
         self.coins = coins
         all_days = sorted({d for c in coins for d in c["days"]})
         self.key = {d: i for i, d in enumerate(all_days)}
+        self.keys = [np.array([self.key[d] for d in c["days"]]) for c in coins]
 
-    def stack(self, name, h, twin=None, shift=0):
-        ys, ss, ts, gs, raw_y, raw_s = [], [], [], [], [], []
-        for c in self.coins:
+    def stack(self, name, h, twin=None, shifts=None, masks=None):
+        ys, ss, ts, gs, raw_y, raw_s, ids = [], [], [], [], [], [], []
+        for j, c in enumerate(self.coins):
             s = c["S"]["sig"][name]
-            if shift:
-                s = np.roll(s, shift % len(s))
+            if shifts is not None:
+                s = np.roll(s, shifts[j])  # the signal moves, the sample days stay
             y = c["S"]["fwd"][h]
             tw = c["S"]["sig"].get(twin) if twin else None
-            m = np.isfinite(s) & np.isfinite(y)
+            m = np.isfinite(s) & np.isfinite(y) & c["elig"]
             if tw is not None:
                 m &= np.isfinite(tw)
+            if masks is not None:
+                m &= masks[j]
             if m.sum() < 30:
                 continue
             yy, sv = y[m], s[m]
@@ -336,30 +374,102 @@ class Pool:
             ss.append(sv - sv.mean())
             if tw is not None:
                 ts.append(tw[m] - tw[m].mean())
-            gs.append(np.array([self.key[c["days"][i]] for i in np.where(m)[0]]))
-        return ys, ss, ts, gs, raw_y, raw_s
+            gs.append(self.keys[j][m])
+            ids.append(j)
+        return ys, ss, ts, gs, raw_y, raw_s, ids
 
-    def t(self, name, h, twin=None, shift=0):
-        ys, ss, ts, gs, raw_y, raw_s = self.stack(name, h, twin, shift)
+    def t(self, name, h, twin=None, shifts=None, masks=None):
+        ys, ss, ts, gs, raw_y, raw_s, _ = self.stack(name, h, twin, shifts, masks)
         if not ys:
             return None
         on = int(sum(s.sum() for s in raw_s))
-        if on < 2 * MIN_ON:
+        off = int(sum(len(s) - s.sum() for s in raw_s))
+        if on < 2 * MIN_ON or off < 2 * MIN_ON:
             return None
         X = [np.concatenate(ss)] + ([np.concatenate(ts)] if twin else [])
         b, se = hac_ols(np.concatenate(ys), X, h, groups=np.concatenate(gs))
-        return float(b[1]), float(b[1] / se[1]), (raw_y, raw_s)
+        return float(b[1]), float(b[1] / se[1]), (raw_y, raw_s, gs)
 
     def test(self, name, h, twin=None):
         r = self.t(name, h, twin)
         if r is None:
             return None
-        diff, t, (raw_y, raw_s) = r
+        diff, t, (raw_y, raw_s, gs) = r
         y, s = np.concatenate(raw_y), np.concatenate(raw_s)
         on, off = y[s == 1], y[s == 0]
         return dict(diff=diff, t=t, p=norm_p(t), n=int(len(y)), n_on=int(len(on)),
-                    events=int(sum(episodes(x) for x in raw_s)), mean_on=float(on.mean()), mean_off=float(off.mean()),
+                    events=clusters(np.concatenate([g[x == 1] for g, x in zip(gs, raw_s)]), h),
+                    mean_on=float(on.mean()), mean_off=float(off.mean()),
                     hit_on=float((on > 0).mean()), hit_off=float((off > 0).mean()))
+
+    def rows(self, name, h):
+        """(forward return, signal, coin index, month) of every pooled row, for the jackknife."""
+        ys, ss, ts, gs, raw_y, raw_s, ids = self.stack(name, h)
+        out = []
+        for yy, sv, j in zip(raw_y, raw_s, ids):
+            c = self.coins[j]
+            s = c["S"]["sig"][name]
+            m = np.isfinite(s) & np.isfinite(c["S"]["fwd"][h]) & c["elig"]
+            months = np.array([c["days"][i][:7] for i in np.where(m)[0]])
+            out.append((yy, sv, np.full(len(yy), j), months))
+        return out
+
+
+def fe_slope(y, s, g):
+    """Within-coin slope of y on a 0/1 signal (each coin's own means removed)."""
+    yd, sd = y.astype(float).copy(), s.astype(float).copy()
+    for j in np.unique(g):
+        k = g == j
+        yd[k] -= yd[k].mean()
+        sd[k] -= sd[k].mean()
+    den = float(sd @ sd)
+    return float(sd @ yd) / den if den > 0 else NAN
+
+
+def jackknife(y, s, g, months):
+    """Leave out every two consecutive calendar months in turn (one rally or crash rarely spans
+    more): the smallest and largest on-minus-off difference, and whether every one keeps the
+    full sample's sign. g = coin index (all zero for a single coin)."""
+    ms = sorted(set(months))
+    full = fe_slope(y, s, g)
+    vals, worst, worst_v = [], None, None
+    for a, b in zip(ms, ms[1:] + [None]):
+        keep = (months != a) & ((months != b) if b else True)
+        if keep.sum() < 30 or s[keep].sum() < MIN_ON or (1 - s[keep]).sum() < MIN_ON:
+            continue
+        v = fe_slope(y[keep], s[keep], g[keep])
+        if v != v:
+            continue
+        vals.append(v)
+        if worst_v is None or v * np.sign(full) < worst_v * np.sign(full):
+            worst, worst_v = (a if not b else f"{a}–{b[5:]}"), v
+    if not vals or full != full:
+        return None
+    return dict(min=min(vals), max=max(vals), kept=bool(all(np.sign(v) == np.sign(full) for v in vals)),
+                worst=worst, worst_diff=worst_v)
+
+
+def perm_fdr(obs, T):
+    """q values from the rotation null (permutation FDR, pi0 = 1): at threshold c the expected
+    number of null tests with |t| >= c is the average count over the rotations (each draw scaled
+    up for its undefined tests); q is the smallest such FDR over thresholds at or below the
+    test's own |t|."""
+    m = len(obs)
+    valid = np.isfinite(T)
+    scale = m / np.maximum(valid.sum(axis=1), 1)
+    Tz = np.where(valid, T, -np.inf)
+    fdr = np.empty(m)
+    for i in range(m):
+        c = obs[i]
+        V = float(np.mean((Tz >= c).sum(axis=1) * scale))
+        R = int(np.sum(obs >= c))
+        fdr[i] = min(1.0, V / max(R, 1))
+    q = np.empty(m)
+    run = 1.0
+    for i in np.argsort(obs):  # ascending |t|: q = min FDR over the thresholds at or below
+        run = min(run, fdr[i])
+        q[i] = run
+    return q
 
 
 def bh(ps):
@@ -375,24 +485,40 @@ def bh(ps):
 
 
 # ------------------------------------------------------------------ flips: are they turning points?
+def where_in_swing(lp, d, span=20):
+    """At the decision close d: trading days since the lowest and the highest close of the last
+    span+1 closes, the move from them (%), and whether the next `span` closes go below that low /
+    above that high (a later, lower low means d was not the turn)."""
+    w = lp[d - span:d + 1]
+    if d - span < 0 or not np.isfinite(lp[d]) or not np.any(np.isfinite(w)):
+        return None
+    li, hi = int(np.nanargmin(w)), int(np.nanargmax(w))
+    fut = lp[d + 1:d + 1 + span]
+    fut = fut[np.isfinite(fut)]
+    return dict(low_days=span - li, gain=float((lp[d] - w[li]) * 100), high_days=span - hi, drop=float((lp[d] - w[hi]) * 100),
+                new_low=None if len(fut) < span // 2 else bool(fut.min() < w[li]),
+                new_high=None if len(fut) < span // 2 else bool(fut.max() > w[hi]))
+
+
 def flip_paths(c, name, span=20):
     """Average log-return path around each event, days -span..+span from the flow's trade date t,
-    relative to the close of t; days since the 20-day low and the rise from it, at t."""
+    relative to the close of t; and where the price stood in its swing at the decision close
+    d = t + lag, the first close at which the flip could be acted on."""
     s, lp, lag = c["S"]["sig"][name], c["S"]["lp"], c["lag"]
+    elig = c.get("elig")
     n = len(lp)
-    paths, lows, gains, highs, drops = [], [], [], [], []
+    paths, pos = [], []
     for d in np.where(s == 1)[0]:
-        t = int(d) - lag
+        d = int(d)
+        if elig is not None and not elig[d]:
+            continue
+        t = d - lag
         if t - span < 0 or not np.isfinite(lp[t]):
             continue
         paths.append([lp[t + k] - lp[t] if 0 <= t + k < n else NAN for k in range(-span, span + 1)])
-        w = lp[t - span:t + 1]
-        if np.any(np.isfinite(w)):
-            li, hi = int(np.nanargmin(w)), int(np.nanargmax(w))
-            lows.append(span - li)
-            gains.append(float((lp[t] - w[li]) * 100))
-            highs.append(span - hi)
-            drops.append(float((lp[t] - w[hi]) * 100))
+        w = where_in_swing(lp, d, span)
+        if w:
+            pos.append(w)
     if not paths:
         return None
     A = np.array(paths)
@@ -400,8 +526,21 @@ def flip_paths(c, name, span=20):
     cnt = fin.sum(axis=0)
     tot = np.where(fin, A, 0.0).sum(axis=0)
     avg = np.where(cnt >= 3, tot / np.maximum(cnt, 1) * 100, np.nan)
-    return dict(n=len(paths), path=[None if v != v else round(float(v), 3) for v in avg],
-                lows=lows, gains=gains, highs=highs, drops=drops)
+    return dict(n=len(paths), path=[None if v != v else round(float(v), 3) for v in avg], pos=pos)
+
+
+def swing_summary(pos):
+    """Medians and shares of where_in_swing() records."""
+    if not pos:
+        return {}
+    med = lambda k: float(np.median([p[k] for p in pos]))  # noqa: E731
+    share = lambda f: float(np.mean([f(p) for p in pos]))  # noqa: E731
+    nl = [p["new_low"] for p in pos if p["new_low"] is not None]
+    nh = [p["new_high"] for p in pos if p["new_high"] is not None]
+    return dict(days_since_low_median=med("low_days"), share_within2=share(lambda p: p["low_days"] <= 2),
+                gain_from_low_median=med("gain"), share_new_low=float(np.mean(nl)) if nl else None,
+                days_since_high_median=med("high_days"), share_within2_high=share(lambda p: p["high_days"] <= 2),
+                drop_from_high_median=med("drop"), share_new_high=float(np.mean(nh)) if nh else None)
 
 
 def summarize_flips(parts):
@@ -414,16 +553,22 @@ def summarize_flips(parts):
     for k in range(L):
         v = [(p["path"][k], p["n"]) for p in parts if p["path"][k] is not None]
         path.append(round(sum(a * b for a, b in v) / sum(b for _, b in v), 3) if v else None)
-    lows = sorted(x for p in parts for x in p["lows"])
-    gains = sorted(x for p in parts for x in p["gains"])
-    highs = sorted(x for p in parts for x in p["highs"])
-    drops = sorted(x for p in parts for x in p["drops"])
-    med = lambda v: v[len(v) // 2] if v else None  # noqa: E731
-    return dict(n=n, path=path, days_since_low_median=med(lows),
-                share_within2=sum(1 for v in lows if v <= 2) / len(lows) if lows else None,
-                gain_from_low_median=med(gains), days_since_high_median=med(highs),
-                share_within2_high=sum(1 for v in highs if v <= 2) / len(highs) if highs else None,
-                drop_from_high_median=med(drops))
+    return dict(n=n, path=path, **swing_summary([x for p in parts for x in p["pos"]]))
+
+
+def swing_baseline(c_list, span=20):
+    """The same swing measures on every decision close of the sample: what "any day" looks like."""
+    pos = []
+    for c in c_list:
+        lp, elig = c["S"]["lp"], c.get("elig")
+        first = c["lag"] + span + 1
+        for d in range(first, len(lp)):
+            if elig is not None and not elig[d]:
+                continue
+            w = where_in_swing(lp, d, span)
+            if w:
+                pos.append(w)
+    return dict(n=len(pos), **swing_summary(pos))
 
 
 # ------------------------------------------------------------------ dose response (Q: how much inflow?)
@@ -433,6 +578,8 @@ def dose(c_list, x, h):
     for c in c_list:
         pc, y = c["S"]["pcts"][x], c["S"]["fwd"][h]
         m = np.isfinite(pc) & np.isfinite(y)
+        if c.get("elig") is not None:
+            m &= c["elig"]
         for p, v in zip(pc[m], y[m]):
             ys[min(int(p * 5), 4)].append(v)
     out = []
@@ -490,7 +637,8 @@ def today_state(c):
                 recent[k] = c["days"][hits[-1] - c["lag"]]
     mc = next((c["MC"][i] for i in range(min(d, n - 1), -1, -1) if c["MC"][i]), None)
     return dict(decision_day=c["days"][d], flow_through=c["days"][d - c["lag"]], states=st, values=vals, pct=pct, mcap=mc,
-                inflow10=sgn10, inflow10_days=run,
+                inflow10=sgn10, inflow10_days=run, lag=c["lag"],
+                in_pool=bool(c["elig"][d]) if c.get("elig") is not None else None,
                 flips_last5=recent, thr5=thresholds_bp(c, 5), thr20=thresholds_bp(c, 20))
 
 
@@ -510,8 +658,8 @@ def run(iters=200):
         c["S"] = build_signals(c)
     names = list(coins["BTC"]["S"]["sig"].keys())
     flow_names = [k for k in names if not k.startswith("P")]
-    pool_coins = [coins[s] for s in ALTS if s in coins and coins[s]["flow_days"] >= POOL_MIN_DAYS
-                  and coins[s]["zero_share"] <= POOL_MAX_ZERO]
+    # the altcoin pool: each coin from the decision close at which it qualified (c["elig"])
+    pool_coins = [coins[s] for s in ALTS if s in coins and coins[s]["elig"].any()]
     # BTC's flow signals as a signal for the altcoins (does BTC ETF demand lead the altcoins?)
     btc = coins["BTC"]
     bidx = {d: i for i, d in enumerate(btc["days"])}
@@ -541,44 +689,57 @@ def run(iters=200):
                     results[(samp, name, h)] = r
     fam = [k for k in results if k[0] in MAIN and k[1] in flow_names]
     for k, q in zip(fam, bh([results[k]["p"] for k in fam])):
-        results[k]["q"] = q
+        results[k]["q_hac"] = q  # Benjamini-Hochberg on the HAC p values (optimistic here, kept for reference)
 
-    # rotation test over the whole family: per-test p and the chance of the best |t|
+    # rotation test over the whole family. Each draw moves every signal against its own coin's
+    # returns by a random offset (at least 25 days from the true alignment at either end), keeping
+    # both series' persistence and breaking only the timing; |t| of every test in every draw.
     rng = random.Random(20261005)
-    obs = {k: abs(results[k]["t"]) for k in fam}
-    exceed = {k: 0 for k in fam}
-    best_exceed, best_obs = 0, max(obs.values())
-    for _ in range(iters):
-        sh = {smp: rng.randrange(25, max(26, len(coins[smp]["days"]) - 25)) for smp in ("BTC", "ETH") if smp in coins}
+    obs = np.array([abs(results[k]["t"]) for k in fam])
+    T = np.full((iters, len(fam)), NAN)
+    off = lambda L: rng.randrange(25, L - 25) if L > 60 else 0  # noqa: E731
+    for b in range(iters):
+        sh = {smp: off(len(coins[smp]["days"])) for smp in ("BTC", "ETH") if smp in coins}
         for smp in POOLED:
-            sh[smp] = rng.randrange(25, 175)
-        best = 0.0
-        for k in fam:
+            sh[smp] = [off(len(c["days"])) for c in pools[smp].coins]
+        for i, k in enumerate(fam):
             smp, name, h = k
             if smp in pools:
-                r = pools[smp].t(name, h, shift=sh[smp])
+                r = pools[smp].t(name, h, shifts=sh[smp])
             else:
                 S = coins[smp]["S"]
                 r = t_single(np.roll(S["sig"][name], sh[smp]), S["fwd"][h], h)
-            if r is None:
-                continue
-            at = abs(r[1])
-            best = max(best, at)
-            if at >= obs[k]:
-                exceed[k] += 1
-        best_exceed += best >= best_obs
-    for k in fam:
-        results[k]["p_rot"] = (exceed[k] + 1) / (iters + 1)
-    reality = dict(max_abs_t=best_obs, p_best=(best_exceed + 1) / (iters + 1), iters=iters, n_tests=len(fam))
+            if r is not None:
+                T[b, i] = abs(r[1])
+    valid = np.isfinite(T)
+    Tz = np.where(valid, T, -np.inf)
+    exceed = (Tz >= obs[None, :]).sum(axis=0)
+    nvalid = valid.sum(axis=0)
+    qrot = perm_fdr(obs, T)
+    for i, k in enumerate(fam):
+        results[k]["p_rot"] = float((exceed[i] + 1) / (nvalid[i] + 1)) if nvalid[i] >= 20 else None
+        results[k]["q"] = float(qrot[i])
+    best_null = Tz.max(axis=1)
+    by_sample = {}
+    for smp in MAIN:
+        idx = [i for i, k in enumerate(fam) if k[0] == smp]
+        if idx:
+            o = float(obs[idx].max())
+            by_sample[smp] = dict(n_tests=len(idx), max_abs_t=o,
+                                  p_best=float((np.sum(Tz[:, idx].max(axis=1) >= o) + 1) / (iters + 1)))
+    reality = dict(max_abs_t=float(obs.max()), p_best=float((np.sum(best_null >= obs.max()) + 1) / (iters + 1)),
+                   iters=iters, n_tests=len(fam), by_sample=by_sample,
+                   null_rate_196=float(np.mean(Tz[valid] >= 1.96)) if valid.any() else None)
 
-    # does the flow add anything to its price twin? and the two halves of each main sample
+    # does the flow add anything to its price twin? the two halves of each sample, and a
+    # leave-two-months-out check (is it one rally or crash?)
     halves_at = {}
     for smp in ("BTC", "ETH"):
         if smp in coins:
             halves_at[smp] = coins[smp]["days"][len(coins[smp]["days"]) // 2]
-    alt_days = sorted({d for c in pool_coins for d in c["days"]})
+    pool_days = sorted(d for c in pool_coins for d, e in zip(c["days"], c["elig"]) if e)
     for smp in POOLED:
-        halves_at[smp] = alt_days[len(alt_days) // 2]
+        halves_at[smp] = pool_days[len(pool_days) // 2] if pool_days else None
     for k in fam:
         smp, name, h = k
         base, par = name.split(" ")
@@ -596,24 +757,31 @@ def run(iters=200):
         hv = []
         for first_half in (True, False):
             if smp in pools:
-                sub = []
-                for c in pools[smp].coins:
-                    mask = np.array([(d < cut) == first_half for d in c["days"]])
-                    cc = dict(c)
-                    cc["S"] = dict(c["S"])
-                    cc["S"]["sig"] = dict(c["S"]["sig"])
-                    cc["S"]["sig"][name] = np.where(mask, c["S"]["sig"][name], NAN)
-                    sub.append(cc)
-                r3 = Pool(sub).t(name, h)
-                hv.append(None if r3 is None else dict(diff=r3[0], t=r3[1]))
+                masks = [np.array([(d < cut) == first_half for d in c["days"]]) for c in pools[smp].coins]
+                r3 = pools[smp].t(name, h, masks=masks)
             else:
                 S = coins[smp]["S"]
                 mask = np.array([(d < cut) == first_half for d in coins[smp]["days"]])
-                r3 = t_single(np.where(mask, S["sig"][name], NAN), S["fwd"][h], h)
-                hv.append(None if r3 is None else dict(diff=r3[0], t=r3[1]))
+                r3 = t_single(S["sig"][name], S["fwd"][h], h, mask=mask)
+            hv.append(None if r3 is None else dict(diff=r3[0], t=r3[1]))
         results[k]["halves"] = hv
+        if smp in pools:
+            rows = pools[smp].rows(name, h)
+            if rows:
+                y, sv, g, mo = (np.concatenate([r[i] for r in rows]) for i in range(4))
+                results[k]["jk"] = jackknife(y, sv, g, mo)
+        else:
+            c = coins[smp]
+            S = c["S"]
+            m = np.isfinite(S["sig"][name]) & np.isfinite(S["fwd"][h])
+            mo = np.array([c["days"][i][:7] for i in np.where(m)[0]])
+            results[k]["jk"] = jackknife(S["fwd"][h][m], S["sig"][name][m], np.zeros(int(m.sum()), int), mo)
 
-    flips = {}
+    flips, baseline = {}, {}
+    for smp in ("BTC", "ETH", "ALTS"):
+        cl = pool_coins if smp == "ALTS" else ([coins[smp]] if smp in coins else [])
+        if cl:
+            baseline[smp] = swing_baseline(cl)
     for y in FLIP_Y:
         for nm in (f"FLIPUP {y}", f"PFLIPUP {y}", f"FLIPDN {y}", f"PFLIPDN {y}"):
             for smp in ("BTC", "ETH"):
@@ -633,16 +801,20 @@ def run(iters=200):
                 if cl:
                     doses[f"{smp}|{x}|{h}"] = dose(cl, x, h)
 
+    joined = {c["sym"]: c["days"][int(np.argmax(c["elig"]))] for c in pool_coins}
     out = {"generated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
            "clock": "daily close 00:00 UTC (08:00 Singapore)", "horizons": HORIZONS,
            "samples": {s: {"from": c["days"][1], "flows_to": c["days"][-1 - c["lag"]], "n": len(c["days"]) - 1 - c["lag"],
-                           "lag": c["lag"], "zero_share": c.get("zero_share"), "in_pool": c in pool_coins}
+                           "lag": c["lag"], "zero_share": c.get("zero_share"), "flow_days": c.get("flow_days"),
+                           "in_pool": bool(c["elig"][-1]) if c.get("elig") is not None else False, "pool_from": joined.get(s)}
                        for s, c in coins.items()},
-           "pool": [c["sym"] for c in pool_coins],
+           "pool": [c["sym"] for c in pool_coins if c["elig"][-1]],
+           "pool_ever": joined,
+           "pool_rule": {"min_days": POOL_MIN_DAYS, "max_zero": POOL_MAX_ZERO},
            "samples_main": list(MAIN),
            "halves_at": halves_at,
            "tests": [dict(sample=k[0], signal=k[1], h=k[2], **rnd(v)) for k, v in results.items() if k[0] in MAIN],
-           "reality": rnd(reality), "flips": rnd(flips), "dose": rnd(doses),
+           "reality": rnd(reality), "flips": rnd(flips), "swing_any_day": rnd(baseline), "dose": rnd(doses),
            "thresholds": {s: {f"x{x}": rnd(thresholds_bp(c, x)) for x in (5, 10, 20, 60)} for s, c in coins.items()},
            "today": {s: rnd(today_state(c)) for s, c in coins.items()}}
     return out
@@ -664,13 +836,17 @@ if __name__ == "__main__":
     o = main()
     T = o["tests"]
     fam = [t for t in T if "q" in t]
-    print("family tests:", len(fam), "| q<0.10:", sum(1 for t in fam if t["q"] < 0.10), "| p<0.05:",
-          sum(1 for t in fam if t["p"] < 0.05), "| rotation p<0.05:", sum(1 for t in fam if t["p_rot"] < 0.05))
-    print("reality:", o["reality"], "halves at", o["halves_at"])
-    for t in sorted(fam, key=lambda t: t["p"])[:20]:
+    pr = lambda t: 1.0 if t.get("p_rot") is None else t["p_rot"]  # noqa: E731
+    print("family tests:", len(fam), "| q (rotation) < 0.10:", sum(1 for t in fam if t["q"] < 0.10),
+          "| HAC p < 0.05:", sum(1 for t in fam if t["p"] < 0.05), "| rotation p < 0.05:", sum(1 for t in fam if pr(t) < 0.05))
+    print("reality:", o["reality"])
+    print("pool now:", o["pool"], "| joined:", o["pool_ever"], "| halves at", o["halves_at"])
+    for t in sorted(fam, key=pr)[:24]:
         vp = t.get("vs_price") or {}
         hv = t.get("halves") or []
-        print(f"{t['sample']:5s} {t['signal']:12s} h={t['h']:2d} diff {t['diff']:+6.2f}% t {t['t']:+5.2f} p {t['p']:.4f} "
-              f"q {t['q']:.3f} prot {t['p_rot']:.3f} on {t['n_on']:4d} ev {t['events']:3d} on {t['mean_on']:+6.2f} off {t['mean_off']:+6.2f}"
+        jk = t.get("jk") or {}
+        print(f"{t['sample']:8s} {t['signal']:12s} h={t['h']:2d} diff {t['diff']:+6.2f}% t {t['t']:+5.2f} p {t['p']:.4f} "
+              f"prot {pr(t):.3f} q {t['q']:.3f} on {t['n_on']:4d} ep {t['events']:3d} on {t['mean_on']:+6.2f} off {t['mean_off']:+6.2f}"
               + (f" | +price t {vp['t']:+.2f}" if vp else "")
-              + (" | halves " + " ".join("—" if x is None else f"{x['diff']:+.2f}({x['t']:+.1f})" for x in hv) if hv else ""))
+              + (" | halves " + " ".join("-" if x is None else f"{x['diff']:+.2f}({x['t']:+.1f})" for x in hv) if hv else "")
+              + (f" | jk {jk['min']:+.2f}..{jk['max']:+.2f} kept {jk['kept']} worst {jk['worst']}" if jk else ""))
