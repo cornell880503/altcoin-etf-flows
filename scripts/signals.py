@@ -126,15 +126,16 @@ def coin_long(sym, long):
     sup = supply_lookup(sym)
     fl = dict(zip(c["dates"], c["flow"]))
     cal = trading_days(c["launch"], c["dates"][-1])
-    days = [max(d for d in px if d < cal[0])] + cal + next_days(c["dates"][-1], 1)
+    prior = sorted(d for d in px if d < cal[0])[-30:]  # prices before launch: full 20-day windows from the start
+    days = prior + cal + next_days(c["dates"][-1], 1)
     P_ = [px.get(d) for d in days]
-    F = [None] + [fl.get(d) for d in cal] + [None]
+    F = [None] * len(prior) + [fl.get(d) for d in cal] + [None]
     MC = [None] * len(days)
     for i in range(1, len(days)):
         s = sup(days[i - 1]) if sup else None
         if P_[i - 1] and s:
             MC[i] = P_[i - 1] * s / 1e6  # US$ millions
-    return dict(sym=sym, days=days, P=P_, F=F, K=F[:], MC=MC, lag=1, launch=c["launch"], sample="long")
+    return dict(sym=sym, days=days, P=P_, F=F, K=F[:], MC=MC, lag=1, launch=c["launch"], sample="long", cal=cal)
 
 
 def coin_alt(sym, daily):
@@ -191,7 +192,7 @@ def coin_alt(sym, daily):
         elig[d] = cnt >= POOL_MIN_DAYS and zer <= POOL_MAX_ZERO * cnt
     zero = sum(1 for v in c["flow"] if v is not None and abs(v) < 1e-9) / max(1, sum(1 for v in c["flow"] if v is not None))
     return dict(sym=sym, days=days, P=[px.get(d) for d in days], F=F, K=K, MC=MC, lag=lag, launch=c["launch"],
-                sample="alt", zero_share=zero, flow_days=sum(1 for v in c["flow"] if v is not None), elig=elig)
+                sample="alt", zero_share=zero, flow_days=sum(1 for v in c["flow"] if v is not None), elig=elig, cal=cal)
 
 
 # ------------------------------------------------------------------ signals
@@ -309,9 +310,10 @@ def hac_ols(y, X, lags, groups=None):
 
 
 def clusters(keys, h):
-    """Separate episodes among the "on" days (trading-day keys): days at most h apart, whose
+    """Separate episodes among a set of days (trading-day keys): days at most h apart, whose
     h-day forward windows touch or overlap, are one episode; in the pool the same day in two
-    coins is one day."""
+    coins is one day. A test's "events" are the episodes of its rarer side (the "on" days for
+    most signals, the "off" days for states that are on most of the time)."""
     ks = sorted(set(int(k) for k in keys))
     return (1 + sum(1 for a, b in zip(ks, ks[1:]) if b - a > max(h, 1))) if ks else 0
 
@@ -336,8 +338,9 @@ def test_single(s, y, h, extra=None):
     diff, t, m = r
     sv, yv = s[m], y[m]
     on, off = yv[sv == 1], yv[sv == 0]
+    k_on, k_off = np.where(m & (s == 1))[0], np.where(m & (s == 0))[0]
     return dict(diff=diff, t=t, p=norm_p(t), n=int(m.sum()), n_on=int(len(on)),
-                events=clusters(np.where(m & (s == 1))[0], h),
+                events=clusters(k_on if len(k_on) <= len(k_off) else k_off, h), events_on=clusters(k_on, h),
                 mean_on=float(on.mean()), mean_off=float(off.mean()),
                 hit_on=float((on > 0).mean()), hit_off=float((off > 0).mean()))
 
@@ -346,18 +349,41 @@ class Pool:
     """The pooled altcoins, as stacked arrays: date key, coin id, forward returns per h. A coin
     counts only on the decision days it was in the pool by then (c["elig"])."""
 
-    def __init__(self, coins):
+    def __init__(self, coins, src=None):
         self.coins = coins
         all_days = sorted({d for c in coins for d in c["days"]})
         self.key = {d: i for i, d in enumerate(all_days)}
         self.keys = [np.array([self.key[d] for d in c["days"]]) for c in coins]
+        self.ncal = len(all_days)
+        self.src = src  # BTC>ALTS: the coin whose signal every altcoin carries
+        if src is not None:
+            sidx = {d: i for i, d in enumerate(src["days"])}
+            self.src_idx = [np.array([sidx.get(d, -1) for d in c["days"]]) for c in coins]
 
-    def stack(self, name, h, twin=None, shifts=None, masks=None):
+    def span(self):
+        return len(self.src["days"]) if self.src is not None else self.ncal
+
+    def rolled(self, name, k):
+        """Every coin's signal moved by the same k trading days of calendar time (wrapping round
+        the calendar), so the coins keep their timing relative to each other; a coin with no
+        value at the source day loses that day. For BTC>ALTS, BTC's own signal is moved on BTC's
+        calendar and then read on each altcoin's days."""
+        out = []
+        if self.src is not None:
+            r = np.roll(self.src["S"]["sig"][name], k)
+            for ix in self.src_idx:
+                out.append(np.where(ix >= 0, r[np.maximum(ix, 0)], NAN))
+        else:
+            for c, ks in zip(self.coins, self.keys):
+                cal = np.full(self.ncal, NAN)
+                cal[ks] = c["S"]["sig"][name]
+                out.append(np.roll(cal, k)[ks])
+        return out
+
+    def stack(self, name, h, twin=None, sigs=None, masks=None):
         ys, ss, ts, gs, raw_y, raw_s, ids = [], [], [], [], [], [], []
         for j, c in enumerate(self.coins):
-            s = c["S"]["sig"][name]
-            if shifts is not None:
-                s = np.roll(s, shifts[j])  # the signal moves, the sample days stay
+            s = c["S"]["sig"][name] if sigs is None else sigs[j]  # rotated: the signal moves, the sample days stay
             y = c["S"]["fwd"][h]
             tw = c["S"]["sig"].get(twin) if twin else None
             m = np.isfinite(s) & np.isfinite(y) & c["elig"]
@@ -378,8 +404,8 @@ class Pool:
             ids.append(j)
         return ys, ss, ts, gs, raw_y, raw_s, ids
 
-    def t(self, name, h, twin=None, shifts=None, masks=None):
-        ys, ss, ts, gs, raw_y, raw_s, _ = self.stack(name, h, twin, shifts, masks)
+    def t(self, name, h, twin=None, sigs=None, masks=None):
+        ys, ss, ts, gs, raw_y, raw_s, _ = self.stack(name, h, twin, sigs, masks)
         if not ys:
             return None
         on = int(sum(s.sum() for s in raw_s))
@@ -397,21 +423,25 @@ class Pool:
         diff, t, (raw_y, raw_s, gs) = r
         y, s = np.concatenate(raw_y), np.concatenate(raw_s)
         on, off = y[s == 1], y[s == 0]
+        k_on = np.concatenate([g[x == 1] for g, x in zip(gs, raw_s)])
+        k_off = np.concatenate([g[x == 0] for g, x in zip(gs, raw_s)])
         return dict(diff=diff, t=t, p=norm_p(t), n=int(len(y)), n_on=int(len(on)),
-                    events=clusters(np.concatenate([g[x == 1] for g, x in zip(gs, raw_s)]), h),
+                    events=clusters(k_on if len(on) <= len(off) else k_off, h), events_on=clusters(k_on, h),
                     mean_on=float(on.mean()), mean_off=float(off.mean()),
                     hit_on=float((on > 0).mean()), hit_off=float((off > 0).mean()))
 
     def rows(self, name, h):
-        """(forward return, signal, coin index, month) of every pooled row, for the jackknife."""
+        """(forward return, signal, coin index, month of the decision day, month of the day the
+        return ends) of every pooled row, for the jackknife."""
         ys, ss, ts, gs, raw_y, raw_s, ids = self.stack(name, h)
         out = []
         for yy, sv, j in zip(raw_y, raw_s, ids):
             c = self.coins[j]
             s = c["S"]["sig"][name]
             m = np.isfinite(s) & np.isfinite(c["S"]["fwd"][h]) & c["elig"]
-            months = np.array([c["days"][i][:7] for i in np.where(m)[0]])
-            out.append((yy, sv, np.full(len(yy), j), months))
+            idx = np.where(m)[0]
+            out.append((yy, sv, np.full(len(yy), j), np.array([c["days"][i][:7] for i in idx]),
+                        np.array([c["days"][min(i + h, len(c["days"]) - 1)][:7] for i in idx])))
         return out
 
 
@@ -426,27 +456,36 @@ def fe_slope(y, s, g):
     return float(sd @ yd) / den if den > 0 else NAN
 
 
-def jackknife(y, s, g, months):
+def jackknife(y, s, g, months, months_end):
     """Leave out every two consecutive calendar months in turn (one rally or crash rarely spans
-    more): the smallest and largest on-minus-off difference, and whether every one keeps the
-    full sample's sign. g = coin index (all zero for a single coin)."""
-    ms = sorted(set(months))
+    more), with every row whose decision day or return end falls in them: the smallest and
+    largest on-minus-off difference, and whether every one keeps the full sample's sign. A window
+    without which the test cannot be computed (too few on or off days left) is a failure: the
+    whole result sits in it. g = coin index (all zero for a single coin)."""
+    ms = sorted(set(months) | set(months_end))
     full = fe_slope(y, s, g)
-    vals, worst, worst_v = [], None, None
+    if full != full:
+        return None
+    vals, worst, worst_v, undefined = [], None, None, None
     for a, b in zip(ms, ms[1:] + [None]):
-        keep = (months != a) & ((months != b) if b else True)
+        label = a if not b else f"{a}–{b[5:]}"
+        out = (months == a) | (months_end == a)
+        if b:
+            out |= (months == b) | (months_end == b)
+        keep = ~out
         if keep.sum() < 30 or s[keep].sum() < MIN_ON or (1 - s[keep]).sum() < MIN_ON:
+            undefined = undefined or label
             continue
         v = fe_slope(y[keep], s[keep], g[keep])
         if v != v:
             continue
         vals.append(v)
         if worst_v is None or v * np.sign(full) < worst_v * np.sign(full):
-            worst, worst_v = (a if not b else f"{a}–{b[5:]}"), v
-    if not vals or full != full:
-        return None
-    return dict(min=min(vals), max=max(vals), kept=bool(all(np.sign(v) == np.sign(full) for v in vals)),
-                worst=worst, worst_diff=worst_v)
+            worst, worst_v = label, v
+    if not vals:
+        return dict(min=None, max=None, kept=False, worst=undefined, worst_diff=None, undefined=undefined)
+    return dict(min=min(vals), max=max(vals), kept=bool(undefined is None and all(np.sign(v) == np.sign(full) for v in vals)),
+                worst=worst, worst_diff=worst_v, undefined=undefined)
 
 
 def perm_fdr(obs, T):
@@ -560,10 +599,9 @@ def swing_baseline(c_list, span=20):
     """The same swing measures on every decision close of the sample: what "any day" looks like."""
     pos = []
     for c in c_list:
-        lp, elig = c["S"]["lp"], c.get("elig")
-        first = c["lag"] + span + 1
-        for d in range(first, len(lp)):
-            if elig is not None and not elig[d]:
+        lp, elig, ok = c["S"]["lp"], c.get("elig"), np.isfinite(c["S"]["sig"]["FLIPUP 5"])
+        for d in range(c["lag"] + span, len(lp)):
+            if not ok[d] or (elig is not None and not elig[d]):
                 continue
             w = where_in_swing(lp, d, span)
             if w:
@@ -670,7 +708,7 @@ def run(iters=200):
         cc["S"]["sig"] = {nm: np.array([btc["S"]["sig"][nm][bidx[d]] if d in bidx else NAN for d in c["days"]])
                           for nm in names}
         cross_coins.append(cc)
-    pools = {"ALTS": Pool(pool_coins), "BTC>ALTS": Pool(cross_coins)}
+    pools = {"ALTS": Pool(pool_coins), "BTC>ALTS": Pool(cross_coins, src=btc)}
 
     results = {}
     for samp in ("BTC", "ETH"):
@@ -691,9 +729,10 @@ def run(iters=200):
     for k, q in zip(fam, bh([results[k]["p"] for k in fam])):
         results[k]["q_hac"] = q  # Benjamini-Hochberg on the HAC p values (optimistic here, kept for reference)
 
-    # rotation test over the whole family. Each draw moves every signal against its own coin's
-    # returns by a random offset (at least 25 days from the true alignment at either end), keeping
-    # both series' persistence and breaking only the timing; |t| of every test in every draw.
+    # rotation test over the whole family. Each draw moves every signal against the returns by a
+    # random offset (at least 25 days from the true alignment at either end; one common calendar
+    # offset for all the coins of a pooled sample), keeping both series' persistence and breaking
+    # only the timing; |t| of every test in every draw.
     rng = random.Random(20261005)
     obs = np.array([abs(results[k]["t"]) for k in fam])
     T = np.full((iters, len(fam)), NAN)
@@ -701,11 +740,11 @@ def run(iters=200):
     for b in range(iters):
         sh = {smp: off(len(coins[smp]["days"])) for smp in ("BTC", "ETH") if smp in coins}
         for smp in POOLED:
-            sh[smp] = [off(len(c["days"])) for c in pools[smp].coins]
+            sh[smp] = off(pools[smp].span())
         for i, k in enumerate(fam):
             smp, name, h = k
             if smp in pools:
-                r = pools[smp].t(name, h, shifts=sh[smp])
+                r = pools[smp].t(name, h, sigs=pools[smp].rolled(name, sh[smp]))
             else:
                 S = coins[smp]["S"]
                 r = t_single(np.roll(S["sig"][name], sh[smp]), S["fwd"][h], h)
@@ -736,7 +775,7 @@ def run(iters=200):
     halves_at = {}
     for smp in ("BTC", "ETH"):
         if smp in coins:
-            halves_at[smp] = coins[smp]["days"][len(coins[smp]["days"]) // 2]
+            halves_at[smp] = coins[smp]["cal"][len(coins[smp]["cal"]) // 2]
     pool_days = sorted(d for c in pool_coins for d, e in zip(c["days"], c["elig"]) if e)
     for smp in POOLED:
         halves_at[smp] = pool_days[len(pool_days) // 2] if pool_days else None
@@ -768,14 +807,16 @@ def run(iters=200):
         if smp in pools:
             rows = pools[smp].rows(name, h)
             if rows:
-                y, sv, g, mo = (np.concatenate([r[i] for r in rows]) for i in range(4))
-                results[k]["jk"] = jackknife(y, sv, g, mo)
+                y, sv, g, mo, me = (np.concatenate([r[i] for r in rows]) for i in range(5))
+                results[k]["jk"] = jackknife(y, sv, g, mo, me)
         else:
             c = coins[smp]
             S = c["S"]
             m = np.isfinite(S["sig"][name]) & np.isfinite(S["fwd"][h])
-            mo = np.array([c["days"][i][:7] for i in np.where(m)[0]])
-            results[k]["jk"] = jackknife(S["fwd"][h][m], S["sig"][name][m], np.zeros(int(m.sum()), int), mo)
+            idx = np.where(m)[0]
+            mo = np.array([c["days"][i][:7] for i in idx])
+            me = np.array([c["days"][min(i + h, len(c["days"]) - 1)][:7] for i in idx])
+            results[k]["jk"] = jackknife(S["fwd"][h][m], S["sig"][name][m], np.zeros(len(idx), int), mo, me)
 
     flips, baseline = {}, {}
     for smp in ("BTC", "ETH", "ALTS"):
@@ -804,7 +845,7 @@ def run(iters=200):
     joined = {c["sym"]: c["days"][int(np.argmax(c["elig"]))] for c in pool_coins}
     out = {"generated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
            "clock": "daily close 00:00 UTC (08:00 Singapore)", "horizons": HORIZONS,
-           "samples": {s: {"from": c["days"][1], "flows_to": c["days"][-1 - c["lag"]], "n": len(c["days"]) - 1 - c["lag"],
+           "samples": {s: {"from": c["cal"][0], "flows_to": c["days"][-1 - c["lag"]], "n": len(c["cal"]),
                            "lag": c["lag"], "zero_share": c.get("zero_share"), "flow_days": c.get("flow_days"),
                            "in_pool": bool(c["elig"][-1]) if c.get("elig") is not None else False, "pool_from": joined.get(s)}
                        for s, c in coins.items()},

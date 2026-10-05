@@ -1631,16 +1631,17 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var list = (SG.tests || []).filter(function (t) { return t.sample === st.allS && t.h === st.allH && t.q != null; }).sort(function (a, b) { return sgPr(a) - sgPr(b) || a.p - b.p; });
     var rows = list.map(function (t) {
       var hv = (t.halves || []).map(function (h) { return h ? pct(h.diff) : '—'; }).join(' / ');
-      var jk = t.jk ? node('span', t.jk.kept ? null : 'negtxt', pct(t.jk.worst_diff) + (t.jk.kept ? '' : ' 變號')) : null;
-      if (jk) jk.title = '去掉 ' + t.jk.worst + ' 之後';
+      var jk = null;
+      if (t.jk && t.jk.undefined) { jk = node('span', 'negtxt', '集中在 ' + t.jk.undefined.slice(2)); jk.title = '去掉 ' + t.jk.undefined + ' 之後，觸發或沒觸發的日子不夠，算不出來：結果全靠那段時間'; }
+      else if (t.jk && t.jk.worst_diff != null) { jk = node('span', t.jk.kept ? null : 'negtxt', pct(t.jk.worst_diff) + (t.jk.kept ? '' : ' 變號')); jk.title = '去掉 ' + t.jk.worst + ' 之後'; }
       return { _cls: sgPr(t) < 0.05 ? 'sigrow' : '', cells: [sgName(t.signal), t.n_on + '（' + t.events + ' 段）', pct(t.mean_on) + ' / ' + pct(t.mean_off), pct(t.diff), sgP(t.p_rot), sgP(t.q), sgP(t.p), hv || '—', jk ? { node: jk } : '—', t.vs_price ? sgP(t.vs_price.p) : '—'] };
     });
     table(document.getElementById('tb-sg-all'), ['訊號', '天數（段）', '觸發後 / 其他時候', '差', '輪換 p', '校正後 q', '常態 p', '前半 / 後半', '去掉兩個月', '扣價格後 p'], rows);
     var half = SG.halves_at && SG.halves_at[st.allS], R = SG.reality || {}, bs = (R.by_sample || {})[st.allS];
-    document.getElementById('sg-all-note').textContent = '輪換 p = 把每個幣的訊號和它自己的報酬錯開隨機天數（至少 25 天）重算 ' + (R.iters || '') + ' 次，|t| 不小於實際值的比例；它保留兩邊各自的持續性，只打亂時間對應，是這裡主要的證據。' +
+    document.getElementById('sg-all-note').textContent = '輪換 p = 把訊號和報酬錯開隨機天數（至少 25 天；合併樣本所有幣錯開同樣的日曆天數）重算 ' + (R.iters || '') + ' 次，|t| 不小於實際值的比例；它保留兩邊各自的持續性，只打亂時間對應，是這裡主要的證據。' +
       'q = 用同一批輪換結果估的偽發現率，全部 ' + sgFam().length + ' 個組合一起校正。常態 p = Newey–West 標準誤的 p，對這種持續好幾天、段數很少的訊號偏樂觀：輪換之下約 ' + (R.null_rate_196 != null ? Math.round(R.null_rate_196 * 100) : '—') + '% 的 |t| 超過 1.96（應該是 5%）。' +
       (bs ? ' 只看這一頁的 ' + bs.n_tests + ' 個組合，最好那個是運氣的機率約 ' + Math.round(bs.p_best * 100) + '%。' : '') +
-      ' 段 = 相隔不到 h 天的觸發日算同一段（合併樣本裡同一天不同幣也算同一段）。前半 / 後半以 ' + (half || '—') + ' 切開（只是穩定度檢查，不是樣本外）；「去掉兩個月」= 輪流去掉每兩個連續月份，差最接近 0（或變號）的那次，滑鼠移上去看是哪兩個月。扣價格後 p = 同時放入只看價格的對照訊號（例如 y 日報酬為正）之後，流量訊號本身的 p。' +
+      ' 段 = 比較少的那一邊（多數訊號是觸發日，一直開著的狀態則是沒觸發的日子）有幾段獨立行情：相隔不到 h 天的日子算同一段，合併樣本裡同一天不同幣也算同一段。前半 / 後半以 ' + (half || '—') + ' 切開（只是穩定度檢查，不是樣本外）；「去掉兩個月」= 輪流去掉每兩個連續月份（連同報酬期間碰到它們的日子），差最接近 0（或變號）的那次，滑鼠移上去看是哪兩個月；「集中在」= 去掉那兩個月就算不出來。扣價格後 p = 同時放入只看價格的對照訊號（例如 y 日報酬為正）之後，流量訊號本身的 p。' +
       (st.allS === 'BTC>ALTS' ? ' 這一頁的訊號都是 BTC 的流量，報酬是山寨幣合併的報酬。' : '');
   }
   function drawSgMethod() {
