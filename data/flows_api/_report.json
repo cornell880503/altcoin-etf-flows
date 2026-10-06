@@ -2,26 +2,26 @@
  "assets": {
   "AVAX": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "112",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "114",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 20,
-   "stored": 21,
+   "returned": 21,
+   "stored": 22,
    "window_days": 30
   },
   "BNB": {
    "first": "2026-09-04",
-   "last": "2026-10-01",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "109",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "111",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "BTC": {
@@ -30,34 +30,34 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Reset": "1791267780"
    },
-   "returned": 31,
+   "returned": 30,
    "stored": 32,
    "window_days": 30
   },
   "DOGE": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "114",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "116",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "DOT": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "108",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "110",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "ETH": {
@@ -66,22 +66,22 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Reset": "1791267780"
    },
-   "returned": 31,
+   "returned": 30,
    "stored": 32,
    "window_days": 30
   },
   "HBAR": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "111",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "113",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "HYPE": {
@@ -89,47 +89,47 @@
    "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "117",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 31,
+   "returned": 30,
    "stored": 32,
    "window_days": 30
   },
   "LINK": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "113",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "115",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "LTC": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "110",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "112",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "NEAR": {
    "first": "2026-09-29",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "106",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "108",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 4,
-   "stored": 4,
+   "returned": 5,
+   "stored": 5,
    "window_days": 30
   },
   "SOL": {
@@ -137,35 +137,35 @@
    "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "119",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 31,
+   "returned": 30,
    "stored": 32,
    "window_days": 30
   },
   "SUI": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "107",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "109",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   },
   "TRX": {
    "first": "2026-09-10",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "105",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "107",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 17,
-   "stored": 17,
+   "returned": 18,
+   "stored": 18,
    "window_days": 30
   },
   "XRP": {
@@ -173,26 +173,26 @@
    "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "118",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 31,
+   "returned": 30,
    "stored": 32,
    "window_days": 30
   },
   "ZEC": {
    "first": "2026-09-04",
-   "last": "2026-10-02",
+   "last": "2026-10-05",
    "rate_limit": {
     "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "104",
-    "X-RateLimit-Reset": "1791194880"
+    "X-RateLimit-Remaining": "106",
+    "X-RateLimit-Reset": "1791267840"
    },
-   "returned": 19,
-   "stored": 20,
+   "returned": 20,
+   "stored": 21,
    "window_days": 30
   }
  },
- "last_success": "2026-10-05T10:07:30Z",
- "run_at": "2026-10-05T10:07:30Z"
+ "last_success": "2026-10-06T06:22:57Z",
+ "run_at": "2026-10-06T06:22:57Z"
 }
