@@ -2,182 +2,180 @@
  "coins": {
   "AVAX": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "AVAX-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "BNB": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "BNB-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "BTC": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2023-12-01",
    "last": "2026-10-07",
    "pair": "BTC-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "DOGE": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "DOGE-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "DOT": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "DOT-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "ETH": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2023-12-01",
    "last": "2026-10-07",
    "pair": "ETH-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "HBAR": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "HBAR-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "HYPE": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2026-02-05",
    "last": "2026-10-07",
    "pair": "HYPE-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "LINK": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "LINK-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "LTC": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "LTC-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "NEAR": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "NEAR-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "SOL": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "SOL-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "SUI": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "SUI-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "TRX": {
    "backfill": false,
-   "days": 9,
-   "errors": {
-    "coinbase": "HTTPError: HTTP Error 404: Not Found"
-   },
-   "filled_hours": 3,
+   "days": 8,
+   "errors": null,
+   "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "TRXUSDT",
    "source": "binance",
-   "with_close": 9
+   "with_close": 8
   },
   "XRP": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "XRP-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   },
   "ZEC": {
    "backfill": false,
-   "days": 9,
+   "days": 8,
    "errors": null,
    "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-07",
    "pair": "ZEC-USD",
    "source": "coinbase",
-   "with_close": 9
+   "with_close": 8
   }
  },
- "run_at": "2026-10-08T01:02:34Z"
+ "run_at": "2026-10-08T10:37:32Z"
 }
