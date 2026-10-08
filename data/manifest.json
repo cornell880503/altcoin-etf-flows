@@ -55,7 +55,7 @@
    "rows": 75
   },
   "SOL": {
-   "first": "2025-10-27",
+   "first": "2025-10-28",
    "keys": [
     "bitwise",
     "canary",
@@ -70,7 +70,7 @@
     "vanEck"
    ],
    "last": "2026-10-08",
-   "rows": 190
+   "rows": 194
   },
   "XRP": {
    "first": "2025-11-14",
@@ -84,15 +84,13 @@
     "xrpPrice"
    ],
    "last": "2026-10-08",
-   "rows": 176
+   "rows": 178
   }
  },
  "changed": [
-  "BTC",
-  "ETH",
   "SOL",
   "XRP",
   "HYPE"
  ],
- "updated_at": "2026-10-08T10:36:37Z"
+ "updated_at": "2026-10-08T18:51:47Z"
 }
