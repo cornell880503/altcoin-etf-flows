@@ -4,19 +4,19 @@
   "AVAX": {
    "first": "2026-09-04",
    "last": "2026-10-06",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "BNB": {
    "first": "2026-09-04",
    "last": "2026-10-06",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "BTC": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 34
   },
   "DOGE": {
@@ -34,7 +34,7 @@
   "ETH": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 34
   },
   "HBAR": {
@@ -46,7 +46,7 @@
   "HYPE": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 34
   },
   "LINK": {
@@ -63,14 +63,14 @@
   },
   "NEAR": {
    "first": "2026-09-29",
-   "last": "2026-10-06",
-   "new_rows": 6,
-   "stored": 6
+   "last": "2026-10-07",
+   "new_rows": 7,
+   "stored": 7
   },
   "SOL": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 34
   },
   "SUI": {
@@ -88,7 +88,7 @@
   "XRP": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 34
   },
   "ZEC": {
@@ -98,5 +98,5 @@
    "stored": 22
   }
  },
- "run_at": "2026-10-07T20:39:08Z"
+ "run_at": "2026-10-08T01:02:34Z"
 }
