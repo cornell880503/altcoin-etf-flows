@@ -413,10 +413,10 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div class="panel">
           <h3>相關係數怎麼算、怎麼讀</h3>
           <ul class="method">
-            <li>流量除以這個幣在前一個收盤時的市值（CoinGecko 每日 UTC 0 點的值，大約是前一個美股收盤後 4 小時），單位 bp（0.01%）。這樣不同大小的幣可以直接比較，幣價跌了一半時，同樣的錢也不會被看成一樣大。</li>
+            <li>流量除以這個幣在前一個收盤時的市值（CoinGecko 每日 UTC 0 點的值，也就是前一天的每日收盤），單位 bp（0.01%）。這樣不同大小的幣可以直接比較，幣價跌了一半時，同樣的錢也不會被看成一樣大。</li>
             <li>報酬用幣價的每日收盤（UTC 0:00，新加坡 08:00）到下一個交易日收盤的對數報酬，不是 ETF 的價格。「扣除 BTC 後」= 報酬 − β × BTC 報酬，β 在同一段樣本裡估計；BTC 自己用原始報酬。</li>
             <li>相關是同一天的關聯，分不出因果：錢推價格、價格吸引錢都會讓它變大。「誰先誰後」圖的 k &gt; 0 才是預測力。</li>
-            <li>研究分頁裡的 0.18、0.20 是美元流量對原始報酬；這裡改用占市值比例與扣除 BTC 的報酬，同一份資料 SOL、XRP 會略高，檢定結論不變。</li>
+            <li>研究分頁裡的 0.14、0.19 是美元流量對原始報酬（固定在 2026-10-02 的結果）；這裡改用占市值比例與扣除 BTC 的報酬，數字會不同。</li>
             <li>NEAR、TRX 上市不久，ZEC 也只有一個多月，樣本少於 30 天或有流量的日子少於 10 天不檢定。</li>
           </ul>
         </div>
@@ -609,8 +609,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div class="panel">
           <h3>資料</h3>
           <ul class="method">
-            <li>ETF 流量：cryptoetf.today 的分基金歷史（美國現貨 BTC ETF 合計，2024-01-11 起，以申購日記帳）。報酬：BTC 本身在美東 16:00 的價格（Coinbase BTC-USD）的對數報酬，也就是 ETF 計算淨值的同一時間，不是 ETF 的價格。</li>
-            <li>市值 = 同一個 16:00 價格 × Coin Metrics 的流通量；流量除以前一個 16:00 的市值，單位 bp。</li>
+            <li>ETF 流量：cryptoetf.today 的分基金歷史（美國現貨 BTC ETF 合計，2024-01-11 起，以申購日記帳）。報酬：BTC 本身每日收盤價（UTC 0:00，新加坡時間早上 8 點；Coinbase BTC-USD）的對數報酬，不是 ETF 的價格；這個 UTC 日涵蓋流量所屬的整個美股交易時段。</li>
+            <li>市值 = 同一個收盤價 × Coin Metrics 的流通量；流量除以前一天收盤的市值，單位 bp。</li>
             <li>其他因素：期貨基差（Binance 季度合約對現貨的年化溢價）、資金費率（Binance 永續）、Coinbase 溢價（對 Binance，美東 10:00–16:00 平均）、穩定幣總供給（DefiLlama）、交易所鏈上淨轉入（Coin Metrics）、那斯達克、美元指數、10 年期殖利率、VIX、高收益債利差（FRED）、Strategy 買幣（strategy.com 公告，每筆平均攤到公告前的交易日）、CME 部位（CFTC TFF 週報）。鏈上與穩定幣是 UTC 日，週一含週末。</li>
           </ul>
         </div>
@@ -618,8 +618,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <h3>方法與限制</h3>
           <ul class="method">
             <li>迴歸用 OLS，標準誤取 Newey–West（5 期）和古典兩者較大的，常態 p 值；同一組檢定用 Benjamini–Hochberg 校正。乘數 = 100 × 斜率（報酬 % 對流量 bp），區間用 10 天一塊的 block bootstrap（2,000 次）。</li>
-            <li>「公布後」從美東隔天 10:00 起算（流量在美股開盤前公布）；VAR 用 5 期落後，流量排第一和排最後各算一次，夾出流量衝擊能解釋的上下限。</li>
-            <li>同一天的關係分不出因果。Strategy 買幣的時點、UTC 日和美股交易日差約 4 小時，都是近似；Binance 基差代替 CME 基差。樣本只有 2024 年的多頭和 2025–26 年的震盪下跌，換到別的市況不一定成立。</li>
+            <li>「公布後」從隔天美東 10:00 起算（流量在美股開盤前公布），到當天的每日收盤（UTC 0:00）；VAR 用 5 期落後，流量排第一和排最後各算一次，夾出流量衝擊能解釋的上下限。</li>
+            <li>同一天的關係分不出因果。Strategy 買幣的時點是近似；Binance 基差代替 CME 基差。樣本只有 2024 年的多頭和 2025–26 年的震盪下跌，換到別的市況不一定成立。</li>
           </ul>
         </div>
       </div>
@@ -711,37 +711,37 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div class="eyebrow">研究結論 · 資料截至 2026-10-02</div>
         <h2 id="h-verdict">流量跟著幣價一起動，但不走在幣價前面</h2>
       </div></div>
-      <p class="thesis">在 SOL 和 XRP 身上，ETF 流量和當天漲跌同步，卻沒有預測力；XRP 的大額流入還常出現在短線漲完之後。若用來判斷山寨季，它比較像確認訊號，不是領先訊號。</p>
+      <p class="thesis">在 SOL 和 XRP 身上，ETF 流量和當天漲跌同步（XRP 明確、SOL 較弱），卻沒有預測力；XRP 的大額流入還常出現在短線漲完之後。若用來判斷山寨季，它比較像確認訊號，不是領先訊號。</p>
       <div class="findings">
         <div class="finding">
           <h3>同一天有關聯，但很弱</h3>
-          <div class="fig">r ≈ 0.18（SOL）· 0.20（XRP）· 0.50（BTC）</div>
-          <p>流入多的那天，幣價通常也比較強，但流量只解釋得了單日漲跌的 3–6%。扣掉 BTC 大盤影響後仍然成立；XRP 經多重檢定校正後顯著（q=0.001），SOL 勉強過門檻（q=0.08）。</p>
+          <div class="fig">r ≈ 0.14（SOL）· 0.19（XRP）· 0.49（BTC）</div>
+          <p>流入多的那天，幣價通常也比較強，但流量只解釋得了單日漲跌的 2–4%。XRP 扣掉 BTC 大盤影響後仍然成立，經多重檢定校正後顯著（q = 0.02）；SOL 改用每日收盤（UTC 0:00）後沒有過門檻（q = 0.15）。</p>
         </div>
         <div class="finding">
           <h3>今天的流量預測不了明天</h3>
-          <div class="fig">隔日 p = 0.31（SOL）· 0.40（XRP）</div>
-          <p>今天的流量對隔天、未來 5 天的超額報酬都沒有預測力，Granger 因果檢定兩個方向也不顯著。對照組 BTC 則兩個方向都有：資金會追前一天的漲幅，對隔天也有小幅預測力。</p>
+          <div class="fig">隔日 p = 0.60（SOL）· 0.74（XRP）</div>
+          <p>今天的流量對隔天、未來 5 天的超額報酬都沒有預測力，Granger 因果檢定兩個方向也不顯著。對照組 BTC 則兩個方向都有：資金會追前一天的漲幅，對隔天也有小幅預測力（但隔天的收盤到收盤有一段在資料公布前，見 BTC 研究）。</p>
         </div>
         <div class="finding">
           <h3>大額流入常出現在短線高點</h3>
-          <div class="fig">XRP：事件前 5 日 +2.3% → 事件後 5 日 −1.7%</div>
-          <p>挑出流入最多的 10% 交易日，和其他交易日比較相對 BTC 的超額報酬：XRP 事件前 5 天高 2.3%，當天高 1.8%，之後 5 天低 1.7%（前後 5 天 p≈0.04–0.07，當天 p = 0.002）。SOL 方向相同，只有當天顯著。</p>
+          <div class="fig">XRP：事件前 5 日 +2.8% → 事件後 5 日 −1.9%</div>
+          <p>挑出流入最多的 10% 交易日，和其他交易日比較相對 BTC 的超額報酬：XRP 事件前 5 天高 2.8%，當天高 1.7%，之後 5 天低 1.9%（p = 0.018、0.017、0.026）。SOL 方向相同，但都不顯著（當天 p = 0.075）。</p>
         </div>
         <div class="finding">
           <h3>市值小確實放大，但沒有等比例放大</h3>
-          <div class="fig">每 1 億美元：SOL +3.9% · XRP +4.5% · BTC +0.45%</div>
-          <p>同樣金額，山寨幣的同日漲幅約是 BTC 的 8–10 倍，方向和你的直覺一致。可是它們的市值小了 18–24 倍，按市值比例算反而比 BTC 弱；而且平均每天的淨流量（絕對值）只有約 800 萬美元。</p>
+          <div class="fig">每 1 億美元：SOL +2.8% · XRP +4.4% · BTC +0.44%</div>
+          <p>同樣金額，山寨幣的同日漲幅約是 BTC 的 6–10 倍，方向和你的直覺一致。可是它們的市值小了 18–24 倍，按市值比例算反而比 BTC 弱；而且平均每天的淨流量（絕對值）只有約 800 萬美元。</p>
         </div>
         <div class="finding">
           <h3>ETF 上市不是起漲點</h3>
           <div class="fig">上市後 120 個交易日：9 檔中 9 檔跑輸 BTC</div>
-          <p>10 個有現貨 ETF 的山寨幣，上市後 20、60 個交易日都有 8 個跑輸 BTC，120 日平均落後 33%；唯一明顯例外是 HYPE。對照：BTC 2024 年 ETF 上市後 12 週 +54%，ETH 同年 −19%。</p>
+          <p>10 個有現貨 ETF 的山寨幣，上市後 20、60 個交易日都有 8 個跑輸 BTC，120 日平均落後 33%；唯一明顯例外是 HYPE。對照：BTC 2024 年 ETF 上市後 12 週 +59%，ETH 同年 −19%。</p>
         </div>
         <div class="finding">
           <h3>累積流入和幣價沒有長期關係</h3>
-          <div class="fig">SOL 累積淨流入約 15 億美元，同期幣價 −40%</div>
-          <p>把累積流入曲線疊在幣價上看，在統計上沒有意義：兩者都是非平穩序列，共整合檢定不顯著（SOL p=0.72、XRP p=0.52）。SOL 的水平相關甚至是 −0.60。</p>
+          <div class="fig">SOL 累積淨流入約 15 億美元，同期幣價 −39%</div>
+          <p>把累積流入曲線疊在幣價上看，在統計上沒有意義：兩者都是非平穩序列，共整合檢定不顯著（SOL p = 0.76、XRP p = 0.63）。SOL 的水平相關甚至是 −0.60。</p>
         </div>
       </div>
     </section>
@@ -750,7 +750,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       <div class="sec-head"><div>
         <div class="eyebrow">研究細節</div>
         <h2 id="h-study">五個檢定，逐一看</h2>
-        <p>報酬一律用幣本身的價格：各幣在美東 16:00（ETF 計算淨值的時點）的現貨價，算對數報酬，不是 ETF 的價格。流量換算成前一日市值的 bp，超額報酬 = 幣的報酬 − β × BTC 報酬。標準誤用 Newey–West（4 期落後），相關係數的信賴區間用 stationary bootstrap（5,000 次）。</p>
+        <p>報酬一律用幣本身的價格：各幣的每日收盤價（UTC 0:00，新加坡時間早上 8 點），算對數報酬，不是 ETF 的價格。流量換算成前一日市值的 bp，超額報酬 = 幣的報酬 − β × BTC 報酬。標準誤用 Newey–West（4 期落後），相關係數的信賴區間用 stationary bootstrap（5,000 次）。</p>
       </div></div>
       <div class="panel">
         <div class="chart-title">1 · 誰先誰後：流量與報酬的領先落後相關 <span class="sub">corr(今天流量, 第 k 天報酬)</span></div>
@@ -760,14 +760,14 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <div><div class="chart-title"><span class="key" style="background:var(--s-xrp)"></span>XRP</div><div class="chart" id="ch-ccf-xrp" role="img" aria-label="XRP 流量與超額報酬的領先落後相關"></div></div>
           <div><div class="chart-title"><span class="key" style="background:var(--s-btc)"></span>BTC（對照組）</div><div class="chart" id="ch-ccf-btc" role="img" aria-label="BTC 流量與報酬的領先落後相關"></div></div>
         </div>
-        <p class="note">讀法：BTC 在 k = −1（0.36）和 k = 0（0.50）都很高，代表 BTC 的錢會追前一天的漲幅。XRP 在 k = 0（0.25）顯著，k = −4（0.17）也過了門檻，但前後幾天都沒有，比較像巧合；SOL 的 k = 0（0.19）在 21 個落差一起校正後不顯著（q = 0.61）。k 為正的一側（流量在前）沒有任何一格顯著。樣本大小下，相關係數要 ≥ 0.18 左右才有 80% 的把握偵測得到。</p>
+        <p class="note">讀法：BTC 在 k = −1（0.36）和 k = 0（0.49）都很高，代表 BTC 的錢會追前一天的漲幅。XRP 的 k = 0（0.28）最高，但 21 個落差一起校正後 q = 0.12，k = −4（0.19）也沒過門檻；SOL 的 k = 0（0.15）不顯著（q = 0.74）。k 為正的一側（流量在前）在 ±5 天內沒有任何一格顯著（BTC 的 k = +1 是 0.13，q = 0.21）。樣本大小下，相關係數要 ≥ 0.18 左右才有 80% 的把握偵測得到。</p>
         <details><summary>表格</summary><div class="tablewrap"><table id="tb-ccf"></table></div></details>
       </div>
       <div class="panel">
         <div class="chart-title">2 · 大額流入日前後，超額報酬怎麼走 <span class="sub">流入最多的 10% 交易日，相對 BTC 的累積超額報酬（%）</span></div>
         <div class="legend"><span><span class="key" style="background:var(--s-sol)"></span>SOL（24 個事件日）</span><span><span class="key" style="background:var(--s-xrp)"></span>XRP（23 個事件日）</span></div>
         <div class="chart" id="ch-event" role="img" aria-label="大額流入日前後五天的累積超額報酬"></div>
-        <p class="note">第 0 天 = 大額流入當天；圖上是事件日的平均累積超額報酬。顯著性用 HAC 迴歸和其他交易日比較（可處理事件日重疊與聚集）：XRP 事件前 5 天高 2.3%（p = 0.044）、當天高 1.8%（p = 0.002）、之後 5 天低 1.7%（p = 0.066）。SOL 只有當天顯著（+1.6%，p = 0.045）；另外 SOL 大額流出日之後 5 天也偏弱（−1.9%，p = 0.039）。</p>
+        <p class="note">第 0 天 = 大額流入當天；圖上是事件日的平均累積超額報酬。顯著性用 HAC 迴歸和其他交易日比較（可處理事件日重疊與聚集）：XRP 事件前 5 天高 2.8%（p = 0.018）、當天高 1.7%（p = 0.017）、之後 5 天低 1.9%（p = 0.026）。SOL 方向相同但都不顯著（當天 +1.2%，p = 0.075）；另外 SOL 大額流出日之後 5 天偏弱（−2.2%，p = 0.019）。</p>
         <details><summary>表格</summary><div class="tablewrap"><table id="tb-event"></table></div></details>
       </div>
       <div class="panel">
@@ -786,10 +786,10 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <div><div class="chart-title">每 1 億美元淨流入對應的當日漲幅（%）</div><div class="chart" id="ch-x-usd" role="img" aria-label="每一億美元淨流入對應的當日漲幅"></div></div>
           <div><div class="chart-title">每 1 bp 市值的淨流入對應的當日漲幅（%）</div><div class="chart" id="ch-x-bp" role="img" aria-label="每一個基點市值的淨流入對應的當日漲幅"></div></div>
         </div>
-        <p class="note">左圖支持「市值小，同樣的錢推得比較動」；右圖說明按市值比例，山寨幣的反應其實比 BTC 小。SOL 與 XRP 的斜率差異不顯著（p = 0.32），合併估計為每 bp +0.32%（p &lt; 0.001）。這些是同日關聯，不是因果的價格衝擊：同一天裡，錢追價格和價格被錢推動都會造成這個數字。</p>
+        <p class="note">左圖支持「市值小，同樣的錢推得比較動」；右圖說明按市值比例，山寨幣的反應其實比 BTC 小。SOL 與 XRP 的斜率差異不顯著（p = 0.15），合併估計為每 bp +0.26%（p = 0.002）。這些是同日關聯，不是因果的價格衝擊：同一天裡，錢追價格和價格被錢推動都會造成這個數字。</p>
       </div>
       <div class="panel">
-        <div class="chart-title">5 · ETF 上市之後：相對 BTC 的報酬 <span class="sub">從首檔 ETF 第一天美東 16:00 的幣價起算，扣掉 BTC 同期報酬（對數差，%）</span></div>
+        <div class="chart-title">5 · ETF 上市之後：相對 BTC 的報酬 <span class="sub">從首檔 ETF 第一天的每日收盤價起算，扣掉 BTC 同期報酬（對數差，%）</span></div>
         <div class="tablewrap"><table id="tb-launch"></table></div>
         <p class="note">上市日集中在 2025 年 10 月到 2026 年 3 月，視窗在時間上高度重疊（同一段山寨幣空頭），所以「9/9 跑輸」的 p 值會高估獨立性，請當描述性結果看。* BTC、ETH 的對照數字是幣價從 ETF 上市後第一個週五起算 4 週、12 週的漲跌。</p>
       </div>
@@ -797,7 +797,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div class="chart-title">全部主要檢定 <span class="sub">p = 原始 p 值；q = 每個資產 8 個假設做 Benjamini–Hochberg 校正後</span></div>
         <div class="tablewrap"><table id="tb-tests"></table></div>
         <details><summary>同日斜率的穩健性</summary><div class="tablewrap"><table id="tb-robust"></table></div>
-          <p class="note" style="margin-top:8px">SOL 的結果集中在後半段樣本，而且改用美元而不是 bp 衡量時不顯著（p = 0.15），證據比 XRP 弱。XRP 在大多數設定下都穩定，只有拿掉前 10 天時變成 p = 0.10。改用週資料（46–52 週）結論相同：同週正相關（SOL 0.28、XRP 0.16、BTC 0.65），下一週沒有延續，山寨幣反而略為反轉；只有 BTC 看得到「上週漲、這週錢進來」。</p></details>
+          <p class="note" style="margin-top:8px">SOL 的結果集中在後半段樣本，而且改用美元而不是 bp 衡量時不顯著（p = 0.22），證據比 XRP 弱。XRP 在大多數設定下都穩定，但拿掉前 10 天時變成 p = 0.23、只看後半段 p = 0.07。改用週資料（46–52 週）結論相同：同週正相關（SOL 0.27、XRP 0.17、BTC 0.63），下一週沒有延續，山寨幣反而略為反轉；只有 BTC 看得到「上週漲、這週錢進來」。</p></details>
       </div>
     </section>
 
@@ -808,8 +808,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           <h3>資料與清理</h3>
           <ul class="method">
             <li>樣本：SOL 233、XRP 221、BTC 250 個交易日，到 2026-10-02 為止。流量來自 cryptoetf.today 的分基金資料，和 Farside 逐日比對過（最大差 13 萬美元）。</li>
-            <li>XRPC 用 Canary 官網的每日流通單位 × NAV 自己算，並往前移一天到申購日（XRPC 首日 2.43 億美元的申購發生在 2025-11-13 上市當天）。不移的話 XRP 斜率從 0.42 降到 0.33，仍然顯著。</li>
-            <li>價格：幣本身在美東 16:00 的現貨價（Coinbase 美元交易對的 1 小時 K 線收盤），和 ETF 定淨值、流量記帳是同一個時點。2026-10-05 以前用 ETF 收盤，兩者的每日報酬相關約 0.9995，所以結論不變；最大的差別是 SOL：BSOL 會把質押收益加進淨值，同期 BSOL −36%、SOL 本身 −40%。市值 = 幣價 × 流通量（流通量按時間線性內插）。</li><li>ETF 上市第一天不放進主樣本（和改用幣價前相同）：XRPC 首日的 2.43 億美元等於 17 bp，是平常的 9 個標準差。若放進去，同日結論不變，但 XRP「流量 → 隔日超額報酬」的 p 會從 0.15 變成 0.006，完全來自這一天，所以不採用。</li>
+            <li>XRPC 用 Canary 官網的每日流通單位 × NAV 自己算，並往前移一天到申購日（XRPC 首日 2.43 億美元的申購發生在 2025-11-13 上市當天）。不移的話 XRP 斜率從 0.41 降到 0.32，仍然顯著。</li>
+            <li>價格：幣本身的每日收盤價（UTC 0:00，新加坡時間早上 8 點；Coinbase 美元交易對），這個 UTC 日涵蓋流量所屬的整個美股交易時段。之前曾用美東 16:00（ETF 定淨值的時點）的幣價、更早用 ETF 收盤；改成每日收盤後，SOL 的同日關係變弱（相關 0.18 → 0.14，校正後不再顯著），XRP、BTC 的結論不變。市值 = 幣價 × 流通量（流通量按時間線性內插）。</li><li>ETF 上市第一天不放進主樣本（和改用幣價前相同）：XRPC 首日的 2.43 億美元等於 17 bp，是平常的 9 個標準差。若放進去，XRP 的同日斜率從 0.41 變成 0.25（p 0.002 → 0.077），「流量 → 隔日超額報酬」的 p 從 0.43 變成 0.058，都是被這一天拉動，所以不採用。</li>
           </ul>
         </div>
         <div class="panel">
@@ -2339,7 +2339,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     finding('大流量日幾乎都跟著大漲跌', '流入 > 3 bp：' + pc0(top.up_share) + ' 收漲 · 流入 < 1 bp：' + pc0(hit.inflow_small.up_share),
       '流量越大，當天平均漲跌越大（見下圖）。不過效果大致是線性的：大流量日和小流量日，每 1 bp 對應的漲幅差異不顯著（' + pEq(BK.interaction_p) + '），沒有明顯的門檻；小流量日只是效果小，被其他波動蓋過。');
     finding('但流量跟著價格走', '前一天報酬 → 今天流量 r = ' + rf(ccf[-1].r),
-      '前 2–4 天的漲幅也都和今天的流量正相關（追漲）。反過來，資料公布後的隔天（美東 10:00 到收盤）r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '），之後 5 天 r = ' + rf(tr5.r) + '（' + pEq(tr5.p) + '）。週資料、20 日、60 日累積也一樣：同期高度相關，下一期沒有。');
+      '前 2–4 天的漲幅也都和今天的流量正相關（追漲）。反過來，資料公布後的隔天（美東 10:00 到當天收盤）r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '），之後 5 天 r = ' + rf(tr5.r) + '（' + pEq(tr5.p) + '）。週資料、20 日、60 日累積也一樣：同期高度相關，下一期沒有。');
     finding('換算成乘數，大到不像是錢推價格', '$1 淨流入 ↔ $' + Math.round(Mu.M) + ' 市值（控制其他因素後 $' + Math.round(MV.M_with_controls) + '）',
       '同日迴歸的斜率換算成乘數是 ' + Math.round(Mu.M_lo) + '–' + Math.round(Mu.M_hi) + ' 倍（95% 區間）。學術上對美股大盤的估計約 5 倍（Gabaix 與 Koijen 的「無彈性市場」），這麼大的數字比較像是價格先動、投資人跟著申購，或兩者同時受消息影響。VAR 裡把流量排第一，最多解釋 BTC 波動的 ' + Math.round(B.var.flow_first * 100) + '%；排最後只剩 ' + Math.round(B.var.flow_last * 100) + '%。');
     var shap = MV.shapley.slice().sort(function (a, b) { return b.r2 - a.r2; });
@@ -2365,7 +2365,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     });
     table(document.getElementById('tb-btc-bk'), ['淨流量（bp）', '天數', '平均流量', '當天平均', '收漲比例', '公布後當天', '公布後 5 天'],
       BK.rows.map(function (r, i) { return [labs[i], String(r.n), bpf(r.f_mean, true), pct(r.r_mean, 2), pc0(r.up_share), pct(r.next_id, 2), pct(r.next5, 2)]; }));
-    document.getElementById('btc-bk-note').textContent = '「公布後當天」= 隔天美東 10:00 到收盤，「公布後 5 天」= 隔天 10:00 到第 5 個收盤，都是看到流量資料之後才進得去的報酬。這兩欄沒有一致的方向：大額流入之後當天 ' + pct(top.next_id, 2) + '、5 天 ' + pct(top.next5, 2) + '；大額流出之後 ' + pct(bot.next_id, 2) + '、' + pct(bot.next5, 2) + '（只有 ' + bot.n + ' 天）。';
+    document.getElementById('btc-bk-note').textContent = '「公布後當天」= 隔天美東 10:00 到當天的每日收盤（UTC 0:00），「公布後 5 天」= 隔天 10:00 到第 5 個每日收盤，都是看到流量資料之後才進得去的報酬。這兩欄沒有一致的方向：大額流入之後當天 ' + pct(top.next_id, 2) + '、5 天 ' + pct(top.next5, 2) + '；大額流出之後 ' + pct(bot.next_id, 2) + '、' + pct(bot.next5, 2) + '（只有 ' + bot.n + ' 天）。';
     // 2. lead / lag
     var ks = LL.ccf;
     barChart(document.getElementById('ch-btc-ll'), {
@@ -2376,10 +2376,10 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       tipRows: function (i) { var e = ks[i]; return [{ color: 'var(--stat)', value: 'r = ' + rf(e.r), label: 'k = ' + e.k }, { value: 'p ' + pf(e.p) + ' · q ' + pf(e.q), label: 'n = ' + e.n }]; },
       aria: 'BTC 流量與報酬的領先落後相關'
     });
-    document.getElementById('btc-ll-note').textContent = '實心 = 校正後 q < 0.10。k = +1 的 ' + rf(ccf[1].r) + ' 是收盤到收盤，裡面有一段在資料公布前：拆開看，夜間（美東 16:00 到隔天 10:00）r = ' + rf(on.r) + '（' + pEq(on.p) + '），資料公布後的 10:00 到收盤 r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '）。用每天 16:00 的 BTC 價格做的 Granger 檢定兩個方向都顯著（流量→價格 ' + pEq(B.var.granger_flow_to_price_p) + '，價格→流量 ' + pEq(B.var.granger_price_to_flow_p) + '），但前者靠的就是這段公布前的夜間。';
+    document.getElementById('btc-ll-note').textContent = '實心 = 校正後 q < 0.10。k = +1 的 ' + rf(ccf[1].r) + ' 是收盤到收盤，裡面有一段在資料公布前：拆開看，公布前（每日收盤 UTC 0:00 到隔天美東 10:00，含亞洲、歐洲時段）r = ' + rf(on.r) + '（' + pEq(on.p) + '），資料公布後的 10:00 到收盤 r = ' + rf(tr1.r) + '（' + pEq(tr1.p) + '）。用每日收盤價做的 Granger 檢定兩個方向都顯著（流量→價格 ' + pEq(B.var.granger_flow_to_price_p) + '，價格→流量 ' + pEq(B.var.granger_price_to_flow_p) + '），但前者靠的就是這段公布前的時段。';
     table(document.getElementById('tb-btc-h'), ['累積天數', '同期相關', '乘數', '下一期相關', 'p'],
       B.horizons.map(function (h) { return [h.h + ' 天', rf(h.corr), '$' + Math.round(h.M), rf(h.next_corr), pf(h.next_p)]; }));
-    document.getElementById('btc-h-note').textContent = '把 h 天的流量加總（占期初市值），和同期、下一期的 BTC 報酬比較。時間拉長後同期相關越來越高（20 天 ' + rf(B.horizons[2].corr) + '、60 天 ' + rf(B.horizons[3].corr) + '），下一期的相關卻都很小：1 天的 ' + rf(B.horizons[0].next_corr) + ' 是收盤到收盤，含資料公布前的夜間（見左圖說明），5、20、60 天都不顯著。視窗有重疊，標準誤用 h 期 Newey–West。';
+    document.getElementById('btc-h-note').textContent = '把 h 天的流量加總（占期初市值），和同期、下一期的 BTC 報酬比較。時間拉長後同期相關越來越高（20 天 ' + rf(B.horizons[2].corr) + '、60 天 ' + rf(B.horizons[3].corr) + '），下一期的相關卻都很小：1 天的 ' + rf(B.horizons[0].next_corr) + ' 是收盤到收盤，含資料公布前的時段（見左圖說明），5、20、60 天都不顯著。視窗有重疊，標準誤用 h 期 Newey–West。';
     var dz = B.dose20;
     table(document.getElementById('tb-btc-dose'), ['20 日流量（五等分）', '視窗', '同期 BTC', '收漲', '下一個 20 日'],
       dz.rows.map(function (r) { return [bpf(r.f_lo, true) + ' ～ ' + bpf(r.f_hi, true), String(r.n), pct(r.r_mean, 1), pc0(r.up), pct(r.rn_mean, 1)]; }));
@@ -2406,7 +2406,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var hi = B.regimes.filter(function (r) { return r.label.indexOf('基差高') === 0; })[0], lw = B.regimes.filter(function (r) { return r.label.indexOf('基差低') === 0; })[0];
     var edge = B.regimes.map(function (r, i) { return { r: r, q: rq[i] }; }).filter(function (e) { return e.q != null && e.q < 0.10; });
     document.getElementById('btc-reg-note').textContent = '每一段的同日關係都顯著。' + (hi && lw ? '基差高的日子同日相關較弱（' + rf(hi.corr) + ' 對 ' + rf(lw.corr) + '），符合「部分買盤是對沖的」，但差異不顯著（' + pEq(B.basis_interaction.p) + '）。' : '') +
-      (edge.length ? '公布後當天的相關，在' + edge.map(function (e) { return e.r.label.replace(/（.*）/, ''); }).join('、') + '這幾段有小幅延續（相關 ' + edge.map(function (e) { return rf(e.r.next_corr); }).join('、') + '，' + B.regimes.length + ' 段一起校正後 q < 0.10）。' + (B.regime_check ? '基差低和下跌趨勢的日子重疊約 ' + Math.round(B.regime_check.overlap_of_low * 100) + '%，拿掉 2026 年仍在（' + rf(B.regime_check.low_ex2026.r) + '、' + rf(B.regime_check.down_ex2026.r) + '）。' : '') + '這是值得之後追蹤的邊緣訊號：在下跌、基差低的市況，流量公布後當天有小幅延續，但解釋力只有 2% 左右，全樣本不顯著。' : '公布後當天的相關，在所有分段校正後都不顯著。');
+      (edge.length ? '公布後當天的相關，在' + edge.map(function (e) { return e.r.label.replace(/（.*）/, ''); }).join('、') + '這幾段有小幅延續（相關 ' + edge.map(function (e) { return rf(e.r.next_corr); }).join('、') + '，' + B.regimes.length + ' 段一起校正後 q < 0.10）。' + (B.regime_check ? '基差低和下跌趨勢的日子重疊約 ' + Math.round(B.regime_check.overlap_of_low * 100) + '%，拿掉 2026 年後是 ' + rf(B.regime_check.low_ex2026.r) + '、' + rf(B.regime_check.down_ex2026.r) + '（' + pEq(B.regime_check.low_ex2026.p) + '、' + pEq(B.regime_check.down_ex2026.p) + '）。' : '') + '這是值得之後追蹤的邊緣訊號：在下跌、基差低的市況，流量公布後當天有小幅延續，但解釋力只有 2% 左右，全樣本不顯著。' : '公布後當天的相關，在所有分段校正後都不顯著。');
     var ro = B.rolling;
     lineChart(document.getElementById('ch-btc-roll'), {
       x: ro.map(function (r) { return r.d; }), height: 200, includeZero: true, rightPad: 14, xFmt: function (d) { return d.slice(2, 7).replace('-', '/'); },
