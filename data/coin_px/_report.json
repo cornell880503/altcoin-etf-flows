@@ -146,10 +146,8 @@
   "TRX": {
    "backfill": false,
    "days": 9,
-   "errors": {
-    "coinbase": "HTTPError: HTTP Error 404: Not Found"
-   },
-   "filled_hours": 3,
+   "errors": null,
+   "filled_hours": 0,
    "first": "2024-06-03",
    "last": "2026-10-08",
    "pair": "TRXUSDT",
@@ -179,5 +177,5 @@
    "with_close": 9
   }
  },
- "run_at": "2026-10-09T01:14:54Z"
+ "run_at": "2026-10-09T10:36:20Z"
 }
