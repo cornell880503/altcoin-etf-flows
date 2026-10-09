@@ -1502,7 +1502,9 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var order = ['BTC', 'ETH'].concat(SG.pool || []).concat(Object.keys(SG.today).filter(function (s) { return s !== 'BTC' && s !== 'ETH' && (SG.pool || []).indexOf(s) < 0; }));
     var any = SG.today.BTC || SG.today[order[0]];
     var late = Object.keys(SG.today).filter(function (s) { return SG.today[s].lag === 2; });
-    var sub = any ? '依據到 ' + sgDay(any.flow_through) + ' 為止公布的流量，下一個決策點是 ' + sgDay(any.decision_day) + ' 的每日收盤（新加坡時間隔天 08:00）' + (late.length ? '；' + late.join('、') + ' 的資料晚一天公布，決策點也晚一天' : '') + '。' : '';
+    var behind = (SG.pool || []).filter(function (s) { return SG.today[s] && any && SG.today[s].flow_through < any.flow_through; });
+    var sub = any ? '依據到 ' + sgDay(any.flow_through) + ' 為止公布的流量，下一個決策點是 ' + sgDay(any.decision_day) + ' 的每日收盤（新加坡時間隔天 08:00）' + (late.length ? '；' + late.join('、') + ' 的資料晚一天公布，決策點也晚一天' : '') + '。' +
+      (behind.length ? ' ' + behind.join('、') + ' 最新一天的流量還沒公布，表裡是到 ' + sgDay(SG.today[behind[0]].flow_through) + ' 的狀態。' : '') : '';
     if (any && SG.generated) {
       var due = new Date(any.flow_through + 'T00:00:00Z').getTime() + 38 * 3600e3;  // the next day 14:00 UTC: usually complete by then
       if (new Date(SG.generated).getTime() < due) sub += ' 最新一天的流量各發行商還在陸續公布，數字可能再變。';
