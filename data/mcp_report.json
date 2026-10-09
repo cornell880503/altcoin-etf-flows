@@ -3,80 +3,80 @@
  "assets": {
   "AVAX": {
    "first": "2026-09-04",
-   "last": "2026-10-07",
+   "last": "2026-10-08",
    "new_rows": 22,
-   "stored": 24
+   "stored": 25
   },
   "BNB": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 24
   },
   "BTC": {
    "first": "2026-09-04",
    "last": "2026-10-08",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 35
   },
   "DOGE": {
    "first": "2026-09-04",
-   "last": "2026-10-07",
+   "last": "2026-10-08",
    "new_rows": 22,
-   "stored": 23
+   "stored": 24
   },
   "DOT": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "ETH": {
    "first": "2026-09-04",
    "last": "2026-10-08",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 35
   },
   "HBAR": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "HYPE": {
    "first": "2026-09-04",
    "last": "2026-10-08",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 35
   },
   "LINK": {
    "first": "2026-09-04",
-   "last": "2026-10-07",
+   "last": "2026-10-08",
    "new_rows": 22,
-   "stored": 23
+   "stored": 24
   },
   "LTC": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "NEAR": {
    "first": "2026-09-29",
-   "last": "2026-10-07",
-   "new_rows": 7,
-   "stored": 7
+   "last": "2026-10-08",
+   "new_rows": 8,
+   "stored": 8
   },
   "SOL": {
    "first": "2026-09-04",
    "last": "2026-10-08",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 35
   },
   "SUI": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   },
   "TRX": {
@@ -88,15 +88,15 @@
   "XRP": {
    "first": "2026-09-04",
    "last": "2026-10-08",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 35
   },
   "ZEC": {
    "first": "2026-09-04",
    "last": "2026-10-07",
-   "new_rows": 22,
+   "new_rows": 21,
    "stored": 23
   }
  },
- "run_at": "2026-10-08T20:13:59Z"
+ "run_at": "2026-10-09T01:14:53Z"
 }
