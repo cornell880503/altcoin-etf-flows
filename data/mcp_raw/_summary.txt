@@ -1,5 +1,5 @@
 {
-  "today": "2026-10-09",
+  "today": "2026-10-10",
   "referenceDate": "2026-10-08",
   "referenceIsToday": false,
   "assets": [
@@ -7,13 +7,13 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-10-08",
-      "netFlowUsdM": -244.1
+      "netFlowUsdM": -244.2
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-10-08",
-      "netFlowUsdM": -72.5
+      "netFlowUsdM": -72.6
     },
     {
       "symbol": "SOL",
@@ -36,7 +36,7 @@
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "date": "2026-10-08",
+      "date": "2026-10-09",
       "netFlowUsdM": 0
     },
     {
@@ -84,8 +84,8 @@
     {
       "symbol": "NEAR",
       "asset": "near",
-      "date": "2026-10-08",
-      "netFlowUsdM": 4
+      "date": "2026-10-09",
+      "netFlowUsdM": 5.1
     },
     {
       "symbol": "TRX",
@@ -100,6 +100,6 @@
       "netFlowUsdM": -18.7
     }
   ],
-  "totalUsdM": -334.5,
-  "updatedAt": "2026-10-09T19:51:22.969Z"
+  "totalUsdM": -333.6,
+  "updatedAt": "2026-10-10T00:52:37.214Z"
 }
