@@ -2,10 +2,15 @@
 """Fetch daily per-fund net flows (US$ millions) for every US spot crypto ETF complex
 tracked by cryptoetf.today and store them as JSON under data/flows/.
 
-Each flow page embeds its full daily history as a JSON array named "historical"
-(one object per day: date, total and one field per issuer). robots.txt allows these
-pages (it disallows /api/ and /admin/ only). Files are rewritten only when the data
-changed, so the repo history doubles as a revision log.
+Two page layouts are understood:
+- until 2026-10-10 each flow page embedded its full daily history as a JSON array named
+  "historical" (one object per day: date, total and one field per issuer);
+- since 2026-10-11 the page carries "cols" (the fund tickers) and "daily" (the last 30
+  sessions, one cell per fund, null = not reported yet, a "partial" flag per session). That
+  window is merged into the stored history: inside the window the page wins, older days are
+  kept. Tickers are stored under the issuer keys the history already uses (build_daily.TICKERS).
+robots.txt allows these pages (it disallows /api/ and /admin/ only). Files are rewritten only
+when the data changed, so the repo history doubles as a revision log.
 """
 import datetime as dt
 import json
@@ -80,6 +85,51 @@ def arrays_named(page, name):
         pos = start + 1
 
 
+def ticker_keys(sym):
+    """Fund ticker -> the issuer key the stored history uses."""
+    import build_daily  # noqa: E402  (same folder; constants only at import)
+    return {t: k for k, t in build_daily.TICKERS.get(sym, {}).items()}
+
+
+def window_rows(page, sym):
+    """The 2026-10-11 layout: rows for the last 30 sessions, keyed like the stored history, and
+    notes (window, partial sessions, tickers not known yet)."""
+    cols = next((a for a in arrays_named(page, "cols") if a and all(isinstance(c, dict) and c.get("ticker") for c in a)), None)
+    daily = next((a for a in arrays_named(page, "daily")
+                  if a and all(isinstance(d, dict) and "cells" in d and d.get("key") for d in a)), None)
+    if not cols or not daily:
+        return None, None
+    keymap = ticker_keys(sym)
+    tick = [c["ticker"] for c in cols]
+    keys = [keymap.get(x, x) for x in tick]
+    rows, partial = [], []
+    for d in daily:
+        cells = d.get("cells") or []
+        if len(cells) != len(keys):
+            continue
+        row = {"date": str(d["key"])[:10]}
+        for k, v in zip(keys, cells):
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
+                row[k] = round(float(v), 4)
+        if isinstance(d.get("total"), (int, float)) and not isinstance(d.get("total"), bool):
+            row["total"] = round(float(d["total"]), 4)
+        rows.append(row)
+        if d.get("partial"):
+            partial.append(row["date"])
+    rows.sort(key=lambda r: r["date"])
+    if not rows:
+        return None, None
+    return rows, {"window": [rows[0]["date"], rows[-1]["date"]], "sessions": len(rows), "partial": sorted(partial),
+                  "unknown_tickers": [x for x in tick if x not in keymap]}
+
+
+def merge_window(old, new):
+    """The stored history with the page's window laid over it: every stored row inside the
+    window's dates (weekend rows too) is replaced, older rows are kept."""
+    lo, hi = new[0]["date"], new[-1]["date"]
+    return sorted([r for r in (old or []) if not lo <= r["date"] <= hi] + new, key=lambda r: r["date"])
+
+
 def clean_rows(rows):
     keep = []
     for r in rows:
@@ -121,7 +171,7 @@ def main():
         names = sorted(set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"\s*:\s*\[\s*\{\s*"date"', t)))
         diag[sym] = {"bytes": len(page), "historical_mentions": t.count('"historical"'), "dated_arrays": names, **info}
         cands = []
-        for nm in (["historical"] + [n for n in names if n != "historical"]):
+        for nm in ["historical"]:  # the full per-fund history (layout until 2026-10-10); other dated arrays hold totals only
             for a in arrays_named(page, nm):
                 c = clean_rows(a)
                 if c and any(k != "date" for k in c[0]) and any(("total" in r) for r in c):
@@ -129,6 +179,23 @@ def main():
             if cands:
                 diag[sym]["used"] = nm
                 break
+        if not cands:  # the 2026-10-11 layout: the last 30 sessions per fund
+            new, note = window_rows(page, sym)
+            if new:
+                path = os.path.join(OUT, f"{sym}.json")
+                try:
+                    old = json.load(open(path)).get("rows")
+                except (OSError, ValueError):
+                    old = None
+                diag[sym].update({"used": "cols+daily", **note})
+                if old and old[-1]["date"] < new[0]["date"]:
+                    # sessions between the stored history and the window are lost: say so loudly
+                    failures.append(f"{sym}: gap between stored history ({old[-1]['date']}) and the page window ({new[0]['date']})")
+                totals = {d.get("date"): d.get("flow") for a in arrays_named(page, "days") for d in a
+                          if isinstance(d, dict) and isinstance(d.get("flow"), (int, float))}
+                diag[sym]["total_mismatch"] = [r["date"] for r in new if r["date"] in totals and "total" in r
+                                               and abs(totals[r["date"]] - r["total"]) > 0.05]
+                cands = [merge_window(old, new)]
         if not cands:
             failures.append(f"{sym}: no dated flow array")
             diag[sym].update(page_markers(page))
