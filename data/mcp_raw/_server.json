@@ -11,7 +11,7 @@
     "name": "cryptoetf",
     "version": "1.0.0"
    },
-   "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All flow values are net USD millions (positive = inflow, negative = outflow). Data sourced from SEC filings and official fund disclosures."
+   "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All flow values are net USD millions (positive = inflow, negative = outflow)."
   },
   "jsonrpc": "2.0",
   "id": 1
