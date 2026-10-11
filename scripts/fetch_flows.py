@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 
 UA = "altcoin-etf-flows/1.0 (+https://github.com/cornell880503/altcoin-etf-flows; daily research fetch)"
@@ -24,10 +25,33 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "flows")
 
 
+PROBE = os.path.join(ROOT, "data", "probe", "flows")
+
+
 def fetch(slug):
+    """(page, info): the HTML and what the server said about it; page is None on an HTTP error."""
     req = urllib.request.Request(BASE.format(slug=slug), headers={"User-Agent": UA, "Accept": "text/html"})
-    with urllib.request.urlopen(req, timeout=40) as r:
-        return r.read().decode("utf-8", "replace")
+    try:
+        with urllib.request.urlopen(req, timeout=40) as r:
+            info = {"status": r.status, "url": r.geturl()}
+            info.update({h: r.headers.get(h) for h in ("Content-Type", "Server", "X-Vercel-Cache", "X-Nextjs-Cache", "Age",
+                                                        "Last-Modified", "CF-Cache-Status") if r.headers.get(h)})
+            return r.read().decode("utf-8", "replace"), info
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", "replace") if e.fp else ""
+        return None, {"status": e.code, "reason": str(e.reason), "body_head": body[:300]}
+
+
+def page_markers(page):
+    """What kind of page came back, for data/diagnostics.json when no flow table is found."""
+    t = page.replace('\\"', '"')
+    title = re.search(r"<title[^>]*>(.*?)</title>", page, re.S | re.I)
+    dates = [m.start() for m in re.finditer(r'"date"\s*:\s*"20\d\d-\d\d-\d\d', t)]
+    keys = sorted(set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"\s*:\s*\[\s*\{', t)))[:60]
+    return {"title": title.group(1).strip()[:120] if title else None, "next_f_pushes": page.count("self.__next_f.push"),
+            "next_data": "__NEXT_DATA__" in page, "date_fields": len(dates),
+            "date_contexts": [t[max(0, i - 80):i + 60] for i in dates[:3]], "array_keys": keys,
+            "script_srcs": re.findall(r'<script[^>]+src="([^"]+)"', page)[:8]}
 
 
 def arrays_named(page, name):
@@ -82,15 +106,20 @@ def main():
     changed, failures, diag = [], [], {}
     for sym, slug in ASSETS.items():
         try:
-            page = fetch(slug)
-        except Exception as e:  # missing page or network error: keep the previous file
+            page, info = fetch(slug)
+        except Exception as e:  # network error: keep the previous file
             failures.append(f"{sym}: {e}")
             diag[sym] = {"error": str(e)[:200]}
             time.sleep(2)
             continue
+        if page is None:  # HTTP error: keep the previous file
+            failures.append(f"{sym}: HTTP {info.get('status')}")
+            diag[sym] = info
+            time.sleep(2)
+            continue
         t = page.replace('\\"', '"')
         names = sorted(set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"\s*:\s*\[\s*\{\s*"date"', t)))
-        diag[sym] = {"bytes": len(page), "historical_mentions": t.count('"historical"'), "dated_arrays": names}
+        diag[sym] = {"bytes": len(page), "historical_mentions": t.count('"historical"'), "dated_arrays": names, **info}
         cands = []
         for nm in (["historical"] + [n for n in names if n != "historical"]):
             for a in arrays_named(page, nm):
@@ -102,6 +131,10 @@ def main():
                 break
         if not cands:
             failures.append(f"{sym}: no dated flow array")
+            diag[sym].update(page_markers(page))
+            if sym in ("BTC", "SOL"):  # keep a copy to see what changed (overwritten each failing run)
+                os.makedirs(PROBE, exist_ok=True)
+                open(os.path.join(PROBE, f"{sym}.html"), "w", encoding="utf-8").write(page)
             time.sleep(2)
             continue
         rows = max(cands, key=len)  # the daily flow table is the longest dated array
