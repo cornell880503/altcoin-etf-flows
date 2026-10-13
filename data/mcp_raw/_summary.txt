@@ -7,19 +7,19 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-10-12",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -65.4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-10-12",
-      "netFlowUsdM": -10.3
+      "netFlowUsdM": -85.4
     },
     {
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-10-12",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -0.7
     },
     {
       "symbol": "XRP",
@@ -37,7 +37,7 @@
       "symbol": "DOGE",
       "asset": "doge",
       "date": "2026-10-12",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -0.4
     },
     {
       "symbol": "LINK",
@@ -54,20 +54,20 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-09",
+      "date": "2026-10-12",
       "netFlowUsdM": 0
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-09",
+      "date": "2026-10-12",
       "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-10-09",
-      "netFlowUsdM": 1.4
+      "date": "2026-10-12",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOT",
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-09",
+      "date": "2026-10-12",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-09",
-      "netFlowUsdM": 0
+      "date": "2026-10-12",
+      "netFlowUsdM": -1.7
     }
   ],
-  "totalUsdM": -5.3,
-  "updatedAt": "2026-10-13T02:37:08.615Z"
+  "totalUsdM": -150,
+  "updatedAt": "2026-10-13T10:37:38.568Z"
 }
