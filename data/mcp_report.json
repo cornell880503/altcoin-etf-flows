@@ -3,9 +3,9 @@
  "assets": {
   "AVAX": {
    "first": "2026-09-04",
-   "last": "2026-10-09",
-   "new_rows": 20,
-   "stored": 26
+   "last": "2026-10-12",
+   "new_rows": 21,
+   "stored": 27
   },
   "BNB": {
    "first": "2026-09-04",
@@ -16,25 +16,25 @@
   "BTC": {
    "first": "2026-09-04",
    "last": "2026-10-12",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 39
   },
   "DOGE": {
    "first": "2026-09-04",
-   "last": "2026-10-09",
-   "new_rows": 20,
-   "stored": 25
+   "last": "2026-10-12",
+   "new_rows": 21,
+   "stored": 26
   },
   "DOT": {
    "first": "2026-09-04",
-   "last": "2026-10-09",
-   "new_rows": 20,
-   "stored": 25
+   "last": "2026-10-12",
+   "new_rows": 21,
+   "stored": 26
   },
   "ETH": {
    "first": "2026-09-04",
    "last": "2026-10-12",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 39
   },
   "HBAR": {
@@ -46,14 +46,14 @@
   "HYPE": {
    "first": "2026-09-04",
    "last": "2026-10-12",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 39
   },
   "LINK": {
    "first": "2026-09-04",
-   "last": "2026-10-09",
-   "new_rows": 20,
-   "stored": 25
+   "last": "2026-10-12",
+   "new_rows": 21,
+   "stored": 26
   },
   "LTC": {
    "first": "2026-09-04",
@@ -63,21 +63,21 @@
   },
   "NEAR": {
    "first": "2026-09-29",
-   "last": "2026-10-09",
-   "new_rows": 9,
-   "stored": 9
+   "last": "2026-10-12",
+   "new_rows": 10,
+   "stored": 10
   },
   "SOL": {
    "first": "2026-09-04",
    "last": "2026-10-12",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 39
   },
   "SUI": {
    "first": "2026-09-04",
-   "last": "2026-10-09",
-   "new_rows": 20,
-   "stored": 25
+   "last": "2026-10-12",
+   "new_rows": 21,
+   "stored": 26
   },
   "TRX": {
    "first": "2026-09-10",
@@ -88,7 +88,7 @@
   "XRP": {
    "first": "2026-09-04",
    "last": "2026-10-12",
-   "new_rows": 31,
+   "new_rows": 30,
    "stored": 39
   },
   "ZEC": {
@@ -98,5 +98,5 @@
    "stored": 25
   }
  },
- "run_at": "2026-10-12T22:16:54Z"
+ "run_at": "2026-10-13T02:37:38Z"
 }
