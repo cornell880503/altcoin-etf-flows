@@ -1,37 +1,37 @@
 {
-  "today": "2026-10-13",
-  "referenceDate": "2026-10-12",
+  "today": "2026-10-14",
+  "referenceDate": "2026-10-13",
   "referenceIsToday": false,
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "date": "2026-10-12",
-      "netFlowUsdM": -65.4
+      "date": "2026-10-13",
+      "netFlowUsdM": 6.7
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "date": "2026-10-12",
-      "netFlowUsdM": -85.4
+      "date": "2026-10-13",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "date": "2026-10-12",
-      "netFlowUsdM": -0.7
+      "date": "2026-10-13",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "date": "2026-10-12",
+      "date": "2026-10-13",
       "netFlowUsdM": 0
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "date": "2026-10-12",
-      "netFlowUsdM": -2.3
+      "date": "2026-10-13",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOGE",
@@ -100,6 +100,6 @@
       "netFlowUsdM": -1.7
     }
   ],
-  "totalUsdM": -150,
-  "updatedAt": "2026-10-13T20:23:30.329Z"
+  "totalUsdM": 10.5,
+  "updatedAt": "2026-10-14T00:19:12.546Z"
 }

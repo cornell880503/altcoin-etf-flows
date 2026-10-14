@@ -4,13 +4,15 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 520154,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 513136,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
-   "partial": [],
+   "partial": [
+    "2026-10-13"
+   ],
    "sessions": 30,
    "status": 200,
    "total_mismatch": [],
@@ -18,8 +20,8 @@
    "url": "https://cryptoetf.today/en/bitcoin-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-31",
-    "2026-10-12"
+    "2026-09-01",
+    "2026-10-13"
    ]
   },
   "ETH": {
@@ -27,12 +29,14 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 480501,
+   "bytes": 471808,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
-   "partial": [],
+   "partial": [
+    "2026-10-13"
+   ],
    "sessions": 30,
    "status": 200,
    "total_mismatch": [],
@@ -40,8 +44,8 @@
    "url": "https://cryptoetf.today/en/ethereum-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-31",
-    "2026-10-12"
+    "2026-09-01",
+    "2026-10-13"
    ]
   },
   "HYPE": {
@@ -49,12 +53,14 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 329760,
+   "bytes": 322609,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
-   "partial": [],
+   "partial": [
+    "2026-10-13"
+   ],
    "sessions": 30,
    "status": 200,
    "total_mismatch": [],
@@ -62,26 +68,26 @@
    "url": "https://cryptoetf.today/en/hype-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-05",
-    "2026-10-12"
+    "2026-08-06",
+    "2026-10-13"
    ]
   },
   "SOL": {
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 384011,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 376116,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
    "partial": [
-    "2026-10-06",
     "2026-10-07",
     "2026-10-08",
     "2026-10-09",
-    "2026-10-12"
+    "2026-10-12",
+    "2026-10-13"
    ],
    "sessions": 30,
    "status": 200,
@@ -90,8 +96,8 @@
    "url": "https://cryptoetf.today/en/solana-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-28",
-    "2026-10-12"
+    "2026-08-31",
+    "2026-10-13"
    ]
   },
   "XRP": {
@@ -99,12 +105,14 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 354939,
+   "bytes": 348305,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
-   "partial": [],
+   "partial": [
+    "2026-10-13"
+   ],
    "sessions": 30,
    "status": 200,
    "total_mismatch": [],
@@ -112,8 +120,8 @@
    "url": "https://cryptoetf.today/en/xrp-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-19",
-    "2026-10-08"
+    "2026-08-20",
+    "2026-10-13"
    ]
   }
  },
