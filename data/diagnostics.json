@@ -5,7 +5,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 521987,
+   "bytes": 522070,
    "dated_arrays": [
     "days"
    ],
@@ -26,8 +26,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 480836,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 480570,
    "dated_arrays": [
     "days"
    ],
@@ -48,8 +48,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 327795,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 328541,
    "dated_arrays": [
     "days"
    ],
@@ -62,16 +62,16 @@
    "url": "https://cryptoetf.today/en/hype-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-06",
-    "2026-10-13"
+    "2026-08-05",
+    "2026-10-12"
    ]
   },
   "SOL": {
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 383960,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 384058,
    "dated_arrays": [
     "days"
    ],
@@ -99,7 +99,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 353796,
+   "bytes": 355079,
    "dated_arrays": [
     "days"
    ],
@@ -112,8 +112,8 @@
    "url": "https://cryptoetf.today/en/xrp-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-20",
-    "2026-10-13"
+    "2026-08-19",
+    "2026-10-08"
    ]
   }
  },
