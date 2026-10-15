@@ -7,13 +7,13 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-10-14",
-      "netFlowUsdM": -150.5
+      "netFlowUsdM": -261.4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-10-14",
-      "netFlowUsdM": -19.7
+      "netFlowUsdM": -129.5
     },
     {
       "symbol": "SOL",
@@ -54,19 +54,19 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-13",
-      "netFlowUsdM": -5.2
+      "date": "2026-10-14",
+      "netFlowUsdM": 3.7
     }
   ],
-  "totalUsdM": -180.9,
-  "updatedAt": "2026-10-15T04:41:12.886Z"
+  "totalUsdM": -392.7,
+  "updatedAt": "2026-10-15T11:31:25.152Z"
 }

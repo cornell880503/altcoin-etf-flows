@@ -1,8 +1,8 @@
 {
- "run_at": "2026-10-15T04:41:56Z",
+ "run_at": "2026-10-15T11:36:39Z",
  "funds": {
   "XRPC": {
-   "bytes": 1497461,
+   "bytes": 1502851,
    "tables": [
     {
      "n_rows": 4,
@@ -76,7 +76,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -151,13 +151,13 @@
     }
    ],
    "from": "table",
-   "parsed": 230,
-   "stored": 230,
+   "parsed": 231,
+   "stored": 231,
    "first": "2025-11-12",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   },
   "LTCC": {
-   "bytes": 1496589,
+   "bytes": 1501988,
    "tables": [
     {
      "n_rows": 4,
@@ -231,7 +231,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -306,13 +306,13 @@
     }
    ],
    "from": "table",
-   "parsed": 242,
-   "stored": 242,
+   "parsed": 243,
+   "stored": 243,
    "first": "2025-10-27",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   },
   "HBR": {
-   "bytes": 1498754,
+   "bytes": 1504158,
    "tables": [
     {
      "n_rows": 4,
@@ -386,7 +386,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -461,13 +461,13 @@
     }
    ],
    "from": "table",
-   "parsed": 242,
-   "stored": 242,
+   "parsed": 243,
+   "stored": 243,
    "first": "2025-10-27",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   },
   "SOLC": {
-   "bytes": 1510102,
+   "bytes": 1515510,
    "tables": [
     {
      "n_rows": 4,
@@ -541,7 +541,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -616,13 +616,13 @@
     }
    ],
    "from": "table",
-   "parsed": 227,
-   "stored": 227,
+   "parsed": 228,
+   "stored": 228,
    "first": "2025-11-17",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   },
   "SUIS": {
-   "bytes": 1506781,
+   "bytes": 1512187,
    "tables": [
     {
      "n_rows": 4,
@@ -694,7 +694,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -769,13 +769,13 @@
     }
    ],
    "from": "table",
-   "parsed": 166,
-   "stored": 166,
+   "parsed": 167,
+   "stored": 167,
    "first": "2026-02-17",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   },
   "TRXS": {
-   "bytes": 1503999,
+   "bytes": 1509402,
    "tables": [
     {
      "n_rows": 4,
@@ -847,7 +847,7 @@
      ]
     },
     {
-     "n_rows": 1135,
+     "n_rows": 1141,
      "head": [
       [
        "Fund Name",
@@ -922,10 +922,10 @@
     }
    ],
    "from": "table",
-   "parsed": 26,
-   "stored": 26,
+   "parsed": 27,
+   "stored": 27,
    "first": "2026-09-08",
-   "last": "2026-10-13"
+   "last": "2026-10-14"
   }
  }
 }
