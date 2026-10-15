@@ -3,10 +3,6 @@
   "windowDays": 30,
   "days": [
     {
-      "date": "2026-09-14",
-      "netFlowUsdM": 1.6
-    },
-    {
       "date": "2026-09-15",
       "netFlowUsdM": 0
     },
@@ -89,7 +85,11 @@
     {
       "date": "2026-10-13",
       "netFlowUsdM": 0
+    },
+    {
+      "date": "2026-10-14",
+      "netFlowUsdM": 0
     }
   ],
-  "updatedAt": "2026-10-14T23:55:54.916Z"
+  "updatedAt": "2026-10-15T04:41:21.190Z"
 }

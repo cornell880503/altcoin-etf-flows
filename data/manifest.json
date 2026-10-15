@@ -19,8 +19,8 @@
     "vanEck",
     "wisdomTree"
    ],
-   "last": "2026-10-13",
-   "rows": 691
+   "last": "2026-10-14",
+   "rows": 692
   },
   "ETH": {
    "first": "2024-07-23",
@@ -39,8 +39,8 @@
     "twentyOneShares",
     "vanEck"
    ],
-   "last": "2026-10-13",
-   "rows": 546
+   "last": "2026-10-14",
+   "rows": 547
   },
   "HYPE": {
    "first": "2026-05-12",
@@ -51,7 +51,7 @@
     "total",
     "twentyOneShares"
    ],
-   "last": "2026-10-13",
+   "last": "2026-10-14",
    "rows": 77
   },
   "SOL": {
@@ -69,8 +69,8 @@
     "twentyOneShares",
     "vanEck"
    ],
-   "last": "2026-10-13",
-   "rows": 197
+   "last": "2026-10-14",
+   "rows": 198
   },
   "XRP": {
    "first": "2025-11-14",
@@ -83,12 +83,16 @@
     "twentyOneShares",
     "xrpPrice"
    ],
-   "last": "2026-10-13",
+   "last": "2026-10-14",
    "rows": 179
   }
  },
  "changed": [
-  "ETH"
+  "BTC",
+  "ETH",
+  "SOL",
+  "XRP",
+  "HYPE"
  ],
- "updated_at": "2026-10-14T23:55:45Z"
+ "updated_at": "2026-10-15T04:41:10Z"
 }

@@ -1,54 +1,54 @@
 {
-  "today": "2026-10-14",
-  "referenceDate": "2026-10-13",
+  "today": "2026-10-15",
+  "referenceDate": "2026-10-14",
   "referenceIsToday": false,
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "date": "2026-10-13",
-      "netFlowUsdM": 175.7
+      "date": "2026-10-14",
+      "netFlowUsdM": -150.5
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "date": "2026-10-13",
-      "netFlowUsdM": 24.8
+      "date": "2026-10-14",
+      "netFlowUsdM": -19.7
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "date": "2026-10-13",
-      "netFlowUsdM": -1
+      "date": "2026-10-14",
+      "netFlowUsdM": -1.3
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "date": "2026-10-13",
-      "netFlowUsdM": 0
+      "date": "2026-10-14",
+      "netFlowUsdM": 0.7
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "date": "2026-10-13",
-      "netFlowUsdM": 0
+      "date": "2026-10-14",
+      "netFlowUsdM": -4.9
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "date": "2026-10-13",
-      "netFlowUsdM": -0.1
+      "date": "2026-10-14",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "LINK",
       "asset": "link",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
@@ -72,20 +72,20 @@
     {
       "symbol": "DOT",
       "asset": "dot",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "SUI",
       "asset": "sui",
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "netFlowUsdM": 0
     },
     {
       "symbol": "NEAR",
       "asset": "near",
-      "date": "2026-10-13",
-      "netFlowUsdM": 3.9
+      "date": "2026-10-14",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "TRX",
@@ -100,6 +100,6 @@
       "netFlowUsdM": -5.2
     }
   ],
-  "totalUsdM": 198.1,
-  "updatedAt": "2026-10-14T23:55:47.358Z"
+  "totalUsdM": -180.9,
+  "updatedAt": "2026-10-15T04:41:12.886Z"
 }

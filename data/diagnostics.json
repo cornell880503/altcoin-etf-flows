@@ -4,8 +4,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 523103,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 521395,
    "dated_arrays": [
     "days"
    ],
@@ -18,16 +18,16 @@
    "url": "https://cryptoetf.today/en/bitcoin-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-09-01",
-    "2026-10-13"
+    "2026-09-02",
+    "2026-10-14"
    ]
   },
   "ETH": {
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 480488,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 479229,
    "dated_arrays": [
     "days"
    ],
@@ -40,16 +40,16 @@
    "url": "https://cryptoetf.today/en/ethereum-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-09-01",
-    "2026-10-13"
+    "2026-09-02",
+    "2026-10-14"
    ]
   },
   "HYPE": {
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 328517,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 330445,
    "dated_arrays": [
     "days"
    ],
@@ -62,8 +62,8 @@
    "url": "https://cryptoetf.today/en/hype-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-05",
-    "2026-10-12"
+    "2026-08-06",
+    "2026-10-14"
    ]
   },
   "SOL": {
@@ -71,17 +71,17 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 384098,
+   "bytes": 382777,
    "dated_arrays": [
     "days"
    ],
    "historical_mentions": 0,
    "partial": [
-    "2026-10-07",
     "2026-10-08",
     "2026-10-09",
     "2026-10-12",
-    "2026-10-13"
+    "2026-10-13",
+    "2026-10-14"
    ],
    "sessions": 30,
    "status": 200,
@@ -90,16 +90,16 @@
    "url": "https://cryptoetf.today/en/solana-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-31",
-    "2026-10-13"
+    "2026-09-01",
+    "2026-10-14"
    ]
   },
   "XRP": {
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "STALE",
-   "bytes": 355111,
+   "X-Nextjs-Cache": "HIT",
+   "bytes": 354331,
    "dated_arrays": [
     "days"
    ],
@@ -112,8 +112,8 @@
    "url": "https://cryptoetf.today/en/xrp-etf-flows",
    "used": "cols+daily",
    "window": [
-    "2026-08-19",
-    "2026-10-08"
+    "2026-08-20",
+    "2026-10-14"
    ]
   }
  },
