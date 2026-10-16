@@ -22,7 +22,7 @@
     {
      "name": "get_flows_summary",
      "title": "Latest Crypto ETF Flows",
-     "description": "Get the latest-day net ETF inflow/outflow (USD millions) for every tracked crypto asset: BTC (Bitcoin), ETH (Ethereum), SOL (Solana), XRP, HYP (Hyperliquid), DOGE (Dogecoin), LINK (Chainlink), AVAX (Avalanche), HBAR (Hedera), LTC (Litecoin), BNB, DOT (Polkadot), SUI, NEAR, TRX (TRON) and ZEC (Zcash). Positive = inflow, negative = outflow. Flows are published one business day in arrears, so `referenceIsToday` is normally false: the figures belong to `referenceDate`, the last trading day published, not to the current date. On Mondays the freshest data is Friday's. `totalUsdM` is the sum across all assets. Figures are asset-level totals with no per-fund breakdown; per-fund tables (IBIT, FBTC, ETHA and others) are published at https://cryptoetf.today/en/<slug>-etf-flows, slug = bitcoin, ethereum, solana, xrp, hype, dogecoin, chainlink, avalanche, hedera, litecoin, bnb, polkadot, sui, near, tron or zcash.",
+     "description": "Get the latest-day net ETF inflow/outflow (USD millions) for every tracked crypto asset: BTC (Bitcoin), ETH (Ethereum), SOL (Solana), XRP, HYP (Hyperliquid), DOGE (Dogecoin), LINK (Chainlink), AVAX (Avalanche), HBAR (Hedera), LTC (Litecoin), BNB, DOT (Polkadot), SUI, NEAR, TRX (TRON) and ZEC (Zcash). Positive = inflow, negative = outflow. Flows are published one business day in arrears, so `referenceIsToday` is normally false: the figures belong to `referenceDate`, the last trading day published, not to the current date. On Mondays the freshest data is Friday's. `totalUsdM` is the sum across all assets. Figures are asset-level totals; the per-fund breakdown (IBIT, FBTC, ETHA and others) is returned by get_fund_flows, net assets by get_funds.",
      "inputSchema": {
       "type": "object",
       "properties": {}
@@ -39,7 +39,7 @@
     {
      "name": "get_asset_flows",
      "title": "Crypto ETF Flow History",
-     "description": "Get daily net ETF flow history for a single crypto asset over the last 30 days. Returns a time series of net USD millions per day (positive = inflow, negative = outflow). Figures are asset-level totals with no per-fund breakdown; per-fund tables (IBIT, FBTC, ETHA and others) are published at https://cryptoetf.today/en/<slug>-etf-flows, slug = bitcoin, ethereum, solana, xrp, hype, dogecoin, chainlink, avalanche, hedera, litecoin, bnb, polkadot, sui, near, tron or zcash.",
+     "description": "Get daily net ETF flow history for a single crypto asset over the last 30 days. Returns a time series of net USD millions per day (positive = inflow, negative = outflow). Figures are asset-level totals; the per-fund breakdown (IBIT, FBTC, ETHA and others) is returned by get_fund_flows.",
      "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -73,6 +73,91 @@
      },
      "annotations": {
       "title": "Crypto ETF Flow History",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_fund_flows",
+     "title": "Crypto ETF Flows by Fund",
+     "description": "Get daily net flows of every spot ETF on one crypto asset, fund by fund (IBIT, FBTC, ETHA, \u2026), over the last 30 days. Each trading day lists the funds trading that day with ticker, issuer and net USD millions (positive = inflow, negative = outflow), plus `totalUsdM` for the day. `netFlowUsdM` is null when there is no figure for the fund that day, usually because it has not reported yet; 0 means no creations or redemptions. Flows are published one business day in arrears.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ],
+        "description": "Asset to fetch: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec"
+       }
+      },
+      "required": [
+       "asset"
+      ]
+     },
+     "annotations": {
+      "title": "Crypto ETF Flows by Fund",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_funds",
+     "title": "Crypto ETF Fund Directory",
+     "description": "Get the US spot crypto ETFs that have started trading, for one asset or all 16: ticker, name, issuer, exchange, listing date, sponsor fee (percent per year), current net assets (`netAssetsUsdM`, USD millions) and coins held, plus the total net assets of each asset. Net assets are a current snapshot, not a history. `netAssetsBasis` is reported (published by the issuer for `netAssetsDate`), repriced (the latest published figure moved to that day by the NAV change of other funds) or estimated (coins times price, for issuers without daily holdings). `coinsHeld` is null for issuers that do not publish holdings in coins.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "description": "Optional asset filter: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec",
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ]
+       }
+      }
+     },
+     "annotations": {
+      "title": "Crypto ETF Fund Directory",
       "readOnlyHint": true,
       "openWorldHint": false
      },

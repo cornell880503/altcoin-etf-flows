@@ -43,7 +43,7 @@
       "symbol": "LINK",
       "asset": "link",
       "date": "2026-10-15",
-      "netFlowUsdM": 0.5
+      "netFlowUsdM": 0
     },
     {
       "symbol": "AVAX",
@@ -54,20 +54,20 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-14",
+      "date": "2026-10-15",
       "netFlowUsdM": 0
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-14",
+      "date": "2026-10-15",
       "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-10-14",
-      "netFlowUsdM": 0
+      "date": "2026-10-15",
+      "netFlowUsdM": -0.3
     },
     {
       "symbol": "DOT",
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-14",
+      "date": "2026-10-15",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-14",
-      "netFlowUsdM": 3.7
+      "date": "2026-10-15",
+      "netFlowUsdM": -14.8
     }
   ],
-  "totalUsdM": -71.1,
-  "updatedAt": "2026-10-16T04:33:50.409Z"
+  "totalUsdM": -90.4,
+  "updatedAt": "2026-10-16T11:26:13.971Z"
 }

@@ -1,8 +1,8 @@
 {
- "run_at": "2026-10-16T04:34:32Z",
+ "run_at": "2026-10-16T11:31:28Z",
  "funds": {
   "XRPC": {
-   "bytes": 1502844,
+   "bytes": 1508225,
    "tables": [
     {
      "n_rows": 4,
@@ -41,14 +41,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "-27.29%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "-26.41%",
        "9.78%",
        "40.37%",
        "-",
        "-",
        "-",
-       "-43.72%"
+       "-43.04%"
       ]
      ]
     },
@@ -76,7 +76,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -151,13 +151,13 @@
     }
    ],
    "from": "table",
-   "parsed": 231,
-   "stored": 231,
+   "parsed": 232,
+   "stored": 232,
    "first": "2025-11-12",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   },
   "LTCC": {
-   "bytes": 1501970,
+   "bytes": 1507356,
    "tables": [
     {
      "n_rows": 4,
@@ -196,14 +196,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "-22.53%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "-21.35%",
        "33.80%",
        "55.65%",
        "-",
        "-",
        "-",
-       "-42.08%"
+       "-41.20%"
       ]
      ]
     },
@@ -231,7 +231,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -306,13 +306,13 @@
     }
    ],
    "from": "table",
-   "parsed": 243,
-   "stored": 243,
+   "parsed": 244,
+   "stored": 244,
    "first": "2025-10-27",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   },
   "HBR": {
-   "bytes": 1504153,
+   "bytes": 1509534,
    "tables": [
     {
      "n_rows": 4,
@@ -351,14 +351,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "-22.02%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "-20.58%",
        "44.71%",
        "49.13%",
        "-",
        "-",
        "-",
-       "-54.68%"
+       "-53.84%"
       ]
      ]
     },
@@ -386,7 +386,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -461,13 +461,13 @@
     }
    ],
    "from": "table",
-   "parsed": 243,
-   "stored": 243,
+   "parsed": 244,
+   "stored": 244,
    "first": "2025-10-27",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   },
   "SOLC": {
-   "bytes": 1515494,
+   "bytes": 1520885,
    "tables": [
     {
      "n_rows": 4,
@@ -506,14 +506,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "-12.04%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "-10.58%",
        "18.33%",
        "54.37%",
        "-",
        "-",
        "-",
-       "-15.56%"
+       "-14.16%"
       ]
      ]
     },
@@ -541,7 +541,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -616,13 +616,13 @@
     }
    ],
    "from": "table",
-   "parsed": 228,
-   "stored": 228,
+   "parsed": 229,
+   "stored": 229,
    "first": "2025-11-17",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   },
   "SUIS": {
-   "bytes": 1512171,
+   "bytes": 1517564,
    "tables": [
     {
      "n_rows": 4,
@@ -661,14 +661,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "5.64%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "7.44%",
        "59.29%",
        "61.70%",
        "-",
        "-",
        "-",
-       "5.64%"
+       "7.44%"
       ]
      ]
     },
@@ -694,7 +694,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -769,13 +769,13 @@
     }
    ],
    "from": "table",
-   "parsed": 167,
-   "stored": 167,
+   "parsed": 168,
+   "stored": 168,
    "first": "2026-02-17",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   },
   "TRXS": {
-   "bytes": 1509386,
+   "bytes": 1514947,
    "tables": [
     {
      "n_rows": 4,
@@ -814,14 +814,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/14/2026",
-       "-1.56%",
+       "Net asset value (NAV) returnAs of 10/15/2026",
+       "-1.80%",
        "-",
        "-",
        "-",
        "-",
        "-",
-       "-1.56%"
+       "-1.80%"
       ]
      ]
     },
@@ -847,7 +847,7 @@
      ]
     },
     {
-     "n_rows": 1141,
+     "n_rows": 1147,
      "head": [
       [
        "Fund Name",
@@ -922,10 +922,10 @@
     }
    ],
    "from": "table",
-   "parsed": 27,
-   "stored": 27,
+   "parsed": 28,
+   "stored": 28,
    "first": "2026-09-08",
-   "last": "2026-10-14"
+   "last": "2026-10-15"
   }
  }
 }

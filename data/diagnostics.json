@@ -5,7 +5,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 515744,
+   "bytes": 522460,
    "dated_arrays": [
     "days"
    ],
@@ -26,8 +26,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 480792,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 482358,
    "dated_arrays": [
     "days"
    ],
@@ -48,8 +48,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 330986,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 332499,
    "dated_arrays": [
     "days"
    ],
@@ -71,7 +71,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 384072,
+   "bytes": 385702,
    "dated_arrays": [
     "days"
    ],
@@ -79,7 +79,6 @@
    "partial": [
     "2026-10-09",
     "2026-10-12",
-    "2026-10-13",
     "2026-10-14",
     "2026-10-15"
    ],
@@ -98,8 +97,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "STALE",
-   "bytes": 355833,
+   "X-Nextjs-Cache": "HIT",
+   "bytes": 357469,
    "dated_arrays": [
     "days"
    ],
