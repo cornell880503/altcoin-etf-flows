@@ -1,54 +1,54 @@
 {
-  "today": "2026-10-16",
-  "referenceDate": "2026-10-15",
+  "today": "2026-10-17",
+  "referenceDate": "2026-10-16",
   "referenceIsToday": false,
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "date": "2026-10-15",
-      "netFlowUsdM": 5.1
+      "date": "2026-10-16",
+      "netFlowUsdM": -82.4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "date": "2026-10-15",
-      "netFlowUsdM": -60.3
+      "date": "2026-10-16",
+      "netFlowUsdM": -69.7
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "date": "2026-10-15",
-      "netFlowUsdM": -9.8
+      "date": "2026-10-16",
+      "netFlowUsdM": -12.7
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "date": "2026-10-15",
-      "netFlowUsdM": -1
+      "date": "2026-10-16",
+      "netFlowUsdM": -1.9
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "date": "2026-10-15",
-      "netFlowUsdM": -10.3
+      "date": "2026-10-16",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "date": "2026-10-15",
+      "date": "2026-10-16",
       "netFlowUsdM": 0
     },
     {
       "symbol": "LINK",
       "asset": "link",
-      "date": "2026-10-15",
-      "netFlowUsdM": 0
+      "date": "2026-10-16",
+      "netFlowUsdM": 1.6
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
-      "date": "2026-10-15",
+      "date": "2026-10-16",
       "netFlowUsdM": 0
     },
     {
@@ -72,20 +72,20 @@
     {
       "symbol": "DOT",
       "asset": "dot",
-      "date": "2026-10-15",
-      "netFlowUsdM": -0.1
+      "date": "2026-10-16",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "SUI",
       "asset": "sui",
-      "date": "2026-10-15",
+      "date": "2026-10-16",
       "netFlowUsdM": 0
     },
     {
       "symbol": "NEAR",
       "asset": "near",
-      "date": "2026-10-15",
-      "netFlowUsdM": 1.1
+      "date": "2026-10-16",
+      "netFlowUsdM": 2.6
     },
     {
       "symbol": "TRX",
@@ -100,6 +100,6 @@
       "netFlowUsdM": -14.8
     }
   ],
-  "totalUsdM": -90.4,
-  "updatedAt": "2026-10-16T23:36:49.547Z"
+  "totalUsdM": -177.6,
+  "updatedAt": "2026-10-17T04:28:04.378Z"
 }
