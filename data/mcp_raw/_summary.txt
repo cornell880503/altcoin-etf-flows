@@ -25,7 +25,7 @@
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-10-16",
-      "netFlowUsdM": -1.9
+      "netFlowUsdM": -2.5
     },
     {
       "symbol": "HYP",
@@ -43,7 +43,7 @@
       "symbol": "LINK",
       "asset": "link",
       "date": "2026-10-16",
-      "netFlowUsdM": 1.6
+      "netFlowUsdM": -0.4
     },
     {
       "symbol": "AVAX",
@@ -54,20 +54,20 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-15",
-      "netFlowUsdM": 0
+      "date": "2026-10-16",
+      "netFlowUsdM": -0.6
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-15",
+      "date": "2026-10-16",
       "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-10-15",
-      "netFlowUsdM": -0.3
+      "date": "2026-10-16",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOT",
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-15",
+      "date": "2026-10-16",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-15",
-      "netFlowUsdM": -14.8
+      "date": "2026-10-16",
+      "netFlowUsdM": -1.2
     }
   ],
-  "totalUsdM": -177.6,
-  "updatedAt": "2026-10-17T04:28:04.378Z"
+  "totalUsdM": -166.9,
+  "updatedAt": "2026-10-17T10:46:01.176Z"
 }
