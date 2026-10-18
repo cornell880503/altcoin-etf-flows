@@ -5,7 +5,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 590198,
+   "bytes": 590377,
    "dated_arrays": [
     "days"
    ],
@@ -27,7 +27,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "HIT",
-   "bytes": 547564,
+   "bytes": 547868,
    "dated_arrays": [
     "days"
    ],
@@ -49,7 +49,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 381908,
+   "bytes": 381887,
    "dated_arrays": [
     "days"
    ],
@@ -71,7 +71,7 @@
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
    "X-Nextjs-Cache": "STALE",
-   "bytes": 447332,
+   "bytes": 447496,
    "dated_arrays": [
     "days"
    ],
@@ -97,8 +97,8 @@
    "CF-Cache-Status": "DYNAMIC",
    "Content-Type": "text/html; charset=utf-8",
    "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "bytes": 414864,
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 415157,
    "dated_arrays": [
     "days"
    ],
