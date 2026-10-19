@@ -1,171 +1,20 @@
 {
  "assets": {
   "BTC": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "array_keys": [
-    "columns",
-    "itemListElement",
-    "links",
-    "mainEntity"
-   ],
-   "bytes": 226085,
-   "date_contexts": [],
-   "date_fields": 0,
-   "dated_arrays": [],
-   "historical_mentions": 0,
-   "next_data": false,
-   "next_f_pushes": 11,
-   "script_srcs": [
-    "/_next/static/chunks/4bd1b696-8a4ab4fdf0ae305a.js",
-    "/_next/static/chunks/3794-6f271a1eb27dfa20.js",
-    "/_next/static/chunks/main-app-aab567c53bf782ca.js",
-    "/_next/static/chunks/9600-c02cf80fe0c07ba6.js",
-    "/_next/static/chunks/app/%5Blocale%5D/bitcoin-etf-flows/loading-5a0215990a1d2403.js",
-    "/_next/static/chunks/6558-718e523a2ab44436.js",
-    "/_next/static/chunks/5809-fd7634b4d6d72c83.js",
-    "/_next/static/chunks/2825-d6aff343974780d0.js"
-   ],
-   "status": 200,
-   "title": "Bitcoin ETF Flows Today: Inflows &amp; Outflows | Crypto ETF",
-   "url": "https://cryptoetf.today/en/bitcoin-etf-flows"
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "ETH": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "array_keys": [
-    "columns",
-    "itemListElement",
-    "links",
-    "mainEntity"
-   ],
-   "bytes": 226311,
-   "date_contexts": [],
-   "date_fields": 0,
-   "dated_arrays": [],
-   "historical_mentions": 0,
-   "next_data": false,
-   "next_f_pushes": 12,
-   "script_srcs": [
-    "/_next/static/chunks/4bd1b696-8a4ab4fdf0ae305a.js",
-    "/_next/static/chunks/3794-6f271a1eb27dfa20.js",
-    "/_next/static/chunks/main-app-aab567c53bf782ca.js",
-    "/_next/static/chunks/9600-c02cf80fe0c07ba6.js",
-    "/_next/static/chunks/app/%5Blocale%5D/ethereum-etf-flows/loading-5a0215990a1d2403.js",
-    "/_next/static/chunks/6558-718e523a2ab44436.js",
-    "/_next/static/chunks/5809-fd7634b4d6d72c83.js",
-    "/_next/static/chunks/2825-d6aff343974780d0.js"
-   ],
-   "status": 200,
-   "title": "Ethereum ETF Flows Today: Inflows &amp; Outflows | Crypto ETF",
-   "url": "https://cryptoetf.today/en/ethereum-etf-flows"
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "HYPE": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "array_keys": [
-    "columns",
-    "itemListElement",
-    "links",
-    "mainEntity"
-   ],
-   "bytes": 232513,
-   "date_contexts": [],
-   "date_fields": 0,
-   "dated_arrays": [],
-   "historical_mentions": 0,
-   "next_data": false,
-   "next_f_pushes": 11,
-   "script_srcs": [
-    "/_next/static/chunks/4bd1b696-8a4ab4fdf0ae305a.js",
-    "/_next/static/chunks/3794-6f271a1eb27dfa20.js",
-    "/_next/static/chunks/main-app-aab567c53bf782ca.js",
-    "/_next/static/chunks/9600-c02cf80fe0c07ba6.js",
-    "/_next/static/chunks/app/%5Blocale%5D/hype-etf-flows/loading-5a0215990a1d2403.js",
-    "/_next/static/chunks/6558-718e523a2ab44436.js",
-    "/_next/static/chunks/5809-fd7634b4d6d72c83.js",
-    "/_next/static/chunks/2825-d6aff343974780d0.js"
-   ],
-   "status": 200,
-   "title": "Hyperliquid ETF Flows Today: Inflows &amp; Outflows | Crypto ETF",
-   "url": "https://cryptoetf.today/en/hype-etf-flows"
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "SOL": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "array_keys": [
-    "columns",
-    "itemListElement",
-    "links",
-    "mainEntity"
-   ],
-   "bytes": 228886,
-   "date_contexts": [],
-   "date_fields": 0,
-   "dated_arrays": [],
-   "historical_mentions": 0,
-   "next_data": false,
-   "next_f_pushes": 12,
-   "script_srcs": [
-    "/_next/static/chunks/4bd1b696-8a4ab4fdf0ae305a.js",
-    "/_next/static/chunks/3794-6f271a1eb27dfa20.js",
-    "/_next/static/chunks/main-app-aab567c53bf782ca.js",
-    "/_next/static/chunks/9600-c02cf80fe0c07ba6.js",
-    "/_next/static/chunks/app/%5Blocale%5D/solana-etf-flows/loading-5a0215990a1d2403.js",
-    "/_next/static/chunks/6558-718e523a2ab44436.js",
-    "/_next/static/chunks/5809-fd7634b4d6d72c83.js",
-    "/_next/static/chunks/2825-d6aff343974780d0.js"
-   ],
-   "status": 200,
-   "title": "Solana ETF Flows Today: Inflows &amp; Outflows | Crypto ETF",
-   "url": "https://cryptoetf.today/en/solana-etf-flows"
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "XRP": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "HIT",
-   "array_keys": [
-    "columns",
-    "itemListElement",
-    "links",
-    "mainEntity"
-   ],
-   "bytes": 224212,
-   "date_contexts": [],
-   "date_fields": 0,
-   "dated_arrays": [],
-   "historical_mentions": 0,
-   "next_data": false,
-   "next_f_pushes": 19,
-   "script_srcs": [
-    "/_next/static/chunks/4bd1b696-8a4ab4fdf0ae305a.js",
-    "/_next/static/chunks/3794-6f271a1eb27dfa20.js",
-    "/_next/static/chunks/main-app-aab567c53bf782ca.js",
-    "/_next/static/chunks/9600-c02cf80fe0c07ba6.js",
-    "/_next/static/chunks/app/%5Blocale%5D/xrp-etf-flows/loading-5a0215990a1d2403.js",
-    "/_next/static/chunks/6558-718e523a2ab44436.js",
-    "/_next/static/chunks/5809-fd7634b4d6d72c83.js",
-    "/_next/static/chunks/2825-d6aff343974780d0.js"
-   ],
-   "status": 200,
-   "title": "XRP ETF Flows Today: Inflows &amp; Outflows | Crypto ETF",
-   "url": "https://cryptoetf.today/en/xrp-etf-flows"
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   }
  },
- "failures": [
-  "BTC: no dated flow array",
-  "ETH: no dated flow array",
-  "SOL: no dated flow array",
-  "XRP: no dated flow array",
-  "HYPE: no dated flow array"
- ]
+ "failures": []
 }
