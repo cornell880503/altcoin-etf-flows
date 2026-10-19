@@ -21,8 +21,10 @@
    ],
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 120,
-    "differ": 6
+    "all_differ": 6,
+    "all_figures": 120,
+    "main_differ": 0,
+    "main_funds": 30
    },
    "window": [
     "2026-09-30",
@@ -31,7 +33,7 @@
   },
   "ETH": {
    "appended": [],
-   "bytes": 198014,
+   "bytes": 198015,
    "rows": 13,
    "status": 200,
    "tickers": [
@@ -49,8 +51,10 @@
    ],
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 110,
-    "differ": 0
+    "all_differ": 0,
+    "all_figures": 110,
+    "main_differ": 0,
+    "main_funds": 30
    },
    "window": [
     "2026-09-30",
@@ -69,8 +73,10 @@
    ],
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 30,
-    "differ": 0
+    "all_differ": 0,
+    "all_figures": 30,
+    "main_differ": 0,
+    "main_funds": 30
    },
    "window": [
     "2026-09-30",
@@ -93,8 +99,10 @@
    ],
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 86,
-    "differ": 0
+    "all_differ": 0,
+    "all_figures": 86,
+    "main_differ": 0,
+    "main_funds": 30
    },
    "window": [
     "2026-09-30",
@@ -102,5 +110,5 @@
    ]
   }
  },
- "run_at": "2026-10-19T04:55:44Z"
+ "run_at": "2026-10-19T04:58:16Z"
 }
