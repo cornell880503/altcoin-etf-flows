@@ -49,7 +49,10 @@ def fund_rows(data, keymap):
             continue
         row = {"date": str(d["date"])[:10]}
         nulls = 0
-        for f in d.get("funds") or []:
+        funds = d.get("funds")
+        for f in funds if isinstance(funds, list) else []:
+            if not isinstance(f, dict):
+                continue
             tk, v = f.get("ticker"), f.get("netFlowUsdM")
             if not tk:
                 continue
@@ -108,6 +111,15 @@ def fetch_funds(key, now):
             except (OSError, ValueError):
                 store = {"asset": sym, "unit": "USD millions", "rows": []}
             old = store.get("rows") or []
+            # never let a reply in an unexpected shape overwrite the history: it must carry fund
+            # figures, and agree with the stored ones on the days both have (revisions are rare)
+            with_funds = sum(1 for r in rows if any(k not in ("date", "total") for k in r))
+            cmp = compare(old, rows)
+            if not with_funds or cmp["differ"] > max(3, 0.03 * cmp["compared"]):
+                report["assets"][sym] = {"error": "reply not merged: " + ("no fund figures" if not with_funds else
+                                         f"{cmp['differ']} of {cmp['compared']} figures differ from the stored ones"),
+                                         "vs_stored": cmp, "days": len(rows)}
+                continue
             merged = merge_window(old, rows)
             changed = merged != old
             if changed:
@@ -117,7 +129,7 @@ def fetch_funds(key, now):
             report["assets"][sym] = {"ok": True, "window": [rows[0]["date"], rows[-1]["date"]], "days": len(rows),
                                      "partial": partial, "unknown_tickers": unknown, "changed": changed,
                                      "gap": bool(old and old[-1]["date"] < rows[0]["date"]),
-                                     "vs_stored": compare(old, rows), "window_days": data.get("windowDays"),
+                                     "vs_stored": cmp, "window_days": data.get("windowDays"),
                                      "rate_limit": limits}
         except urllib.error.HTTPError as e:
             report["assets"][sym] = {"error": f"HTTP {e.code}"}

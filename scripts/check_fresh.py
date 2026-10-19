@@ -7,6 +7,10 @@ coins kept fund by fund) has no row for it while the asset totals (data/flows_ap
 show money moving that day or know nothing of it; a day the totals put at zero is not missing.
 One source failing (say, the site's flow pages) is not an alarm as long as another one delivered.
 
+While data stay missing (a source outage nobody here can fix), the alarm fires once per UTC day,
+plus whenever another day goes missing; the runs in between pass with a warning. The state is
+kept in data/freshness.json (written only when it changes).
+
 Usage: python3 scripts/check_fresh.py [--now 2026-10-20T19:00:00Z]"""
 import argparse
 import datetime as dt
@@ -47,8 +51,11 @@ def due(day, now):
     return now >= dt.datetime(d.year, d.month, d.day, tzinfo=dt.timezone.utc) + dt.timedelta(days=1, hours=GRACE_HOURS)
 
 
+STATE = P("data", "freshness.json")
+
+
 def check(now):
-    problems = []
+    problems, missing_keys = [], []
     for sym in COINS:
         have = sorted(str(r.get("date", ""))[:10] for r in rows_of(P("data", "flows", f"{sym}.json")) if r.get("date"))
         sessions = [d for d in have if is_trading_day(d)]
@@ -61,11 +68,12 @@ def check(now):
         tot = totals(sym)
         missing = [d for d in (trading_days(start, today) if start <= today else [])
                    if due(d, now) and (d not in tot or abs(tot[d]) > 1e-9)]
+        missing_keys += [f"{sym} {d}" for d in missing]
         if missing:
             problems.append(f"{sym}: per-fund flows end {last}; missing {', '.join(missing)}"
                             + (" (totals: " + ", ".join(f"{d} {tot[d]:+.1f}M" for d in missing if d in tot) + ")"
                                if any(d in tot for d in missing) else ""))
-    return problems
+    return problems, missing_keys
 
 
 def main():
@@ -74,13 +82,25 @@ def main():
     a = ap.parse_args()
     now = (dt.datetime.strptime(a.now, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc) if a.now
            else dt.datetime.now(dt.timezone.utc))
-    problems = check(now)
+    problems, keys = check(now)
+    try:
+        state = json.load(open(STATE))
+    except (OSError, ValueError):
+        state = {}
+    today = now.date().isoformat()
     if not problems:
+        new = {"missing": [], "alerted_on": None}
+        alert = False
         print("flows are current for", ", ".join(COINS))
-        return
-    for p in problems:
-        print("::error::" + p)
-    sys.exit(1)
+    else:
+        alert = state.get("alerted_on") != today or bool(set(keys) - set(state.get("missing") or []))
+        new = {"missing": keys, "alerted_on": today if alert else state.get("alerted_on")}
+        for p in problems:
+            print(("::error::" if alert else "::warning::") + p + ("" if alert else " (already reported today)"))
+    if new != {k: state.get(k) for k in new}:
+        json.dump(new, open(STATE, "w"), indent=1)
+    if alert:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

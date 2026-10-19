@@ -32,6 +32,9 @@ jobs:
       - name: Fetch flows (site pages; only for a coin the API did not deliver)
         run: python scripts/fetch_flows.py
         continue-on-error: true
+      - name: Fetch flows (Farside, backup for a coin cryptoetf.today did not deliver)
+        run: python scripts/fetch_farside.py
+        continue-on-error: true
       - name: Fetch flows (MCP endpoint, smaller assets)
         run: python scripts/fetch_mcp.py
         continue-on-error: true
@@ -49,6 +52,10 @@ jobs:
       - name: Build the cleaned daily series (data/daily.json)
         run: python scripts/build_daily.py
         continue-on-error: true
+      - name: Check that every coin's flows are current (alarm at most once a day while data are missing)
+        id: fresh
+        run: python scripts/check_fresh.py
+        continue-on-error: true  # the page is still built and published; the last step turns the run red
       - name: Commit if changed
         run: |
           git config user.name "etf-flows-bot"
@@ -83,5 +90,8 @@ jobs:
           for i in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:site && break; sleep 5; done
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Check that every coin's flows are current (red only if a published day is missing)
-        run: python scripts/check_fresh.py
+      - name: Turn the run red if a published trading day is missing (see the check step)
+        if: steps.fresh.outcome == 'failure'
+        run: |
+          echo "::error::Flows are missing for a published trading day; data/freshness.json lists them"
+          exit 1
