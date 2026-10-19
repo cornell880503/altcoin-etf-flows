@@ -1,0 +1,106 @@
+{
+ "assets": {
+  "BTC": {
+   "appended": [],
+   "bytes": 275400,
+   "rows": 13,
+   "status": 200,
+   "tickers": [
+    "IBIT",
+    "FBTC",
+    "BITB",
+    "ARKB",
+    "BTCO",
+    "EZBC",
+    "BRRR",
+    "HODL",
+    "BTCW",
+    "MSBT",
+    "GBTC",
+    "BTC"
+   ],
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 120,
+    "differ": 6
+   },
+   "window": [
+    "2026-09-30",
+    "2026-10-16"
+   ]
+  },
+  "ETH": {
+   "appended": [],
+   "bytes": 198014,
+   "rows": 13,
+   "status": 200,
+   "tickers": [
+    "ETHA",
+    "ETHB",
+    "FETH",
+    "ETHW",
+    "TETH",
+    "ETHV",
+    "QETH",
+    "EZET",
+    "MSSE",
+    "ETHE",
+    "ETH"
+   ],
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 110,
+    "differ": 0
+   },
+   "window": [
+    "2026-09-30",
+    "2026-10-16"
+   ]
+  },
+  "HYPE": {
+   "appended": [],
+   "bytes": 79135,
+   "rows": 13,
+   "status": 200,
+   "tickers": [
+    "BHYP",
+    "THYP",
+    "HYPG"
+   ],
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 30,
+    "differ": 0
+   },
+   "window": [
+    "2026-09-30",
+    "2026-10-16"
+   ]
+  },
+  "SOL": {
+   "appended": [],
+   "bytes": 116640,
+   "rows": 13,
+   "status": 200,
+   "tickers": [
+    "BSOL",
+    "VSOL",
+    "FSOL",
+    "TSOL",
+    "SOEZ",
+    "MSOL",
+    "GSOL"
+   ],
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 86,
+    "differ": 0
+   },
+   "window": [
+    "2026-09-30",
+    "2026-10-16"
+   ]
+  }
+ },
+ "run_at": "2026-10-19T04:55:44Z"
+}
