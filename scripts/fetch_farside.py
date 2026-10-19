@@ -99,18 +99,29 @@ def parse(page, sym):
 
 
 def agree(old, new, last_n=10):
-    """Compare the recent sessions both have: (compared, differ)."""
+    """Compare the recent sessions both have. The two sources differ now and then on a small fund
+    (BRRR +4.0M on 2026-10-14 at cryptoetf.today, 0 at Farside), so the test that matters is the
+    funds that moved the most: a table read into the wrong columns fails it. Returns
+    (main funds compared, of them differing, all figures compared, of them differing)."""
     stored = {r["date"]: r for r in old}
     both = [r for r in new if r["date"] in stored][-last_n:]
-    n = bad = 0
+    keys = {k for r in both for k in stored[r["date"]] if k not in ("date", "total") and not k.endswith("Price")}
+    size = {k: sum(abs(stored[r["date"]].get(k) or 0.0) for r in both) for k in keys}
+    main = [k for k in sorted(size, key=size.get, reverse=True)[:3] if size[k] > 0]
+    nm = bm = na = ba = 0
     for r in both:
         o = stored[r["date"]]
         for k in (set(r) | set(o)) - {"date", "total"}:
             if k.endswith("Price"):
                 continue
-            n += 1
-            bad += abs((r.get(k) or 0.0) - (o.get(k) or 0.0)) > 0.15  # Farside rounds to 0.1
-    return n, bad
+            a, b = r.get(k) or 0.0, o.get(k) or 0.0
+            off = abs(a - b) > max(0.15, 0.02 * abs(b))  # Farside rounds to 0.1
+            na += 1
+            ba += off
+            if k in main:
+                nm += 1
+                bm += off
+    return nm, bm, na, ba
 
 
 def page_used():
@@ -150,12 +161,12 @@ def main():
             except (OSError, ValueError):
                 store = None
             old = (store or {}).get("rows") or []
-            n, bad = agree(old, rows)
-            rep["vs_stored"] = {"compared": n, "differ": bad}
-            if not old or not n:
+            nm, bm, na, ba = agree(old, rows)
+            rep["vs_stored"] = {"main_funds": nm, "main_differ": bm, "all_figures": na, "all_differ": ba}
+            if not old or not nm:
                 rep["error"] = "no stored sessions to check Farside against; nothing appended"
-            elif bad > max(2, 0.05 * n):
-                rep["error"] = f"{bad} of {n} recent figures differ from the stored ones; nothing appended"
+            elif bm > 0.2 * nm:
+                rep["error"] = f"{bm} of {nm} recent figures of the main funds differ from the stored ones; nothing appended"
             else:
                 last = old[-1]["date"]
                 add = [r for r in rows if r["date"] > last]
