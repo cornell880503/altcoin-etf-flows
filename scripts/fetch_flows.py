@@ -9,6 +9,9 @@ Two page layouts are understood:
   sessions, one cell per fund, null = not reported yet, a "partial" flag per session). That
   window is merged into the stored history: inside the window the page wins, older days are
   kept. Tickers are stored under the issuer keys the history already uses (build_daily.TICKERS).
+Since 2026-10-18 the pages come back without data, so the official API's per-fund endpoint
+(scripts/fetch_api.py, run first) is the main source; a coin it delivered in the last two hours
+is skipped here, and this script only fills in when the API could not.
 robots.txt allows these pages (it disallows /api/ and /admin/ only). Files are rewritten only
 when the data changed, so the repo history doubles as a revision log.
 """
@@ -85,6 +88,18 @@ def arrays_named(page, name):
         pos = start + 1
 
 
+def api_covered(hours=2):
+    """Coins whose per-fund window the API delivered in the last `hours` (scripts/fetch_api.py)."""
+    try:
+        rep = json.load(open(os.path.join(ROOT, "data", "flows_api", "_funds_report.json")))
+        at = dt.datetime.strptime(rep["run_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    except (OSError, ValueError, KeyError):
+        return set()
+    if (dt.datetime.now(dt.timezone.utc) - at).total_seconds() > hours * 3600:
+        return set()
+    return {s for s, v in (rep.get("assets") or {}).items() if v.get("ok")}
+
+
 def ticker_keys(sym):
     """Fund ticker -> the issuer key the stored history uses."""
     import build_daily  # noqa: E402  (same folder; constants only at import)
@@ -154,7 +169,11 @@ def main():
     except (OSError, ValueError):
         manifest = {"assets": {}}
     changed, failures, diag = [], [], {}
+    covered = api_covered()
     for sym, slug in ASSETS.items():
+        if sym in covered:
+            diag[sym] = {"skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"}
+            continue
         try:
             page, info = fetch(slug)
         except Exception as e:  # network error: keep the previous file

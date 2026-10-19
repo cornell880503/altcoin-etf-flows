@@ -23,19 +23,18 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Fetch flows (full per-fund history pages)
-        id: flows
-        run: python scripts/fetch_flows.py
-        continue-on-error: true  # the other sources still run; the last step turns the run red
-      - name: Fetch flows (MCP endpoint, smaller assets)
-        run: python scripts/fetch_mcp.py
-        continue-on-error: true
-      - name: Fetch flows (REST API with key, once a day)
+      - name: Fetch flows (official API with key; per fund every run, asset totals once a day)
         run: python scripts/fetch_api.py
         env:
           CRYPTOETF_API_KEY: ${{ secrets.CRYPTOETF_API_KEY }}
         continue-on-error: true
         timeout-minutes: 4
+      - name: Fetch flows (site pages; only for a coin the API did not deliver)
+        run: python scripts/fetch_flows.py
+        continue-on-error: true
+      - name: Fetch flows (MCP endpoint, smaller assets)
+        run: python scripts/fetch_mcp.py
+        continue-on-error: true
       - name: Fetch market caps (CoinGecko, once a day)
         run: python scripts/fetch_mcap.py
         continue-on-error: true
@@ -84,8 +83,5 @@ jobs:
           for i in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:site && break; sleep 5; done
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Flag a failed flow-page fetch (data/diagnostics.json says why)
-        if: steps.flows.outcome == 'failure'
-        run: |
-          echo "::error::The per-fund flow pages could not be read; see data/diagnostics.json"
-          exit 1
+      - name: Check that every coin's flows are current (red only if a published day is missing)
+        run: python scripts/check_fresh.py
