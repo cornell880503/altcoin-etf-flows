@@ -14,7 +14,7 @@
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -362.7,
+      "netFlowUsdM": -362.8,
       "tradingDays": 4,
       "avgDailyUsdM": -90.7,
       "positiveDays": 0,
@@ -113,10 +113,10 @@
     {
       "symbol": "SUI",
       "asset": "sui",
-      "netFlowUsdM": 0,
+      "netFlowUsdM": 2,
       "tradingDays": 4,
-      "avgDailyUsdM": 0,
-      "positiveDays": 0,
+      "avgDailyUsdM": 0.5,
+      "positiveDays": 1,
       "negativeDays": 0
     },
     {
