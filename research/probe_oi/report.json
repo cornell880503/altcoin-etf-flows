@@ -1,0 +1,342 @@
+{
+ "run_at": "2026-10-22T15:09:31Z",
+ "sources": {
+  "binance_api": {
+   "fapi_ping": {
+    "body": "{ \"code\": 0, \"msg\": \"Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this ",
+    "status": 451
+   },
+   "oi_hist_1d": {
+    "body": "{ \"code\": 0, \"msg\": \"Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this ",
+    "status": 451
+   },
+   "oi_hist_2022": {
+    "body": "{ \"code\": 0, \"msg\": \"Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this ",
+    "status": 451
+   },
+   "ok": true,
+   "secs": 0.5
+  },
+  "binance_vision": {
+   "continuity": {
+    "1000PEPEUSDT": {
+     "files": 1266,
+     "first": "2023-05-05",
+     "last": "2026-10-21",
+     "missing_in_span": 0
+    },
+    "BTCUSDT": {
+     "files": 2242,
+     "first": "2020-09-01",
+     "last": "2026-10-21",
+     "missing_in_span": 0
+    },
+    "DOGEUSDT": {
+     "files": 1786,
+     "first": "2021-12-01",
+     "last": "2026-10-21",
+     "missing_in_span": 0
+    },
+    "ETHUSDT": {
+     "files": 1786,
+     "first": "2021-12-01",
+     "last": "2026-10-21",
+     "missing_in_span": 0
+    },
+    "FTTUSDT": {
+     "files": 275,
+     "first": "2022-04-15",
+     "last": "2024-07-15",
+     "missing_in_span": 548
+    },
+    "SOLUSDT": {
+     "files": 1786,
+     "first": "2021-12-01",
+     "last": "2026-10-21",
+     "missing_in_span": 0
+    },
+    "ZECUSDT": {
+     "files": 1785,
+     "first": "2021-12-01",
+     "last": "2026-10-21",
+     "missing_in_span": 1
+    }
+   },
+   "first_day_overall": "2020-09-01",
+   "list_errors": 2,
+   "monthly_metrics": [],
+   "ok": true,
+   "samples": {
+    "BTCUSDT 2022-08-01": {
+     "first": [
+      "2022-08-01 00:00:00",
+      "BTCUSDT",
+      "113426.08200000",
+      "2641767454.50470070",
+      "",
+      "",
+      "0.9098460977578708",
+      "0.8284466214"
+     ],
+     "header": [
+      "create_time",
+      "symbol",
+      "sum_open_interest",
+      "sum_open_interest_value",
+      "count_toptrader_long_short_ratio",
+      "sum_toptrader_long_short_ratio",
+      "count_long_short_ratio",
+      "sum_taker_long_short_vol_ratio"
+     ],
+     "last": [
+      "2022-08-01 23:55:00",
+      "BTCUSDT",
+      "112122.79700000",
+      "2613618012.35047600",
+      "",
+      "",
+      "1.0034901653093802",
+      "2.0620804930"
+     ],
+     "rows": 288
+    },
+    "BTCUSDT 2026-10-20": {
+     "first": [
+      "2026-10-20 00:25:00",
+      "BTCUSDT",
+      "94970.2220000000000000",
+      "7743705995.7837090000000000",
+      "1.79286027",
+      "1.82483200",
+      "1.66601468",
+      "1.92183500"
+     ],
+     "header": [
+      "create_time",
+      "symbol",
+      "sum_open_interest",
+      "sum_open_interest_value",
+      "count_toptrader_long_short_ratio",
+      "sum_toptrader_long_short_ratio",
+      "count_long_short_ratio",
+      "sum_taker_long_short_vol_ratio"
+     ],
+     "last": [
+      "2026-10-20 23:45:00",
+      "BTCUSDT",
+      "94802.8110000000000000",
+      "7864950401.7195140000000000",
+      "1.58481192",
+      "1.84326300",
+      "1.49856458",
+      "1.27627100"
+     ],
+     "rows": 288
+    },
+    "BTCUSDT 2026-10-21": {
+     "first": [
+      "2026-10-21 00:00:00",
+      "BTCUSDT",
+      "94759.3080000000000000",
+      "7859415730.5922270000000000",
+      "1.58560282",
+      "1.84273700",
+      "1.49751965",
+      "0.59934900"
+     ],
+     "header": [
+      "create_time",
+      "symbol",
+      "sum_open_interest",
+      "sum_open_interest_value",
+      "count_toptrader_long_short_ratio",
+      "sum_toptrader_long_short_ratio",
+      "count_long_short_ratio",
+      "sum_taker_long_short_vol_ratio"
+     ],
+     "last": [
+      "2026-10-21 23:50:00",
+      "BTCUSDT",
+      "98039.1750000000000000",
+      "8244927950.9025000000000000",
+      "1.10400026",
+      "1.64932200",
+      "1.02370022",
+      "0.50074600"
+     ],
+     "rows": 288
+    },
+    "SOLUSDT 2022-08-01": {
+     "first": [
+      "2022-08-01 00:00:00",
+      "SOLUSDT",
+      "2518784.00000000",
+      "106615564.47172864",
+      "",
+      "",
+      "1.7397020157756353",
+      "1.0500065226"
+     ],
+     "header": [
+      "create_time",
+      "symbol",
+      "sum_open_interest",
+      "sum_open_interest_value",
+      "count_toptrader_long_short_ratio",
+      "sum_toptrader_long_short_ratio",
+      "count_long_short_ratio",
+      "sum_taker_long_short_vol_ratio"
+     ],
+     "last": [
+      "2022-08-01 23:55:00",
+      "SOLUSDT",
+      "2527031.00000000",
+      "105554084.87000000",
+      "",
+      "",
+      "1.9714851485148515",
+      "1.3862988715"
+     ],
+     "rows": 288
+    }
+   },
+   "secs": 114.0,
+   "spot_monthly_klines_SOL_1d": [
+    "data/spot/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-08.zip",
+    "data/spot/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-08.zip.CHECKSUM",
+    "data/spot/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-09.zip"
+   ],
+   "symbols": 1041,
+   "um_monthly_klines_SOL_1d": [
+    "data/futures/um/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-09.zip",
+    "data/futures/um/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-09.zip.CHECKSUM",
+    "data/futures/um/monthly/klines/SOLUSDT/1d/SOLUSDT-1d-2020-10.zip"
+   ],
+   "usdt_symbols": 910,
+   "usdt_symbols_with_file_by": {
+    "2021-12-01": 132,
+    "2022-08-01": 151,
+    "2023-01-01": 162,
+    "2024-01-01": 261,
+    "2025-01-01": 392,
+    "2026-01-01": 634
+   }
+  },
+  "bybit": {
+   "latest": {
+    "body": "{ error:The Amazon CloudFront distribution is configured to block access from your country }",
+    "status": 403
+   },
+   "ok": true,
+   "secs": 0.1
+  },
+  "coinalyze_nokey": {
+   "ok": true,
+   "result": {
+    "body": "{\"message\":\"Invalid/Missing API key\"}",
+    "status": 401
+   },
+   "secs": 0.4
+  },
+  "coingecko": {
+   "chart_max": {
+    "body": "{\"error\":{\"status\":{\"timestamp\":\"2026-10-22T15:11:54.161+00:00\",\"error_code\":10012,\"error_message\":\"Your request exceeds the allowed time range. Public API users are limited to querying historical dat",
+    "status": 401
+   },
+   "global": {
+    "pct": {
+     "bnb": 3.49,
+     "btc": 59.46,
+     "eth": 10.64,
+     "sol": 2.23,
+     "trx": 1.14,
+     "usdc": 2.62,
+     "usdt": 6.63,
+     "xrp": 3.02
+    },
+    "total_mcap_usd": 2745120818324.4775
+   },
+   "global_chart": {
+    "body": "{\"status\":{\"timestamp\":\"2026-10-22T15:12:02.252+00:00\",\"error_code\":10005,\"error_message\":\"This request is limited to PRO API subscribers. Please visit https://www.coingecko.com/en/api/pricing to subs",
+    "status": 401
+   },
+   "markets": {
+    "n": 250
+   },
+   "ok": true,
+   "secs": 32.4
+  },
+  "coinmetrics": {
+   "assets_by": {
+    "2021-12-01": 401,
+    "2022-08-01": 457,
+    "2023-01-01": 472,
+    "2024-01-01": 536,
+    "2025-01-01": 679,
+    "2026-01-01": 845
+   },
+   "assets_with_mcap": 901,
+   "current_through": "2026-10-21",
+   "oi_catalog": {
+    "body": "{\"error\":{\"type\":\"unsupported_parameter\",\"message\":\"Unsupported parameter 'exchanges'.\"}}",
+    "status": 400
+   },
+   "oi_timeseries": {
+    "body": "{\"error\":{\"type\":\"forbidden\",\"message\":\"Requested markets are not available with supplied credentials: binance-BTCUSDT-future.\"}}",
+    "status": 403
+   },
+   "ok": true,
+   "secs": 3.3
+  },
+  "defillama_stables": {
+   "days": 3250,
+   "first": "2017-11-29",
+   "last": "2026-10-22",
+   "last_usd_bn": 303.8,
+   "ok": true,
+   "secs": 0.1
+  },
+  "okx": {
+   "depth": {
+    "BTC-USDT-SWAP": {
+     "earliest": "2023-12-31",
+     "rows": 1026
+    },
+    "DOGE-USDT-SWAP": {
+     "earliest": "2023-12-31",
+     "rows": 1026
+    },
+    "SOL-USDT-SWAP": {
+     "earliest": "2023-12-31",
+     "rows": 1026
+    }
+   },
+   "latest": {
+    "code": "0",
+    "data": [
+     [
+      "1792598400000",
+      "3053933.01000001315",
+      "30539.3301000001315",
+      "2493658459.985410737501"
+     ],
+     [
+      "1792512000000",
+      "3161680.8200000133",
+      "31616.808200000133",
+      "2671724628.3670712389389"
+     ]
+    ],
+    "msg": ""
+   },
+   "oi_volume_ccy_SOL": {
+    "code": "0",
+    "earliest": "2026-04-25",
+    "rows": 180
+   },
+   "ok": true,
+   "secs": 20.1,
+   "usdt_swaps": 507
+  }
+ }
+}
