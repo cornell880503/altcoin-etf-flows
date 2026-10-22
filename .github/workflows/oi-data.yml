@@ -1,0 +1,44 @@
+name: oi-data
+# Open-interest and market-cap history for the altcoin leverage radar (data/oi/). Incremental: the
+# first run backfills Binance OI from 2021-12 and Coin Metrics market caps from 2021-06; later runs
+# only fetch new days. On demand for now; it joins the daily schedule once the radar page is live.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["scripts/fetch_oi_binance.py", "scripts/fetch_cm_mcap.py", ".github/workflows/oi-data.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: oi-data
+  cancel-in-progress: false
+jobs:
+  oi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Coin Metrics market caps
+        run: python scripts/fetch_cm_mcap.py
+        continue-on-error: true
+        timeout-minutes: 30
+      - name: Binance open interest
+        run: python scripts/fetch_oi_binance.py --budget 270
+        continue-on-error: true
+        timeout-minutes: 295
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data/oi || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -q -m "oi data: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do git pull --rebase -X theirs -q && git push -q && break; git rebase --abort 2>/dev/null; sleep 9; done
+          fi
