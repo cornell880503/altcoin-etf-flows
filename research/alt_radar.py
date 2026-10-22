@@ -48,6 +48,11 @@ PARAMS = dict(L=14, year=365, btc_flat=0.10, heat_days=10, near_win=60, near_lo=
               recede_win=7, recede_full=0.05, thr=90, gap=14, rally=0.20, rally_win=30, rally_rule=True,
               horizon=30)
 SPLIT = "2025-01-01"  # results are shown for alerts before and from this day
+# v1 above alerted 0.8 times a year (too strict). v2 keeps every component and changes only the
+# scaling: ALR = where today's heat x near x receding ranks within the past year, with the heat pooled
+# as the mean of the two percentiles; the threshold (95) was picked from 85/90/95 as the one closest
+# to CoinKarma's ~5 alerts a year, looking at alert counts only, before any outcome was computed.
+PARAMS_V2 = dict(PARAMS, mode="v2", thr=95)
 
 # ------------------------------------------------------------------ contracts that are not altcoins
 INDEX_STABLE = {"BTCDOM", "DEFI", "BLUEBIRD", "FOOTBALL", "USDC", "USDEX", "USDBRL", "TUSD", "BUSD", "USDP"}
@@ -68,6 +73,12 @@ EQUITY = {  # stocks, ETFs and pre-IPO contracts Binance listed from 2025 on
 NOT_ALT_ASSETS = {"btc", "eth", "paxg", "xaut", "kau", "kag", "eurc", "eurs", "eurt", "ageur", "eure", "xsgd", "gyen",
                   "buidl", "ousg", "usyc", "ustb", "benji", "jtrsy", "jaaa"}
 PEG_BASES = ["btc", "eth", "sol", "bnb", "avax", "hype", "trx", "sui", "near", "ada", "xrp", "doge", "ltc", "dot"]
+# the same token counted twice: a copy on another chain (leo_eth), or a migration both sides of
+# which Coin Metrics still values (matic -> pol). Each group counts once a day, at its largest member.
+CHAIN_SUFFIX = {"eth", "eos", "evm", "native", "bsc", "trx", "sol", "matic", "arb", "op", "base", "avaxc", "polygon"}
+SAME_TOKEN = [("matic", "pol"), ("rndr", "render"), ("lend", "aave"), ("ftm", "s"), ("eos", "a"), ("mkr", "sky_sky")]
+NEW_CONTRACTS = "2025-06-01"  # Binance lists stocks, ETFs and metals from here on: newer contracts must
+WEEKEND_MIN = 0.5             # move on weekends at least half as much as on weekdays to count as crypto
 
 
 def d2s(d):
@@ -157,9 +168,11 @@ def classify_contracts(oi):
             out[sym] = "commodity"
         elif base in EQUITY:
             out[sym] = "equity"
+        elif min(s) < NEW_CONTRACTS:
+            out[sym] = "alt"
         else:
-            wr = weekend_ratio(s) if min(s) >= "2025-06-01" else None
-            out[sym] = "equity?" if wr is not None and wr < 0.35 else "alt"
+            wr = weekend_ratio(s)
+            out[sym] = "too new to tell" if wr is None else "alt" if wr >= WEEKEND_MIN else "equity (weekend test)"
     return out
 
 
@@ -178,6 +191,10 @@ def classify_assets(cm):
             if dev[len(dev) // 2] < 0.02 and dev[int(len(dev) * 0.95)] < 0.08:
                 out[a] = "stablecoin"
                 continue
+            rets = [math.log(vals[i] / vals[i - 1]) for i in range(1, len(vals)) if vals[i] > 0 and vals[i - 1] > 0]
+            if len(rets) > 20 and statistics.pstdev(rets) < 0.005:
+                out[a] = "yield/fund token"  # sUSDe, USDY, sDAI: drift, no volatility
+                continue
         pegged = None
         for b in PEG_BASES:
             if b == a or b not in px:
@@ -194,6 +211,56 @@ def classify_assets(cm):
     return out
 
 
+def dup_groups(cm, alts):
+    """Groups of assets that are the same token (see CHAIN_SUFFIX / SAME_TOKEN), plus any two of the
+    300 largest whose price ratio stays within 3% (coefficient of variation) over 60+ shared days."""
+    import numpy as np
+    parent = {a: a for a in alts}
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    for a in alts:
+        if "_" in a:
+            base, suf = a.split("_", 1)
+            if suf in CHAIN_SUFFIX and base in parent:
+                union(base, a)
+    for a, b in SAME_TOKEN:
+        if a in parent and b in parent:
+            union(a, b)
+    mx = {a: max(m for m, p in cm[a].values()) for a in alts}
+    top = sorted(alts, key=lambda a: -mx[a])[:300]
+    days = sorted({d for a in top for d in cm[a]})
+    col = {d: i for i, d in enumerate(days)}
+    P = np.full((len(top), len(days)), np.nan)
+    for i, a in enumerate(top):
+        for d, (m, p) in cm[a].items():
+            if p and p > 0:
+                P[i, col[d]] = p
+    for i in range(len(top) - 1):
+        R = P[i] / P[i + 1:]
+        ok = np.isfinite(R)
+        n = ok.sum(axis=1)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            mu = np.nanmean(np.where(ok, R, np.nan), axis=1)
+            sd = np.nanstd(np.where(ok, R, np.nan), axis=1)
+            cv = sd / mu
+        for j in np.where((n >= 60) & (cv < 0.03))[0]:
+            union(top[i], top[i + 1 + j])
+    groups = defaultdict(list)
+    for a in alts:
+        groups[find(a)].append(a)
+    return [sorted(g, key=lambda a: -mx[a]) for g in groups.values()]
+
+
 # ------------------------------------------------------------------ series
 def day_range(first, last):
     d, out = s2d(first), []
@@ -205,12 +272,17 @@ def day_range(first, last):
 
 def chain(series, dates, max_jump):
     """Chain-linked index (start 100) and raw sum: each day's change uses only members present on
-    both days; a member whose value jumps by more than max_jump in a day is left out that day."""
+    that day and on the previous day with data; a member whose value jumps by more than max_jump in
+    a day is left out that day. A day with no data at all (Binance skipped 2022-03-07) carries the
+    previous level and is not in tot."""
     idx, tot, level, prev = {}, {}, 100.0, None
     for d in dates:
         s = sum(v[d] for v in series.values() if d in v)
-        if s > 0:
-            tot[d] = s
+        if s <= 0:
+            if prev is not None:
+                idx[d] = level
+            continue
+        tot[d] = s
         if prev is not None:
             num = den = 0.0
             for v in series.values():
@@ -220,8 +292,7 @@ def chain(series, dates, max_jump):
                     den += a
             if den > 0:
                 level *= num / den
-        if d in tot or prev is not None:
-            idx[d] = level
+        idx[d] = level
         prev = d
     return idx, tot
 
@@ -232,14 +303,27 @@ def build(oi, cm):
     alt_oi = {s: {d: v[0] for d, v in oi[s].items()} for s, c in ccls.items() if c == "alt"}
     first = max(min(oi["BTCUSDT"]), min(oi["ETHUSDT"]), min(min(v) for v in alt_oi.values()))
     last = min(max(oi["BTCUSDT"]), max(oi["ETHUSDT"]))
-    alt_mc = {a: {d: v[0] for d, v in cm[a].items()} for a, c in acls.items() if c == "alt"}
+    alt_mc = {}
+    for g in dup_groups(cm, [a for a, c in acls.items() if c == "alt"]):
+        ser = {}
+        for a in g:
+            for d, (m, p) in cm[a].items():
+                if m > ser.get(d, 0):
+                    ser[d] = m
+        alt_mc[g[0]] = ser
+        for a in g[1:]:
+            acls[a] = f"same token as {g[0]}"
     last = min(last, max(max(v) for v in alt_mc.values()))
     dates = day_range(min(first, min(min(v) for v in alt_mc.values())), last)
     oi_dates = [d for d in dates if d >= first]
     alt_oi_idx, alt_oi_sum = chain(alt_oi, oi_dates, 5.0)
     alt_idx, alt_sum = chain(alt_mc, dates, 3.0)
-    major = {d: oi["BTCUSDT"][d][0] + oi["ETHUSDT"][d][0] for d in oi_dates
-             if d in oi["BTCUSDT"] and d in oi["ETHUSDT"]}
+    major, prev = {}, None
+    for d in oi_dates:  # a missing Binance day carries the previous value
+        if d in oi["BTCUSDT"] and d in oi["ETHUSDT"]:
+            prev = oi["BTCUSDT"][d][0] + oi["ETHUSDT"][d][0]
+        if prev is not None:
+            major[d] = prev
     btc = {d: p for d, (m, p) in cm["btc"].items() if p}
     return dict(dates=dates, oi_dates=oi_dates, alt_oi_idx=alt_oi_idx, alt_oi_sum=alt_oi_sum, major=major,
                 alt_idx=alt_idx, alt_sum=alt_sum, btc=btc, contracts=ccls, assets=acls)
@@ -280,9 +364,10 @@ def alr(S, P=PARAMS):
         h2 = sorted(f2[x] for x in past)
         p1[d] = pct_rank(h1, f1[d]) if abs(rb[d]) <= P["btc_flat"] else 0.0
         p2[d] = pct_rank(h2, f2[d])
-    out, comp = {}, {}
+    out, comp, H = {}, {}, {}
+    pool = (lambda a, b: min(a, b)) if P.get("mode", "v1") == "v1" else (lambda a, b: (a + b) / 2)
     for d in sorted(p1):
-        heat = max((min(p1[x], p2[x]) for x in (d2s(s2d(d) - dt.timedelta(days=k)) for k in range(P["heat_days"]))
+        heat = max((pool(p1[x], p2[x]) for x in (d2s(s2d(d) - dt.timedelta(days=k)) for k in range(P["heat_days"]))
                     if x in p1), default=0.0)
         hi = max((v for k in range(P["near_win"]) for v in [lagged(S["alt_idx"], d, k)] if v), default=None)
         g = S["alt_idx"][d] / hi if hi else 0
@@ -290,9 +375,18 @@ def alr(S, P=PARAMS):
         top = max((v for k in range(P["recede_win"]) for v in [lagged(S["alt_oi_idx"], d, k)] if v), default=None)
         q = S["alt_oi_idx"][d] / top if top else 1
         rec = min(1.0, max(0.0, (1 - q) / P["recede_full"]))
-        out[d] = round(100 * heat * near * rec, 2)
+        H[d] = heat * near * rec
         comp[d] = dict(conc=round(p1[d], 3), lev=round(p2[d], 3), heat=round(heat, 3), near=round(near, 3),
                        rec=round(rec, 3))
+    if P.get("mode", "v1") == "v1":
+        out = {d: round(100 * h, 2) for d, h in H.items()}
+    else:  # v2: where today's heat x near x receding ranks within the past year (at least 180 days)
+        days = sorted(H)
+        for i, d in enumerate(days):
+            past = sorted(H[x] for x in days[max(0, i - year):i])
+            if len(past) >= 180:  # no heat today (e.g. alt OI at its 7-day high) reads 0, not a tied rank
+                out[d] = round(100 * pct_rank(past, H[d]), 2) if H[d] > 0 else 0.0
+                comp[d]["raw"] = round(H[d], 4)
     return out, comp
 
 
@@ -316,7 +410,10 @@ def alerts(score, S, P=PARAMS):
 
 
 # ------------------------------------------------------------------ evaluation
-def outcome(idx, d, H):
+def outcome(idx, d, H, delay=0):
+    """30-day path after day d's close; delay=1 starts a day later (Binance publishes day d's file
+    about 7 hours after midnight UTC, so an alert from these free files is known on d+1 morning)."""
+    d = d2s(s2d(d) + dt.timedelta(days=delay))
     base = idx.get(d)
     path = [idx.get(d2s(s2d(d) + dt.timedelta(days=k))) for k in range(1, H + 1)]
     if not base or any(v is None for v in path):
@@ -332,7 +429,7 @@ def outcome(idx, d, H):
 def evaluate(alert_days, S, score, P=PARAMS, lo=None, hi=None):
     H, idx = P["horizon"], S["alt_idx"]
     days = [d for d in sorted(score) if (lo is None or d >= lo) and (hi is None or d < hi)]
-    oc = {d: outcome(idx, d, H) for d in days}
+    oc = {d: outcome(idx, d, H, P.get("delay", 0)) for d in days}
     oc = {d: o for d, o in oc.items() if o}
     al = [d for d in alert_days if d in oc]
     if not oc:
@@ -394,14 +491,14 @@ def run(S, P=PARAMS):
                              "from_" + SPLIT: evaluate(al, S, score, P, lo=SPLIT)}
 
 
-def grid(S):
+def grid(S, base=PARAMS):
     rows = []
     for L in (10, 14, 21):
         for flat in (0.07, 0.10, 0.15):
             for rf in (0.03, 0.05, 0.08):
                 for thr in (85, 90, 95):
                     for rule in (True, False):
-                        P = dict(PARAMS, L=L, btc_flat=flat, recede_full=rf, thr=thr, rally_rule=rule)
+                        P = dict(base, L=L, btc_flat=flat, recede_full=rf, thr=thr, rally_rule=rule)
                         score, _, al, ev = run(S, P)
                         e = ev["all"]
                         rows.append(dict(L=L, btc_flat=flat, recede_full=rf, thr=thr, rally_rule=rule,
@@ -419,28 +516,37 @@ def main():
     random.seed(7)
     oi, cm = load_oi(), load_cm()
     S = build(oi, cm)
-    score, comp, al, ev = run(S)
-    P2 = dict(PARAMS, rally_rule=False)
-    _, _, al2, ev2 = run(S, P2)
     os.makedirs(a.out, exist_ok=True)
-    rep = {"params": PARAMS, "split": SPLIT, "first_day": S["oi_dates"][0], "last_day": S["oi_dates"][-1],
+    rep = {"split": SPLIT, "first_day": S["oi_dates"][0], "last_day": S["oi_dates"][-1],
            "contracts": {c: sum(1 for v in S["contracts"].values() if v == c) for c in set(S["contracts"].values())},
-           "assets": {c: sum(1 for v in S["assets"].values() if v == c) for c in set(S["assets"].values())},
-           "latest": {"date": max(score), "alr": score[max(score)], **comp[max(score)]},
-           "alerts": al, "eval": ev, "alerts_no_rally_rule": al2, "eval_no_rally_rule": ev2}
+           "assets": {c: sum(1 for v in S["assets"].values() if v == c) for c in set(S["assets"].values())}}
+    scores = {}
+    for name, P in (("v1", PARAMS), ("v2", PARAMS_V2)):
+        score, comp, al, ev = run(S, P)
+        scores[name] = score
+        rep[name] = {"params": P, "alerts": al, "eval": ev,
+                     "eval_no_rally_rule": run(S, dict(P, rally_rule=False))[3],
+                     "eval_delay_1d": run(S, dict(P, delay=1))[3],
+                     "latest": {"date": max(score), "alr": score[max(score)], **comp[max(score)]}}
     if not a.no_grid:
-        rep["grid"] = grid(S)
+        rep["v2"]["grid"] = grid(S, PARAMS_V2)
     with open(os.path.join(a.out, "backtest.json"), "w") as f:
         json.dump(rep, f, indent=1, sort_keys=True)
     series = {d: [round(S["alt_sum"].get(d, 0) / 1e9, 2), round(S["alt_idx"][d], 3),
                   round(S["alt_oi_sum"].get(d, 0) / 1e9, 3), round(S["alt_oi_idx"].get(d, 0), 3),
-                  round(S["major"].get(d, 0) / 1e9, 3), score.get(d)] for d in S["dates"] if d in S["alt_idx"]}
+                  round(S["major"].get(d, 0) / 1e9, 3), scores["v1"].get(d), scores["v2"].get(d)]
+              for d in S["dates"] if d in S["alt_idx"]}
     with open(os.path.join(a.out, "series.json"), "w") as f:
-        json.dump({"fields": ["alt_mcap_bn", "alt_idx", "alt_oi_bn", "alt_oi_idx", "major_oi_bn", "alr"],
+        json.dump({"fields": ["alt_mcap_bn", "alt_idx", "alt_oi_bn", "alt_oi_idx", "major_oi_bn", "alr_v1", "alr_v2"],
                    "rows": series}, f, separators=(",", ":"))
-    e = ev["all"]
-    print(json.dumps({k: rep[k] for k in ("first_day", "last_day", "contracts", "assets", "latest", "alerts")}, indent=1))
-    print(json.dumps({k: {kk: vv for kk, vv in v.items() if kk != "list"} if v else v for k, v in ev.items()}, indent=1))
+    print(json.dumps({k: rep[k] for k in ("first_day", "last_day", "contracts")}, indent=1))
+    for name in ("v1", "v2"):
+        r = rep[name]
+        print(name, "alerts:", r["alerts"], "latest:", r["latest"])
+        for k in ("eval", "eval_no_rally_rule", "eval_delay_1d"):
+            e = r[k]["all"]
+            print(f"  {k}: n={e['alerts']} kinds={e['kinds']} dd={e['median_dd']} up={e['median_up']} "
+                  f"random={e['random_dd']}/{e['random_up']} control={e['control_dd']} p_dd={e.get('p_rot_dd')}")
 
 
 if __name__ == "__main__":
