@@ -1,0 +1,39 @@
+name: probe-oi
+# Step 1 of the altcoin leverage indicator: which free sources give perpetual open-interest history
+# (and an altcoin market-cap series) far enough back. On-demand; writes research/probe_oi/.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/probe_oi.py", ".github/workflows/probe-oi.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: probe-oi
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Probe free sources
+        run: python research/probe_oi.py
+        continue-on-error: true
+        timeout-minutes: 25
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/probe_oi || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "probe-oi: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4; do git pull --rebase -X theirs && git push && break; git rebase --abort 2>/dev/null; sleep 7; done
+          fi
