@@ -156,7 +156,7 @@ def parse(sym, day, raw):
 
 
 def fetch(sym, day):
-    st, body = get(HOST, f"/{PREFIX}{sym}/{sym}-metrics-{day}.zip")
+    st, body = get(HOST, urllib.parse.quote(f"/{PREFIX}{sym}/{sym}-metrics-{day}.zip"))  # 币安人生USDT and co.
     if st != 200:
         return sym, day, None, st
     try:
