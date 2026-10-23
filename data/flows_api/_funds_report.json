@@ -9,7 +9,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1792771320"
+    "X-RateLimit-Reset": "1792775340"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -32,7 +32,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1792771320"
+    "X-RateLimit-Reset": "1792775340"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -55,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1792771380"
+    "X-RateLimit-Reset": "1792775400"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -70,39 +70,7 @@
    "window_days": 30
   },
   "SOL": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [
-    "2026-09-23",
-    "2026-10-05",
-    "2026-10-06",
-    "2026-10-07",
-    "2026-10-08",
-    "2026-10-09",
-    "2026-10-12",
-    "2026-10-13",
-    "2026-10-14",
-    "2026-10-15",
-    "2026-10-22"
-   ],
-   "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1792771320"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 185,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-09-23",
-    "2026-10-22"
-   ],
-   "window_days": 30
+   "error": "URLError: <urlopen error _ssl.c:993: The handshake operation timed out>"
   },
   "XRP": {
    "changed": false,
@@ -113,7 +81,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1792771380"
+    "X-RateLimit-Reset": "1792775400"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -128,5 +96,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-10-23T16:01:54Z"
+ "run_at": "2026-10-23T17:08:33Z"
 }
