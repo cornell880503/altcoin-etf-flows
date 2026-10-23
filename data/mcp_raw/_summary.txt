@@ -1,54 +1,54 @@
 {
-  "today": "2026-10-22",
-  "referenceDate": "2026-10-21",
+  "today": "2026-10-23",
+  "referenceDate": "2026-10-22",
   "referenceIsToday": false,
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "date": "2026-10-21",
-      "netFlowUsdM": 524.8
+      "date": "2026-10-22",
+      "netFlowUsdM": -134.4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "date": "2026-10-21",
-      "netFlowUsdM": 14.9
+      "date": "2026-10-22",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "date": "2026-10-21",
-      "netFlowUsdM": 0.6
+      "date": "2026-10-22",
+      "netFlowUsdM": -5.7
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "date": "2026-10-21",
-      "netFlowUsdM": 0.1
+      "date": "2026-10-22",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "date": "2026-10-21",
-      "netFlowUsdM": 0
+      "date": "2026-10-22",
+      "netFlowUsdM": -7.9
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "LINK",
       "asset": "link",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
@@ -72,20 +72,20 @@
     {
       "symbol": "DOT",
       "asset": "dot",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "SUI",
       "asset": "sui",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "NEAR",
       "asset": "near",
-      "date": "2026-10-21",
-      "netFlowUsdM": 0.8
+      "date": "2026-10-22",
+      "netFlowUsdM": 0.5
     },
     {
       "symbol": "TRX",
@@ -100,6 +100,6 @@
       "netFlowUsdM": 15.2
     }
   ],
-  "totalUsdM": 556.5,
-  "updatedAt": "2026-10-22T21:37:06.537Z"
+  "totalUsdM": -132.4,
+  "updatedAt": "2026-10-23T02:41:09.698Z"
 }
