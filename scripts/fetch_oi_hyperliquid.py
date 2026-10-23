@@ -92,6 +92,9 @@ def main(argv=None):
     snap, note = snapshot(now)
     have = store.keys(OUT)
     snap = [r for r in snap if (r[0], r[1]) not in have]  # the first snapshot of a day stands
+    if a.daily and not snap:  # nothing stored: leave _meta.json alone (no commit every run)
+        print(f"hyperliquid: no snapshot ({note})", flush=True)
+        return 0
     if rows or snap:
         store.write_rows(OUT, FIELDS, rows + snap)
     days = sorted({r[0] for r in rows + snap})
