@@ -499,13 +499,13 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       <div class="sec-head">
         <div>
           <h2 id="h-rd-hist">ALR 和山寨持倉</h2>
-          <p>上圖是每天的 ALR；下圖是 Binance 上山寨永續合約的持倉，占山寨＋BTC＋ETH 合約持倉的比例，也就是「資金往山寨集中」看的東西。</p>
+          <p>上圖是每天的 ALR；下圖是山寨永續合約的持倉，占山寨＋BTC＋ETH 合約持倉的比例，也就是「資金往山寨集中」看的東西。算進來的交易所見最下面的「資料」；有交易所加入的那天，這條線會小跳一下（ALR 用的是串接指數，不受影響）。</p>
         </div>
       </div>
       <div class="panel">
         <div class="chart-title">ALR <span class="sub">升破虛線發出警報</span></div>
         <div class="chart" id="ch-rd-alr"></div>
-        <div class="chart-title">山寨持倉占比 <span class="sub">Binance USDT 永續合約</span></div>
+        <div class="chart-title">山寨持倉占比 <span class="sub" id="rd-oi-venues">Binance USDT 永續合約</span></div>
         <div class="chart" id="ch-rd-oi"></div>
       </div>
     </section>
@@ -932,7 +932,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   </main>
 
   <footer>
-    <p>資料：cryptoetf.today、Canary Capital（流量）；Coinbase、Binance（幣價，每日收盤 UTC 0:00）；CoinGecko（市值）。BTC 研究另用 Coin Metrics、DefiLlama、FRED、CFTC、strategy.com；研究結論另用 Farside Investors、CoinMarketCap、Interactive Brokers（ETF 收盤，只用於比對）。本頁是資料整理與統計，不是投資建議。</p>
+    <p>資料：cryptoetf.today、Canary Capital（流量）；Coinbase、Binance（幣價，每日收盤 UTC 0:00）；CoinGecko（市值）。BTC 研究另用 Coin Metrics、DefiLlama、FRED、CFTC、strategy.com；槓桿雷達用 Binance、Hyperliquid、OKX、Gate 的永續合約持倉和 Coin Metrics 的市值；研究結論另用 Farside Investors、CoinMarketCap、Interactive Brokers（ETF 收盤，只用於比對）。本頁是資料整理與統計，不是投資建議。</p>
   </footer>
 </div>
 <div id="tip" hidden></div>
@@ -2542,6 +2542,12 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   var RD_KIND = { down: ['跌多於漲', 'var(--neg)'], down_then_up: ['先跌後漲', 'var(--live)'], up_first: ['先漲', 'var(--pos)'] };
   function rdKind(a) { return a.kind ? RD_KIND[a.kind] : ['觀察中', 'var(--accent)']; }
   function rdD(d) { return d ? d.replace(/-/g, '/') : '—'; }
+  function rdVenues() {  // open-interest venues in the data, oldest first
+    var names = { binance: 'Binance', hyperliquid: 'Hyperliquid', okx: 'OKX', gate: 'Gate' };
+    var C = RD.coverage || {}, V = C.venues || { binance: { from: C.oiFrom } };
+    return Object.keys(V).sort(function (a, b) { return a === 'binance' ? -1 : b === 'binance' ? 1 : V[a].from < V[b].from ? -1 : 1; })
+      .map(function (k) { return { k: k, name: names[k] || k, from: V[k].from, last: V[k].last, alt: V[k].alt, altOI: V[k].altOI }; });
+  }
   function rdP(x) { return x == null ? '—' : pct(x, 1); }
   function rdF(x) { return x == null ? '—' : pct(x * 100, 1); }
   function rdPv(p) { return p == null ? '—' : p < 0.001 ? 'p < 0.001' : 'p = ' + p.toFixed(2); }
@@ -2710,16 +2716,26 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     ]);
     var rob = [['全部（上表）', A], ['2025 年以前', st.before], ['2025 年以後', st.after], ['拿掉「BTC 剛大漲不發」', st.noRule], ['晚一天才進場', st.delay1]].filter(function (r) { return r[1]; })
       .map(function (r) { var e = r[1]; return [r[0], e.alerts + ' 次', rdF(e.median_dd), rdF(e.random_dd), rdPv(e.p_rot_dd)]; });
+    var VC = RD.venuesCmp;
+    if (VC && VC.binance) rob.push(['只用 Binance 的持倉', VC.binance.alerts + ' 次', rdF(VC.binance.median_dd), rdF(VC.binance.random_dd), rdPv(VC.binance.p_rot_dd)]);
     if (G) rob.push({ _cls: 'ref', cells: [G.n + ' 種參數組合', '—', '中位數 ' + rdF(G.median_dd), Math.round(G.worse * 100) + '% 比隨機日差', Math.round(G.p10 * 100) + '% 的 p < 0.10'] });
     table(document.getElementById('tb-rd-rob'), ['穩健性', '警報', '最多跌（中位數）', '隨機一天', '整批平移檢定'], rob);
-    document.getElementById('rd-stats-note').textContent = '整批平移檢定：把所有警報日期一起往後挪幾百種天數，看挪過去之後的跌幅有多常跟原本一樣大；p 越小越不像運氣。目前的結果方向和 CoinKarma 一致，但 p 值只在 0.1 附近、樣本只有十幾次，而且主要效果來自「BTC 剛大漲後第一次過熱不發」這條規則（拿掉後 ' + rdPv(st.noRule && st.noRule.p_rot_dd) + '）。這條規則照 CoinKarma 的寫法，可能是看著同一段歷史調出來的。漲勢相近的日子：之前 30 天山寨漲幅和警報日相差 5 個百分點以內、前後 30 天沒有警報。';
+    document.getElementById('rd-stats-note').textContent = '整批平移檢定：把所有警報日期一起往後挪幾百種天數，看挪過去之後的跌幅有多常跟原本一樣大；p 越小越不像運氣。目前的結果方向和 CoinKarma 一致，但 ' + rdPv(A.p_rot_dd) + '、樣本只有十幾次，統計上還不夠確定，而且效果主要來自「BTC 剛大漲後第一次過熱不發」這條規則（拿掉後 ' + rdPv(st.noRule && st.noRule.p_rot_dd) + '）。這條規則照 CoinKarma 的寫法，可能是看著同一段歷史調出來的。' +
+      (VC && VC.matched != null ? '只用 Binance 的持倉算，' + VC.nBinance + ' 次警報裡有 ' + VC.matched + ' 次和多交易所版本相差不到 7 天。' : '') +
+      '漲勢相近的日子：之前 30 天山寨漲幅和警報日相差 5 個百分點以內、前後 30 天沒有警報。';
   }
   function rdMethod() {
     var h = document.getElementById('rd-method'), C = RD.coverage, P = RD.params; h.replaceChildren();
     var lag = C.publishLagH && C.publishLagH.median != null ? Math.round(C.publishLagH.median) : 7;
     var ka = (RD.stats && RD.stats.all) || {}, kk = ka.kinds || {};
+    var V = rdVenues(), multi = V.length > 1;
+    var src = { binance: 'data.binance.vision 的每日公開檔', hyperliquid: 'stats.hyperliquid.xyz 背後的每日資料', okx: 'OKX 的 rubik 統計 API，只有現在還在上架的合約', gate: 'Gate 的 contract_stats，只給最近 180 天，之後每天累積' };
     var blocks = [
-      ['資料', ['持倉：Binance USDT 永續合約，每個合約每天一個公開檔（data.binance.vision，' + rdD(C.oiFrom) + ' 起，每 5 分鐘一筆，取每天收盤）。算進山寨的有 ' + (C.contracts.alt || 0) + ' 個合約；BTC、ETH、股票、ETF、貴金屬、指數和穩定幣合約不算（' + ((C.contracts.equity || 0) + (C.contracts['equity (weekend test)'] || 0)) + ' 個股票類合約，2025/06 以後新上的合約要週末也有在動才算加密貨幣）。',
+      ['資料', [(multi
+          ? '持倉：' + V.map(function (v) { return v.name + '（' + (v.k === 'binance' ? rdD(C.oiFrom) : rdD(v.from)).slice(0, 7) + ' 起，' + src[v.k] + (v.altOI ? '；今天山寨持倉 $' + v.altOI.toFixed(1) + 'B' : v.last && v.last < RD.asof ? '；資料到 ' + rdD(v.last) + (v.k === 'hyperliquid' ? '，這個來源停更了，之後改成每天午夜抓一次快照' : '') : '') + '）'; }).join('、') + '，各合約每天收盤的持倉，加總成一個指數。後加入的交易所從它第一天起才算，不會讓指數跳一下（每天只比較前後兩天都有的合約）。'
+          : '持倉：Binance USDT 永續合約，每個合約每天一個公開檔（data.binance.vision，' + rdD(C.oiFrom) + ' 起，每 5 分鐘一筆，取每天收盤）。') +
+          '算進山寨的有 ' + (C.contracts.alt || 0) + ' 個合約；BTC、ETH、股票、ETF、貴金屬、指數和穩定幣合約不算（' + ((C.contracts.equity || 0) + (C.contracts['equity (weekend test)'] || 0)) + ' 個股票類合約，2025/06 以後新上的合約要週末也有在動才算加密貨幣）。',
+        '沒算進來的：Bybit（擋美國的雲端主機，抓不到）和 Bitget（沒有歷史資料）。2026/10/23 的快照裡，六大交易所（Binance、Hyperliquid、Gate、Bybit、Bitget、OKX）的山寨永續持倉，這兩家約占四分之一。',
         '山寨市值：Coin Metrics 免費 API 的每日市值，' + C.altAssets + ' 個幣加總，扣掉 BTC、ETH、穩定幣、包裝幣、質押幣、黃金代幣和同一個幣在不同鏈上的重複。新幣加入、合約上下架不會讓指數跳動（每天只比較前後兩天都有的）。',
         '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡下午 4 點左右更新（Binance 晚發時是 5 點多），比 CoinKarma 的 00:10 UTC 晚。']],
       ['ALR 怎麼算', ['資金往山寨集中：山寨持倉相對 BTC＋ETH 持倉 ' + P.L + ' 天的增速，在過去一年排第幾；BTC 同期漲跌超過 ' + Math.round(P.btc_flat * 100) + '%（不是橫盤）時記 0。',
@@ -2733,12 +2749,14 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         '門檻 ' + P.thr + ' 是在 85、90、95 裡，挑警報頻率最接近 CoinKarma（一年約 5 次）的一個；挑的時候只看次數，沒看之後的漲跌。']],
       ['限制', ['不是做空訊號：已滿 ' + P.horizon + ' 天的 ' + (ka.alerts || 0) + ' 次警報裡，有 ' + (kk.down_then_up || 0) + ' 次是先跌後漲。',
         '樣本小：統計從 2023 年 4 月開始，已滿 30 天的警報只有十幾次，統計上還不夠確定（見上面的檢定）。',
-        '只有 Binance 的持倉，沒有 Bybit、OKX；結果和 CoinKarma 的山寨頂部雷達不會一樣，這是用公開資料、公式完全公開的版本。',
+        (multi ? '交易所不齊：沒有 Bybit、Bitget，而 ' + rdD(V[1].from).slice(0, 7) + ' 以前只有 Binance。' : '只有 Binance 的持倉，沒有 Bybit、OKX、Hyperliquid。') + '結果和 CoinKarma 的山寨頂部雷達不會一樣，這是用公開資料、公式完全公開的版本。',
         '只看山寨整體，個別幣種的走勢可能不同。']]];
     blocks.forEach(function (b) { h.appendChild(rdN('h3', null, b[0])); var ul = rdN('ul'); b[1].forEach(function (x) { ul.appendChild(rdN('li', null, x)); }); h.appendChild(ul); });
   }
   function drawRadar() {
     if (!RD || !RD.series) { document.getElementById('rd-status').replaceChildren(rdN('p', 'empty', '雷達資料還沒產生，下一次更新後會出現。')); return; }
+    var vs = rdVenues(), sub = document.getElementById('rd-oi-venues');
+    if (sub) sub.textContent = vs.length > 1 ? vs.map(function (v) { return v.name; }).join('、') + ' 永續合約' : 'Binance USDT 永續合約';
     rdStatus(); rdCharts(); rdList(); rdStats(); rdMethod();
   }
   ['all', '1y'].forEach(function (r) {

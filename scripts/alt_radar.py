@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Altcoin leverage radar (ALR): a transparent take on CoinKarma's Alt Top Radar, and its backtest.
 
-Inputs (data/oi/, from scripts/fetch_oi_binance.py and scripts/fetch_cm_mcap.py):
-  Binance USD-M perpetual open interest per contract and UTC day (end of day, ~23:55 UTC)
+Inputs (data/oi/, from scripts/fetch_oi_<venue>.py and scripts/fetch_cm_mcap.py):
+  perpetual open interest per contract and UTC day (end of day) on Binance, Hyperliquid, OKX and Gate
+  (VENUES below: what each covers and since when)
   Coin Metrics market cap and price per asset and UTC day (end of day)
 
 Series
   alt market cap  sum of altcoin market caps: ex BTC, ETH, stablecoins, wrapped/staked copies,
                   gold tokens and tokenized funds. Chain-linked for returns, so an asset entering
                   the data does not jump the index.
-  alt OI          US$ OI summed over altcoin perpetuals: ex BTC, ETH, stocks, ETFs, metals,
-                  indexes, stablecoins. Chain-linked the same way, so new listings do not jump it.
-  major OI        BTCUSDT + ETHUSDT
+  alt OI          US$ OI summed over altcoin perpetuals on every venue: ex BTC, ETH, stocks, ETFs,
+                  metals, indexes, stablecoins. Chain-linked the same way, so new listings and venues
+                  do not jump it.
+  major OI        BTC + ETH perpetuals on every venue, chain-linked
 
 ALR, 0-100 (the site shows v2)
   concentration  14-day growth of alt OI relative to major OI, as a percentile of the past year,
@@ -46,6 +48,12 @@ import oi_store as store
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data", "oi")
+# open-interest venues (data/oi/<venue>/), each entering the chain-linked indices on its first day
+# without jumping them: Binance from 2021-12, Hyperliquid 2023-06 to 2026-04 then daily snapshots, OKX
+# from 2024-02 (contracts still listed), Gate from 2026-04 (it keeps 180 days). Bybit (blocks US cloud
+# IPs) and Bitget (no history) are missing. research/venues_compare.py: Binance alone vs all of them.
+VENUES = ("binance", "hyperliquid", "okx", "gate")
+SNAPSHOT_VENUES = {"hyperliquid"}  # best-effort daily snapshots: a missing one never holds the radar back
 
 PARAMS = dict(L=14, year=365, btc_flat=0.10, heat_days=10, near_win=60, near_lo=0.85, near_hi=0.95,
               recede_win=7, recede_full=0.05, thr=90, gap=14, rally=0.20, rally_win=30, rally_rule=True,
@@ -93,22 +101,53 @@ def s2d(s):
 
 
 # ------------------------------------------------------------------ loading
-def load_oi():
-    """symbol -> {date: (oi_usd_last, qty_last, n)}"""
+def load_oi(venues=None):
+    """symbol -> {date: (oi_usd_end_of_day, qty, n)}. Binance symbols as they are (BTCUSDT); other
+    venues prefixed with their name (okx:SOL-USDT-SWAP)."""
     oi = defaultdict(dict)
-    for row in store.read_all(os.path.join(DATA, "binance")):
-        if len(row) < 8:
+    for venue in venues or VENUES:
+        folder = os.path.join(DATA, venue)
+        if not os.path.isdir(folder):
             continue
-        date, sym, oi_last, _, qty_last = row[:5]
-        try:
-            v = float(oi_last)
-            q = float(qty_last) if qty_last else None
-            n = int(row[7] or 0)
-        except ValueError:
-            continue
-        if v > 0:
-            oi[sym][date] = (v, q, n)
+        for row in store.read_all(folder):
+            if venue == "binance":
+                if len(row) < 8:
+                    continue
+                date, sym, oi_last, _, qty_last = row[:5]
+                nrows = row[7]
+            else:  # date, symbol, oi_usd, oi_ccy
+                if len(row) < 4:
+                    continue
+                date, sym, oi_last, qty_last = row[:4]
+                sym, nrows = f"{venue}:{sym}", 0
+            try:
+                v = float(oi_last)
+                q = float(qty_last) if qty_last else None
+                n = int(nrows or 0)
+            except ValueError:
+                continue
+            if v > 0:
+                oi[sym][date] = (v, q, n)
     return oi
+
+
+def venue_of(sym):
+    return sym.split(":", 1)[0] if ":" in sym else "binance"
+
+
+def base_of(sym):
+    """The coin a USDT perpetual is on (1000PEPE stays 1000PEPE), or None for other contracts."""
+    venue = venue_of(sym)
+    s = sym.split(":", 1)[-1]
+    if venue == "binance":
+        return s[:-4] if s.endswith("USDT") else None
+    if venue == "okx":
+        return s[:-len("-USDT-SWAP")] if s.endswith("-USDT-SWAP") else None
+    if venue == "gate":
+        return s[:-len("_USDT")] if s.endswith("_USDT") else None
+    if venue == "hyperliquid":  # coin names (kPEPE = 1000 PEPE); the main exchange lists only crypto and PAXG
+        return s if s and ":" not in s else None
+    return None
 
 
 def load_cm():
@@ -149,12 +188,29 @@ def weekend_ratio(series):
     return statistics.median(we) / m if m > 0 else None
 
 
+def coin_of(base):
+    """The coin under a contract name across venues: 1000PEPE (Binance), kPEPE (Hyperliquid), PEPE."""
+    for p in ("1000000", "1000", "1M"):
+        if base.startswith(p) and len(base) > len(p) + 1:
+            return base[len(p):]
+    if len(base) > 2 and base[0] == "k" and base[1:].isupper():
+        return base[1:]
+    return base
+
+
 def classify_contracts(oi):
+    """contract -> 'major' | 'alt' | why it is not counted. Binance's contracts first; a contract on
+    another venue whose coin Binance lists takes Binance's verdict, since the other venues' short
+    histories (Gate's starts 2026-04) would put old coins like DOGE through the weekend test."""
     out = {}
-    for sym, s in oi.items():
-        if not sym.endswith("USDT"):
+    ordered = sorted(oi, key=lambda s: venue_of(s) != "binance")
+    verdict = {}  # coin -> Binance's class
+    for sym in ordered:
+        s = oi[sym]
+        base = base_of(sym)
+        if not base:
             continue
-        base = sym[:-4]
+        coin = coin_of(base)
         if base in ("BTC", "ETH"):
             out[sym] = "major"
         elif base in INDEX_STABLE:
@@ -163,11 +219,15 @@ def classify_contracts(oi):
             out[sym] = "commodity"
         elif base in EQUITY:
             out[sym] = "equity"
-        elif min(s) < NEW_CONTRACTS:
+        elif venue_of(sym) != "binance" and coin in verdict:
+            out[sym] = verdict[coin]
+        elif min(s) < NEW_CONTRACTS or venue_of(sym) == "hyperliquid":
             out[sym] = "alt"
         else:
             wr = weekend_ratio(s)
             out[sym] = "too new to tell" if wr is None else "alt" if wr >= WEEKEND_MIN else "equity (weekend test)"
+        if venue_of(sym) == "binance" and out[sym] in ("alt", "equity (weekend test)", "too new to tell"):
+            verdict.setdefault(coin, out[sym])
     return out
 
 
@@ -292,12 +352,26 @@ def chain(series, dates, max_jump):
     return idx, tot
 
 
+def venue_last(oi, ccls, tolerance=1):
+    """Last day every active venue has (its BTC and ETH contracts both in); a venue more than
+    `tolerance` days behind the newest is left out of this, so one stale source cannot stall the radar."""
+    lasts = {}
+    for s, c in ccls.items():
+        if c == "major" and venue_of(s) not in SNAPSHOT_VENUES:
+            v = venue_of(s)
+            lasts[v] = min(lasts.get(v, "9999"), max(oi[s]))
+    newest = max(lasts.values())
+    cut = d2s(s2d(newest) - dt.timedelta(days=tolerance))
+    return min(x for x in lasts.values() if x >= cut)
+
+
 def build(oi, cm):
     ccls = classify_contracts(oi)
     acls = classify_assets(cm)
     alt_oi = {s: {d: v[0] for d, v in oi[s].items()} for s, c in ccls.items() if c == "alt"}
+    majors = {s: {d: v[0] for d, v in oi[s].items()} for s, c in ccls.items() if c == "major"}
     first = max(min(oi["BTCUSDT"]), min(oi["ETHUSDT"]), min(min(v) for v in alt_oi.values()))
-    last = min(max(oi["BTCUSDT"]), max(oi["ETHUSDT"]))
+    last = venue_last(oi, ccls)
     alt_mc = {}
     for g in dup_groups(cm, [a for a, c in acls.items() if c == "alt"]):
         ser = {}
@@ -312,16 +386,21 @@ def build(oi, cm):
     dates = day_range(min(first, min(min(v) for v in alt_mc.values())), last)
     oi_dates = [d for d in dates if d >= first]
     alt_oi_idx, alt_oi_sum = chain(alt_oi, oi_dates, 5.0)
+    major_idx, _ = chain(majors, oi_dates, 5.0)  # BTC + ETH on every venue, chain-linked like alt OI
     alt_idx, alt_sum = chain(alt_mc, dates, 3.0)
-    major, prev = {}, None
-    for d in oi_dates:  # a missing Binance day carries the previous value
-        if d in oi["BTCUSDT"] and d in oi["ETHUSDT"]:
-            prev = oi["BTCUSDT"][d][0] + oi["ETHUSDT"][d][0]
-        if prev is not None:
-            major[d] = prev
+    # BTC + ETH level in US$, for display only. A contract missing a single day (Binance skipped
+    # 2022-03-07) counts at its value the day before; a venue absent for longer is simply not in it.
+    major = {}
+    for d in oi_dates:
+        p, n = d2s(s2d(d) - dt.timedelta(days=1)), d2s(s2d(d) + dt.timedelta(days=1))
+        tot = sum(v[d] if d in v else v[p] if p in v and n in v else 0.0 for v in majors.values())
+        if tot > 0:
+            major[d] = tot
+        elif major:
+            major[d] = major[max(major)]
     btc = {d: p for d, (m, p) in cm["btc"].items() if p}
     return dict(dates=dates, oi_dates=oi_dates, alt_oi_idx=alt_oi_idx, alt_oi_sum=alt_oi_sum, major=major,
-                alt_idx=alt_idx, alt_sum=alt_sum, btc=btc, contracts=ccls, assets=acls)
+                major_idx=major_idx, alt_idx=alt_idx, alt_sum=alt_sum, btc=btc, contracts=ccls, assets=acls, oi=oi)
 
 
 # ------------------------------------------------------------------ ALR
@@ -341,7 +420,7 @@ def alr(S, P=PARAMS):
     f1, f2, rb = {}, {}, {}
     for d in S["oi_dates"]:
         a0, a1 = lagged(S["alt_oi_idx"], d, L), S["alt_oi_idx"].get(d)
-        m0, m1 = lagged(S["major"], d, L), S["major"].get(d)
+        m0, m1 = lagged(S["major_idx"], d, L), S["major_idx"].get(d)
         x0, x1 = lagged(S["alt_idx"], d, L), S["alt_idx"].get(d)
         b0, b1 = lagged(S["btc"], d, L), S["btc"].get(d)
         if None in (a0, a1, m0, m1, x0, x1, b0, b1):
@@ -504,8 +583,20 @@ def _stats(e):
     return {k: e.get(k) for k in keep if k in e}
 
 
-def payload(S, P=PARAMS_V2, grid_rows=None, meta=None):
-    """Everything the website's radar tab shows, as one JSON-ready dict."""
+def _venues_cmp(rep):
+    """The Binance-only side of research/venues_compare.py, for the page."""
+    try:
+        b, a = rep["binance"]["eval"], rep["alr"]
+        return {"binance": {k: b.get(k) for k in ("alerts", "median_dd", "random_dd", "p_rot_dd")},
+                "nBinance": len(a["alerts_binance"]), "matched": a["binance_alerts_matched_within_7d"],
+                "from": a["from"], "corr": a["corr"]}
+    except (TypeError, KeyError):
+        return None
+
+
+def payload(S, P=PARAMS_V2, grid_rows=None, meta=None, venues_cmp=None):
+    """Everything the website's radar tab shows, as one JSON-ready dict. venues_cmp: research/alt_radar/
+    venues.json (Binance alone vs every venue), shown as one row of the robustness table."""
     score, comp = alr(S, P)
     skipped = []
     al = alerts(score, S, P, skipped)
@@ -578,6 +669,17 @@ def payload(S, P=PARAMS_V2, grid_rows=None, meta=None):
     cls = {}
     for v in S["contracts"].values():
         cls[v] = cls.get(v, 0) + 1
+    venues = {}  # per venue: first day, altcoin contracts, altcoin and BTC+ETH OI on the last day (US$ bn)
+    for s, c in S["contracts"].items():
+        v = venues.setdefault(venue_of(s), {"from": "9999", "last": "", "alt": 0, "altOI": 0.0, "majorOI": 0.0})
+        v["from"], v["last"] = min(v["from"], min(S["oi"][s])), max(v["last"], max(S["oi"][s]))
+        if c == "alt":
+            v["alt"] += 1
+            v["altOI"] += S["oi"][s].get(last, (0,))[0]
+        elif c == "major":
+            v["majorOI"] += S["oi"][s].get(last, (0,))[0]
+    for v in venues.values():
+        v["altOI"], v["majorOI"] = _r(v["altOI"] / 1e9), _r(v["majorOI"] / 1e9)
     return {"asof": last, "params": {k: P[k] for k in ("thr", "gap", "horizon", "rally", "rally_win", "L", "btc_flat",
                                                         "near_win", "near_lo", "near_hi", "recede_win", "recede_full",
                                                         "heat_days")},
@@ -585,8 +687,10 @@ def payload(S, P=PARAMS_V2, grid_rows=None, meta=None):
                        "resultDay": d2s(s2d(last_alert) + dt.timedelta(days=H)) if last_alert else None,
                        "skipped": recent_skip},
             "today": today, "alerts": items, "series": series, "stats": stats, "grid": gsum,
+            "venuesCmp": _venues_cmp(venues_cmp),
             "coverage": {"contracts": cls, "altAssets": sum(1 for v in S["assets"].values() if v == "alt"),
-                         "oiFrom": S["oi_dates"][0], "publishLagH": (meta or {}).get("publish_lag_hours")}}
+                         "oiFrom": S["oi_dates"][0], "publishLagH": (meta or {}).get("publish_lag_hours"),
+                         "venues": venues}}
 
 
 def grid(S, base=PARAMS):

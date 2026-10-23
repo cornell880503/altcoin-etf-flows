@@ -3,7 +3,8 @@
 
 1. When yesterday (UTC) is not stored yet and Binance has published it (about 7 hours after
    midnight UTC), fetch the new days: open interest (fetch_oi_binance --daily) and Coin Metrics
-   market caps (fetch_cm_mcap).
+   market caps (fetch_cm_mcap). The other open-interest venues in alt_radar.VENUES serve yesterday
+   right after midnight; each is fetched (fetch_oi_<venue> --daily) on any run while it lacks it.
 2. When data/oi/radar.json is older than the newest day both sources have, rebuild it with
    alt_radar.payload(): ALR v2, status (alert / watch / none), every alert with its 30-day path,
    and the backtest statistics. The grid summary comes from research/alt_radar/backtest.json.
@@ -41,6 +42,27 @@ def published(day):
         return False
 
 
+def other_venues(yday):
+    """Daily update of the radar's other open-interest venues: each serves a finished UTC day right
+    after midnight (hours before Binance), so each is fetched on any run while it lacks yesterday.
+    One failing never stops the rest. Returns {venue: latest stored day}."""
+    import alt_radar as R
+    out = {}
+    for venue in R.VENUES:
+        if venue == "binance":
+            continue
+        if latest(venue) < yday:
+            try:
+                mod = __import__(f"fetch_oi_{venue}")
+                mod.main(["--daily", "--budget", "4"])
+            except SystemExit:
+                pass
+            except Exception as e:
+                print(f"{venue} daily update failed: {type(e).__name__}: {e}", flush=True)
+        out[venue] = latest(venue)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true")
@@ -61,6 +83,8 @@ def main():
             fetch_cm_mcap.main()
             bn, cm = latest("binance"), latest("cm")
             print(f"after fetch: binance {bn}, coin metrics {cm} ({time.time() - t0:.0f}s)", flush=True)
+    if not a.no_fetch:
+        print("other venues:", other_venues(yday), flush=True)
     try:
         cur = json.load(open(OUT)).get("asof", "")
     except (OSError, ValueError):
@@ -79,7 +103,11 @@ def main():
         meta = json.load(open(os.path.join(OI, "binance", "_meta.json")))
     except (OSError, ValueError):
         meta = {}
-    p = R.payload(S, grid_rows=grid, meta=meta)
+    try:
+        cmp = json.load(open(os.path.join(ROOT, "research", "alt_radar", "venues.json")))
+    except (OSError, ValueError):
+        cmp = None
+    p = R.payload(S, grid_rows=grid, meta=meta, venues_cmp=cmp)
     p["built_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     tmp = OUT + ".tmp"
     with open(tmp, "w") as f:

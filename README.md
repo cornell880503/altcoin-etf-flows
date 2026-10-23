@@ -24,8 +24,14 @@ A build stops without publishing when the data look wrong (too few days, no rece
 
 An open version of CoinKarma's Alt Top Radar: an alert when altcoin perpetual leverage overheats (ALR, 0-100), with every past alert and what the altcoin market did in the 30 days after it. Formula, rules and backtest are in `scripts/alt_radar.py`; the research write-up is in `research/alt_radar/`.
 
-- Data: `data/oi/binance/` daily open interest of every Binance USD-M perpetual from Binance's public files (data.binance.vision, from 2021-12; Binance's live API refuses US cloud IPs), `data/oi/cm/` daily market caps of ~900 assets from the Coin Metrics community API (the altcoin market cap excludes BTC, ETH, stablecoins, wrapped and staked copies). Finished months are one file each; the running month is one small file per day (`scripts/oi_store.py`).
-- Update: `scripts/radar_update.py` runs in every workflow run but only fetches once Binance has published yesterday's files (about 7 hours after midnight UTC; the 07:52 UTC run usually catches it), then writes `data/oi/radar.json`, which the page embeds. `.github/workflows/oi-data.yml` is the full backfill and gap fill (manual).
+- Open interest: every USDT perpetual's end-of-day OI on four venues, chain-linked into one index (a venue enters on its first day without jumping it):
+  - `data/oi/binance/` Binance, from Binance's public files (data.binance.vision, from 2021-12; Binance's live API refuses US cloud IPs)
+  - `data/oi/hyperliquid/` Hyperliquid, from the daily per-coin data behind stats.hyperliquid.xyz (2023-06-13 to 2026-04-03, when it stopped), then a snapshot of Hyperliquid's API on the first run after midnight UTC (none for April to October 2026)
+  - `data/oi/okx/` OKX, from its rubik statistics (UTC days from 2024-02-04; only contracts still listed, OKX drops the history of delisted ones)
+  - `data/oi/gate/` Gate, from its contract_stats (only the last 180 days are served: from 2026-04-28, accumulated daily)
+  - Missing: Bybit (blocks US cloud IPs) and Bitget (no history), about a quarter of the altcoin perp OI of the six large venues on 2026-10-23 (`research/probe_oi/cg_derivatives.json`, from `research/probe_oi_venues.py`). `research/venues_compare.py` compares Binance alone with all venues (`research/alt_radar/venues.json`); the page shows it in the robustness table.
+- Market caps: `data/oi/cm/` daily market caps of ~900 assets from the Coin Metrics community API (the altcoin market cap excludes BTC, ETH, stablecoins, wrapped and staked copies). Finished months are one file each; the running month is one small file per day (`scripts/oi_store.py`).
+- Update: `scripts/radar_update.py` runs in every workflow run. It fetches Binance once Binance has published yesterday's files (about 7 hours after midnight UTC; the 07:52 UTC run usually catches it) and every other venue on any run while it lacks yesterday, then writes `data/oi/radar.json`, which the page embeds. Full backfills: `.github/workflows/oi-data.yml` (Binance, Coin Metrics) and `.github/workflows/oi-venues.yml` (the other venues).
 
 ### Serve it from your own server
 
