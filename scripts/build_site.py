@@ -7,6 +7,7 @@ Inputs (all in this repo):
   site/template.html     the dashboard (statistics run in the browser, same code as make_docs)
   site/research.json     fixed research results (SOL/XRP/BTC study, BTC flow study, rule tests)
   scripts/signals.py     the signal research, recomputed on every build (needs numpy; skipped without)
+  data/oi/radar.json     the altcoin leverage radar (scripts/radar_update.py); the tab says so when missing
 
 Usage: python3 scripts/build_site.py --out DIR
 Writes DIR/index.html, DIR/health.json and DIR/.nojekyll (for GitHub Pages). Standard library only. Exits non-zero, without
@@ -101,11 +102,19 @@ def signal_research():
         return None
 
 
-def render(snap, research, built_at, sig=None):
+def radar():
+    try:
+        return json.load(open(P("data", "oi", "radar.json"), encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print("radar data missing:", e, file=sys.stderr)
+        return None
+
+
+def render(snap, research, built_at, sig=None, rd=None):
     tpl = open(P("site", "template.html"), encoding="utf-8").read()
     body = tpl.replace("/*SNAP*/", json_for_script(snap)).replace("/*DATA*/", json_for_script(research)) \
-              .replace("/*SIG*/", json_for_script(sig))
-    if "/*SNAP*/" in body or "/*DATA*/" in body or "/*SIG*/" in body:
+              .replace("/*SIG*/", json_for_script(sig)).replace("/*RADAR*/", json_for_script(rd))
+    if any(k in body for k in ("/*SNAP*/", "/*DATA*/", "/*SIG*/", "/*RADAR*/")):
         raise SystemExit("template placeholders not filled")
     cut = body.index('<div class="wrap">')
     head, rest = body[:cut].strip(), body[cut:].strip()
@@ -115,7 +124,7 @@ def render(snap, research, built_at, sig=None):
         "<head>",
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
-        '<meta name="description" content="美國現貨山寨幣 ETF 每日淨流量，和各幣幣價的相關、領先落後的顯著性，以及流量交易規則的研究。每 3 小時自動更新。">',
+        '<meta name="description" content="美國現貨山寨幣 ETF 每日淨流量，和各幣幣價的相關、領先落後的顯著性、流量交易規則的研究，以及山寨永續合約的槓桿過熱雷達。每 3 小時自動更新。">',
         '<meta name="theme-color" content="#0e1116">',
         '<meta name="robots" content="noindex">',
         f'<meta name="altetf-built" content="{built_at}">',
@@ -144,13 +153,15 @@ def main():
     research = json.load(open(P("site", "research.json"), encoding="utf-8"))
     research.pop("_about", None)
     sig = signal_research()
-    html = render(snap, research, built_at, sig)
+    rd = radar()
+    html = render(snap, research, built_at, sig, rd)
     os.makedirs(a.out, exist_ok=True)
     tmp = os.path.join(a.out, ".index.html.tmp")
     open(tmp, "w", encoding="utf-8").write(html)
     os.replace(tmp, os.path.join(a.out, "index.html"))
     health = {"built_at": built_at, "latest_date": snap["asof"], "trading_days": len(snap["dates"]),
-              "missing_price_on_latest": missing, "signals": sig is not None, "bytes": len(html.encode())}
+              "missing_price_on_latest": missing, "signals": sig is not None,
+              "radar": rd.get("asof") if rd else None, "bytes": len(html.encode())}
     json.dump(health, open(os.path.join(a.out, "health.json"), "w"), indent=1)
     open(os.path.join(a.out, ".nojekyll"), "w").close()  # GitHub Pages: serve the files as they are
     print(json.dumps(health, ensure_ascii=False))

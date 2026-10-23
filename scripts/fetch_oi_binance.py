@@ -10,11 +10,16 @@ publishes one file per contract per UTC day (futures/um/daily/metrics: a row eve
   ls        mean long/short account ratio (count_long_short_ratio)
   taker     mean taker buy/sell volume ratio (sum_taker_long_short_vol_ratio)
   n         rows in the file (288 for a complete day)
-Output: data/oi/binance/<YYYY-MM>.csv.gz and _meta.json (contracts, first/last day, how many hours
-after midnight UTC Binance published the latest files). Incremental and time-boxed: only
-(contract, day) pairs not stored yet are fetched, and no new download starts after --budget
-minutes, so the workflow's commit step always runs. Stocks, gold and other non-crypto contracts are
-stored too; the radar's build step decides what counts as an altcoin.
+Output: data/oi/binance/ (scripts/oi_store.py: month files, day files for the running month) and
+_meta.json (contracts, first/last day, how many hours after midnight UTC Binance published the
+latest files). Incremental and time-boxed: only (contract, day) pairs not stored yet are fetched,
+and no new download starts after --budget minutes, so the workflow's commit step always runs.
+Two modes:
+  full (default)  lists every contract's files on the bucket: backfill and gap filling (~2,500
+                  listing requests)
+  --daily         one listing of the contracts, then asks directly for each day after a contract's
+                  last stored day (contracts silent for 10+ days are taken as delisted)
+Stocks, gold and other non-crypto contracts are stored too; the radar decides what is an altcoin.
 """
 import argparse
 import concurrent.futures as cf
@@ -31,6 +36,8 @@ import time
 import urllib.parse
 import xml.etree.ElementTree as ET
 import zipfile
+
+import oi_store as store
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "oi", "binance")
@@ -158,59 +165,49 @@ def fetch(sym, day):
         return sym, day, None, f"parse {type(e).__name__}"
 
 
-def month_path(ym):
-    return os.path.join(OUT, f"{ym}.csv.gz")
-
-
-def read_month(ym):
-    p = month_path(ym)
-    if not os.path.exists(p):
-        return []
-    with gzip.open(p, "rt", newline="") as f:
-        r = csv.reader(f)
-        next(r, None)
-        return [row for row in r if row]
-
-
-def write_month(ym, rows):
-    rows = sorted({(r[0], r[1]): r for r in rows}.values())
-    buf = io.StringIO()
-    w = csv.writer(buf, lineterminator="\n")
-    w.writerow(FIELDS)
-    w.writerows(rows)
-    with open(month_path(ym), "wb") as f:  # mtime=0: identical content gives an identical file
-        with gzip.GzipFile(fileobj=f, mode="wb", mtime=0, compresslevel=9) as g:
-            g.write(buf.getvalue().encode())
-
-
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=float, default=280, help="minutes after which no new download starts")
     ap.add_argument("--workers", type=int, default=48)
     ap.add_argument("--since", default="2020-09-01")
-    a = ap.parse_args()
+    ap.add_argument("--daily", action="store_true", help="only days after each contract's last stored day")
+    a = ap.parse_args(argv)
     t0 = time.time()
     os.makedirs(OUT, exist_ok=True)
-
-    stored = set()
-    for fn in os.listdir(OUT):
-        if fn.endswith(".csv.gz"):
-            stored |= {(r[1], r[0]) for r in read_month(fn[:7])}
+    store.fold(OUT, FIELDS)
+    rows_all = store.read_all(OUT)
+    stored = {(r[1], r[0]) for r in rows_all}
+    last_day = {}
+    for r in rows_all:
+        if r[0] > last_day.get(r[1], ""):
+            last_day[r[1]] = r[0]
     print(f"stored pairs: {len(stored)}", flush=True)
 
     _, prefixes = s3_list_all(PREFIX, delimiter="/")
     syms = sorted(p[len(PREFIX):].strip("/") for p in prefixes)
     syms = [s for s in syms if s.endswith("USDT")]
-    with cf.ThreadPoolExecutor(16) as ex:
-        listing = dict(zip(syms, ex.map(files_of, syms)))
-    print(f"contracts: {len(syms)}, files listed: {sum(len(v) for v in listing.values())} "
+    listing, todo = {}, []
+    if a.daily:
+        yday = dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=1)
+        for s in syms:
+            ld = last_day.get(s)
+            if ld is None:  # a new contract: list its files once
+                listing[s] = files_of(s)
+                todo += [(s, d) for d, _ in listing[s] if d >= a.since and (s, d) not in stored]
+            elif dt.date.fromisoformat(ld) >= yday - dt.timedelta(days=10):
+                d = dt.date.fromisoformat(ld) + dt.timedelta(days=1)
+                while d <= yday:  # not published yet (404) is fine: the next run asks again
+                    todo.append((s, d.isoformat()))
+                    d += dt.timedelta(days=1)
+    else:
+        with cf.ThreadPoolExecutor(16) as ex:
+            listing = dict(zip(syms, ex.map(files_of, syms)))
+        todo = [(s, d) for s, files in listing.items() for d, _ in files if d >= a.since and (s, d) not in stored]
+    todo.sort(key=lambda x: (x[1], x[0]))  # oldest first: an interrupted run leaves complete early months
+    print(f"contracts: {len(syms)}, mode: {'daily' if a.daily else 'full'}, to fetch: {len(todo)} "
           f"({time.time() - t0:.0f}s)", flush=True)
 
-    todo = [(s, d) for s, files in listing.items() for d, _ in files if d >= a.since and (s, d) not in stored]
-    todo.sort(key=lambda x: (x[1], x[0]))  # oldest first: an interrupted run leaves complete early months
-    print(f"to fetch: {len(todo)}", flush=True)
-
-    new, fails, done = {}, {}, 0
+    new, fails, done = [], {}, 0
     deadline = t0 + a.budget * 60
     with cf.ThreadPoolExecutor(a.workers) as ex:
         it = iter(todo)
@@ -228,34 +225,49 @@ def main():
                 sym, day, row, st = fu.result()
                 done += 1
                 if row:
-                    new.setdefault(day[:7], []).append(row)
+                    new.append(row)
                 else:
                     fails[str(st)] = fails.get(str(st), 0) + 1
                 if done % 20000 == 0:
                     print(f"  {done}/{len(todo)} ({time.time() - t0:.0f}s) fails={fails}", flush=True)
-    print(f"fetched {done} of {len(todo)} in {time.time() - t0:.0f}s; fails={fails}", flush=True)
+    print(f"fetched {done} of {len(todo)} in {time.time() - t0:.0f}s; new rows {len(new)}; fails={fails}", flush=True)
+    if new:
+        store.write_rows(OUT, FIELDS, new)
 
-    for ym, rows in sorted(new.items()):
-        write_month(ym, read_month(ym) + rows)
-
-    meta = {"run_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "contracts": {s: [f[0][0], f[-1][0], len(f)] for s, f in listing.items() if f},
-            "fetched": done, "remaining": len(todo) - done, "fails": fails}
-    lags = []  # hours from the end of the file's UTC day to its publication
-    for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT"):
-        for d, lm in listing.get(s, [])[-14:]:
-            try:
-                pub = dt.datetime.strptime(lm[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=dt.timezone.utc)
-                end = dt.datetime.fromisoformat(d).replace(tzinfo=dt.timezone.utc) + dt.timedelta(days=1)
-                lags.append(round((pub - end).total_seconds() / 3600, 2))
-            except Exception:
-                pass
-    lags.sort()
-    meta["publish_lag_hours"] = {"n": len(lags), "min": lags[0] if lags else None,
-                                 "median": lags[len(lags) // 2] if lags else None, "max": lags[-1] if lags else None}
-    with open(os.path.join(OUT, "_meta.json"), "w") as f:
+    mpath = os.path.join(OUT, "_meta.json")
+    try:
+        meta = json.load(open(mpath))
+    except (OSError, ValueError):
+        meta = {}
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    contracts = meta.get("contracts", {})
+    for s, f in listing.items():
+        if f:
+            contracts[s] = [f[0][0], f[-1][0], len(f)]
+    for r in new:
+        c = contracts.setdefault(r[1], [r[0], r[0], 0])
+        if r[0] > c[1]:
+            c[1] = r[0]
+    meta.update({"run_at": now, "mode": "daily" if a.daily else "full", "contracts": contracts,
+                 "fetched": done, "new_rows": len(new), "remaining": len(todo) - done, "fails": fails,
+                 "latest_day": max((r[0] for r in new), default=meta.get("latest_day"))})
+    if not a.daily:
+        lags = []  # hours from the end of the file's UTC day to its publication
+        for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT"):
+            for d, lm in listing.get(s, [])[-14:]:
+                try:
+                    pub = dt.datetime.strptime(lm[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=dt.timezone.utc)
+                    end = dt.datetime.fromisoformat(d).replace(tzinfo=dt.timezone.utc) + dt.timedelta(days=1)
+                    lags.append(round((pub - end).total_seconds() / 3600, 2))
+                except Exception:
+                    pass
+        lags.sort()
+        meta["publish_lag_hours"] = {"n": len(lags), "min": lags[0] if lags else None,
+                                     "median": lags[len(lags) // 2] if lags else None, "max": lags[-1] if lags else None}
+    with open(mpath, "w") as f:
         json.dump(meta, f, separators=(",", ":"), sort_keys=True)
     print("meta:", {k: v for k, v in meta.items() if k != "contracts"}, flush=True)
+    return len(new)
 
 
 if __name__ == "__main__":

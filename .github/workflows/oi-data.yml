@@ -1,7 +1,8 @@
 name: oi-data
-# Open-interest and market-cap history for the altcoin leverage radar (data/oi/). Incremental: the
-# first run backfills Binance OI from 2021-12 and Coin Metrics market caps from 2021-06; later runs
-# only fetch new days. On demand for now; it joins the daily schedule once the radar page is live.
+# Full open-interest and market-cap fetch for the altcoin leverage radar (data/oi/): backfill and
+# gap filling (every contract's file list is checked). The daily update runs in fetch-etf-flows
+# (scripts/radar_update.py, --daily mode); this one shares its concurrency group so the two never
+# write data/oi at the same time.
 on:
   workflow_dispatch:
   push:
@@ -10,7 +11,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: oi-data
+  group: fetch-etf-flows
   cancel-in-progress: false
 jobs:
   oi:

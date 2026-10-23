@@ -20,6 +20,13 @@ Live at **https://cornell880503.github.io/altcoin-etf-flows/** (GitHub Pages, pu
 
 A build stops without publishing when the data look wrong (too few days, no recent flows or prices), so the last good page stays up.
 
+### Altcoin leverage radar (槓桿雷達 tab)
+
+An open version of CoinKarma's Alt Top Radar: an alert when altcoin perpetual leverage overheats (ALR, 0-100), with every past alert and what the altcoin market did in the 30 days after it. Formula, rules and backtest are in `scripts/alt_radar.py`; the research write-up is in `research/alt_radar/`.
+
+- Data: `data/oi/binance/` daily open interest of every Binance USD-M perpetual from Binance's public files (data.binance.vision, from 2021-12; Binance's live API refuses US cloud IPs), `data/oi/cm/` daily market caps of ~900 assets from the Coin Metrics community API (the altcoin market cap excludes BTC, ETH, stablecoins, wrapped and staked copies). Finished months are one file each; the running month is one small file per day (`scripts/oi_store.py`).
+- Update: `scripts/radar_update.py` runs in every workflow run but only fetches once Binance has published yesterday's files (about 7 hours after midnight UTC; the 07:52 UTC run usually catches it), then writes `data/oi/radar.json`, which the page embeds. `.github/workflows/oi-data.yml` is the full backfill and gap fill (manual).
+
 ### Serve it from your own server
 
 On a Debian or Ubuntu server (for example a Linode Nanode), run as root:

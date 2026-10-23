@@ -79,6 +79,7 @@ header.top { display: grid; gap: 12px; }
 .toprow > div:not(.seg) { display: grid; gap: 6px; min-width: 0; }
 .status { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 13px; color: var(--ink-2); }
 .status span { display: inline-flex; gap: 6px; align-items: center; }
+.status > span { max-width: 100%; }
 .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; flex: none; }
 .pulse.live { background: var(--live); }
 
@@ -234,6 +235,8 @@ ul.method { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(
 @media (max-width: 520px) { .tabs button { padding: 8px 10px; font-size: 13.5px; } }
 @media (max-width: 440px) { .tabs button { padding: 8px 7px; font-size: 13px; } }
 .seg.tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+header.top, .toprow { min-width: 0; }
+.toprow > .seg.tabs { flex: 0 1 auto; min-width: 0; }
 .sgctl { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 13px; color: var(--ink-2); }
 .sgctl .seg button { padding: 5px 10px; }
 .sglist { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
@@ -256,6 +259,36 @@ tr.mutrow td { color: var(--muted); }
 .hbar .fill.flow { background: var(--accent); }
 .hbar .v { font-family: var(--font-mono); font-size: 12.5px; text-align: right; color: var(--ink); }
 @media (max-width: 520px) { .hbar { grid-template-columns: minmax(0, 8em) minmax(0, 1fr) 3.6em; } }
+/* leverage radar tab */
+.rd-kpis { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.3fr); border: 1px solid var(--hair); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.rd-kpis > div { padding: 16px 18px 18px; display: grid; gap: 7px; align-content: start; min-width: 0; border-left: 1px solid var(--hair); }
+.rd-kpis > div:first-child { border-left: 0; }
+.rd-kpis .lab { font-size: 12.5px; color: var(--muted); }
+.rd-state { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; line-height: 1.35; }
+.rd-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--muted); }
+.rd-dot.alert { background: var(--neg); box-shadow: 0 0 0 4px var(--neg-wash); }
+.rd-dot.watch { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-wash); }
+.rd-dot.none { background: var(--live); }
+.rd-sub { font-size: 13px; color: var(--ink-2); line-height: 1.65; }
+.rd-sub b { color: var(--ink); font-weight: 600; font-family: var(--font-mono); }
+.rd-big { font-size: clamp(38px, 4.6vw, 48px); font-weight: 700; line-height: 1.05; font-family: var(--font-mono); letter-spacing: -0.02em; }
+.rd-meter { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); margin-top: 4px; }
+.rd-meter .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--stat); }
+.rd-meter .tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--neg); }
+.rd-scale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.rd-comp { display: grid; grid-template-columns: minmax(0, 8.6em) minmax(0, 1fr) 2.6em; gap: 7px 10px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+.rd-comp .bar { height: 6px; border-radius: 3px; background: var(--surface-2); position: relative; overflow: hidden; }
+.rd-comp .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--stat); border-radius: 3px; }
+.rd-comp .v { font-family: var(--font-mono); font-size: 12px; text-align: right; color: var(--ink); }
+.rd-pick { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; border-top: 1px solid var(--hair); padding-top: 14px; }
+.rd-pick .t { display: grid; gap: 3px; min-width: 0; }
+.rd-pick .t b { font-size: 15px; }
+.rd-pick .seg button:disabled { opacity: 0.45; cursor: default; }
+.rd-chip { display: inline-block; font-size: 12px; padding: 0 9px; border-radius: 999px; color: var(--ink); background: var(--surface-2); border: 1px solid var(--hair); line-height: 1.7; }
+.rd-method { font-size: 14px; color: var(--ink-2); }
+.rd-method ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.rd-method h3 { color: var(--ink); }
+@media (max-width: 900px) { .rd-kpis { grid-template-columns: minmax(0, 1fr); } .rd-kpis > div { border-left: 0; border-top: 1px solid var(--hair); } .rd-kpis > div:first-child { border-top: 0; } }
 footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hair); padding-top: 16px; display: grid; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -269,6 +302,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       </div>
       <div class="seg tabs" role="tablist" aria-label="頁面">
         <button type="button" role="tab" id="tab-track" aria-selected="true" aria-controls="view-track">每日追蹤</button>
+        <button type="button" role="tab" id="tab-radar" aria-selected="false" aria-controls="view-radar">槓桿雷達</button>
         <button type="button" role="tab" id="tab-signals" aria-selected="false" aria-controls="view-signals">訊號研究</button>
         <button type="button" role="tab" id="tab-btc" aria-selected="false" aria-controls="view-btc">BTC 研究</button>
         <button type="button" role="tab" id="tab-trading" aria-selected="false" aria-controls="view-trading">交易研究</button>
@@ -421,6 +455,79 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           </ul>
         </div>
       </div>
+    </section>
+  </main>
+
+  <main id="view-radar" role="tabpanel" aria-labelledby="tab-radar" hidden style="display:grid;gap:40px;min-width:0">
+    <section aria-labelledby="h-radar">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">山寨頂部雷達 · 永續合約槓桿</div>
+          <h2 id="h-radar">山寨的槓桿是不是過熱了</h2>
+          <p>ALR（Altcoin Leverage Risk，0–100）在三件事同時出現時升高：山寨永續合約的持倉往山寨集中、持倉長得比價格快、山寨漲到高點附近後持倉開始退潮。升破門檻發出警報，警報是降低山寨多單的參考，不是做空訊號。</p>
+        </div>
+      </div>
+      <div id="rd-status"></div>
+    </section>
+
+    <section aria-labelledby="h-rd-alerts">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-rd-alerts">每一次警報</h2>
+          <p>山寨市值（不含 BTC、ETH、穩定幣）。三角形是警報，點一下或用下面的按鈕，看那次警報之後 30 天怎麼走。</p>
+        </div>
+        <div class="seg" role="group" aria-label="期間">
+          <button type="button" id="rd-all" aria-pressed="true">全部</button>
+          <button type="button" id="rd-1y" aria-pressed="false">近一年</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="legend">
+          <span><span class="sq" style="background:var(--neg)"></span>之後 30 天跌多於漲</span>
+          <span><span class="sq" style="background:var(--live)"></span>先跌後漲</span>
+          <span><span class="sq" style="background:var(--pos)"></span>先漲</span>
+          <span><span class="sq" style="background:var(--accent)"></span>觀察中</span>
+        </div>
+        <div class="chart" id="ch-rd-mc"></div>
+        <div class="rd-pick" id="rd-pick"></div>
+        <div class="legend"><span><span class="key" style="background:var(--muted)"></span><span id="rd-med-lab">過去警報的中位數</span></span><span><span class="key" id="rd-this-key" style="background:var(--neg)"></span>這次</span></div>
+        <div class="chart" id="ch-rd-path"></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-rd-hist">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-rd-hist">ALR 和山寨持倉</h2>
+          <p>上圖是每天的 ALR；下圖是 Binance 上山寨永續合約的持倉，占山寨＋BTC＋ETH 合約持倉的比例，也就是「資金往山寨集中」看的東西。</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="chart-title">ALR <span class="sub">升破虛線發出警報</span></div>
+        <div class="chart" id="ch-rd-alr"></div>
+        <div class="chart-title">山寨持倉占比 <span class="sub">Binance USDT 永續合約</span></div>
+        <div class="chart" id="ch-rd-oi"></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-rd-stats">
+      <div class="sec-head">
+        <div>
+          <h2 id="h-rd-stats">回測：警報之後 30 天</h2>
+          <p id="rd-stats-lede"></p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="tablewrap"><table id="tb-rd-stats"></table></div>
+        <div class="tablewrap"><table id="tb-rd-rob"></table></div>
+        <p class="note" id="rd-stats-note"></p>
+      </div>
+      <details class="panel"><summary>每一次警報（點一下在上面的圖展開）</summary><div class="tablewrap"><table id="tb-rd-list"></table></div></details>
+    </section>
+
+    <section aria-labelledby="h-rd-method">
+      <div class="sec-head"><div><h2 id="h-rd-method">怎麼算、有哪些限制</h2></div></div>
+      <div class="panel rd-method" id="rd-method"></div>
     </section>
   </main>
 
@@ -833,6 +940,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
 <script id="page-data" type="application/json">/*DATA*/</script>
 <script id="snap-data" type="application/json">/*SNAP*/</script>
 <script id="sig-data" type="application/json">/*SIG*/</script>
+<script id="radar-data" type="application/json">/*RADAR*/</script>
 <script>
 (function () {
   'use strict';
@@ -1296,9 +1404,11 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     });
     var ticks = cfg.xShow ? null : xTicks(n, cfg.xEvery);
     cfg.x.forEach(function (lab, i) { if (cfg.xShow ? cfg.xShow(i) : ticks[i]) txt(svg, xs(i), H - 8, cfg.xFmt ? cfg.xFmt(lab) : lab, { size: 10.5, anchor: (!cfg.xShow && i === n - 1 && n > 8 && !cfg.rightPad) ? 'end' : 'middle' }); });
+    if (cfg.after) cfg.after(svg, { xs: xs, y: y, m: m, W: W, H: H, n: n });
     var cross = el('line', { y1: m.t, y2: H - m.b, x1: -10, x2: -10 }, svg); cross.style.stroke = 'var(--muted)'; cross.style.strokeWidth = 1; cross.style.opacity = 0; cross.style.pointerEvents = 'none';
     var hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent', tabindex: 0 }, svg);
     hit.setAttribute('aria-label', cfg.aria || '折線圖，左右鍵逐日查看');
+    if (cfg.onClick) { hit.style.cursor = 'pointer'; hit.addEventListener('click', function (e) { var r = svg.getBoundingClientRect(); var px = (e.clientX - r.left) * (W / r.width); cfg.onClick(Math.max(0, Math.min(n - 1, Math.round((px - m.l) / ((W - m.l - m.r) / Math.max(1, n - 1)))))); }); }
     var cur = n - 1;
     function at(i, e) {
       cur = Math.max(0, Math.min(n - 1, i));
@@ -2425,11 +2535,219 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     });
     document.getElementById('btc-cme-note').textContent = '2024 年 ETF 買進約 ' + wan(W.etf_btc_2024) + '，同期槓桿基金在 CME 的淨空單增加約 ' + wan(W.lev_short_2024_change_btc) + '，就算全部都是基差交易，也只占 ETF 買盤的 ' + Math.round(W.lev_short_2024_change_btc / W.etf_btc_2024 * 100) + '%；淨空單在 ' + W.lev_short_peak_date + ' 達到 ' + wan(W.lev_short_peak_btc) + ' 後回落到 ' + wan(W.lev_short_last_btc) + '。週資料裡，ETF 每買 1 顆對應 ' + W.hedge_ratio.b.toFixed(2) + ' 顆新增空單，但控制當週漲跌後只剩 ' + W.hedge_ratio_given_return.b.toFixed(2) + '（' + pEq(W.hedge_ratio_given_return.p) + '）：空單主要是跟著價格和基差走。所以大部分 ETF 買盤是有方向的，基差交易不是流量和價格脫鉤的主因。';
   }
-  var TABS = { track: ['tab-track', 'view-track'], signals: ['tab-signals', 'view-signals'], btc: ['tab-btc', 'view-btc'], trading: ['tab-trading', 'view-trading'], research: ['tab-research', 'view-research'] };
+  // ---------------------------------------------------------------- leverage radar tab
+  var RD = null;
+  try { RD = JSON.parse(document.getElementById('radar-data').textContent); } catch (e) { RD = null; }
+  var rd = { range: 'all', sel: null };
+  var RD_KIND = { down: ['跌多於漲', 'var(--neg)'], down_then_up: ['先跌後漲', 'var(--live)'], up_first: ['先漲', 'var(--pos)'] };
+  function rdKind(a) { return a.kind ? RD_KIND[a.kind] : ['觀察中', 'var(--accent)']; }
+  function rdD(d) { return d ? d.replace(/-/g, '/') : '—'; }
+  function rdP(x) { return x == null ? '—' : pct(x, 1); }
+  function rdF(x) { return x == null ? '—' : pct(x * 100, 1); }
+  function rdPv(p) { return p == null ? '—' : p < 0.001 ? 'p < 0.001' : 'p = ' + p.toFixed(2); }
+  function rdN(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function rdChip(a) { var k = rdKind(a), c = rdN('span', 'rd-chip', k[0]); c.style.borderColor = k[1]; return c; }
+  function rdStatus() {
+    var host = document.getElementById('rd-status'); host.replaceChildren();
+    var s = RD.status, t = RD.today, P = RD.params, al = RD.alerts, last = al.length ? al[al.length - 1] : null;
+    var box = rdN('div', 'rd-kpis');
+    var c1 = rdN('div'); box.appendChild(c1);
+    c1.appendChild(rdN('span', 'lab', '目前狀態 · 資料至 ' + rdD(RD.asof) + '（UTC 收盤）'));
+    var st = rdN('div', 'rd-state'); st.appendChild(rdN('span', 'rd-dot ' + s.state));
+    st.appendChild(document.createTextNode(s.state === 'alert' ? '警報：ALR 今天升破 ' + P.thr : s.state === 'watch' ? '觀察期中 · 警報後第 ' + s.day + ' 天' : '目前沒有警報'));
+    c1.appendChild(st);
+    var sub = rdN('p', 'rd-sub');
+    if (s.state === 'none' || !last) {
+      sub.textContent = '最近 ' + P.horizon + ' 天沒有警報。' + (last ? '上一次警報是 ' + rdD(last.d) + '，之後 ' + P.horizon + ' 天「' + rdKind(last)[0] + '」。' : '');
+    } else if (s.state === 'alert') {
+      sub.textContent = '山寨槓桿過熱：考慮降低山寨多單。' + P.horizon + ' 天觀察期從今天開始，' + rdD(s.resultDay) + ' 公布結果。';
+    } else {
+      sub.append(rdD(s.alert) + ' 警報以來，山寨市值 '); sub.appendChild(rdN('b', null, rdP(last.ret)));
+      sub.append('，期間最多跌 '); sub.appendChild(rdN('b', null, rdP(last.dd)));
+      sub.append('、最多漲 '); sub.appendChild(rdN('b', null, rdP(last.up)));
+      sub.append('。' + rdD(s.resultDay) + ' 公布 ' + P.horizon + ' 天的結果。');
+    }
+    c1.appendChild(sub);
+    (s.skipped || []).slice(-1).forEach(function (sk) {
+      c1.appendChild(rdN('p', 'note', rdD(sk.d) + ' 也升破過門檻，但' + (sk.why === 'gap' ? '離上次警報不到 ' + P.gap + ' 天，不再發。' : 'BTC 30 天內剛漲超過 ' + Math.round(P.rally * 100) + '%：這種第一次過熱歷史上多半還會再漲，不發；' + P.horizon + ' 天內再過熱才發。')));
+    });
+    var c2 = rdN('div'); box.appendChild(c2);
+    c2.appendChild(rdN('span', 'lab', '今天的 ALR'));
+    c2.appendChild(rdN('div', 'rd-big', t.alr == null ? '—' : t.alr.toFixed(0)));
+    var mt = rdN('div', 'rd-meter'), fill = rdN('div', 'fill'), tick = rdN('div', 'tick');
+    fill.style.width = Math.max(0, Math.min(100, t.alr || 0)) + '%'; tick.style.left = 'calc(' + P.thr + '% - 1px)';
+    mt.appendChild(fill); mt.appendChild(tick); c2.appendChild(mt);
+    var sc = rdN('div', 'rd-scale'); sc.appendChild(rdN('span', null, '0')); sc.appendChild(rdN('span', null, P.thr + ' 警報')); c2.appendChild(sc);
+    c2.appendChild(rdN('p', 'rd-sub', !t.alr ? (t.rec === 0 ? '山寨持倉還在 7 天高點，沒有開始退潮，所以是 0。' : t.near === 0 ? '山寨市值離 60 天高點超過 15%，不在高點附近，所以是 0。' : '沒有過熱跡象，所以是 0。')
+      : '過去一年裡，今天的過熱程度高於 ' + t.alr.toFixed(0) + '% 的日子。'));
+    var c3 = rdN('div'); box.appendChild(c3);
+    c3.appendChild(rdN('span', 'lab', '四個條件（今天，0–100）'));
+    var comp = rdN('div', 'rd-comp');
+    [['資金往山寨集中', t.conc, '山寨持倉相對 BTC、ETH 持倉 ' + P.L + ' 天的增速，在過去一年排第幾（BTC ' + P.L + ' 天漲跌超過 ' + Math.round(P.btc_flat * 100) + '% 時不算，記 0）'],
+     ['持倉長得比價格快', t.lev, '山寨持倉相對山寨市值 ' + P.L + ' 天的增速，在過去一年排第幾'],
+     ['在高點附近', t.near, '山寨市值距 ' + P.near_win + ' 天高點 ' + rdP(t.vsHigh60) + '（' + (100 - Math.round(P.near_lo * 100)) + '% 以內才算）'],
+     ['持倉開始退潮', t.rec, '山寨持倉距 ' + P.recede_win + ' 天高點 ' + rdP(t.oiVsHigh7) + '（跌 ' + Math.round(P.recede_full * 100) + '% 算滿分）']].forEach(function (r) {
+      var lab = rdN('span', null, r[0]); lab.title = r[2]; comp.appendChild(lab);
+      var bar = rdN('span', 'bar'), i = rdN('i'); i.style.width = Math.round((r[1] || 0) * 100) + '%'; bar.appendChild(i); comp.appendChild(bar);
+      comp.appendChild(rdN('span', 'v', r[1] == null ? '—' : String(Math.round(r[1] * 100))));
+    });
+    c3.appendChild(comp);
+    c3.appendChild(rdN('p', 'note', 'BTC 14 天 ' + rdP(t.btc14) + '、30 天 ' + rdP(t.btc30) + '；山寨持倉 $' + (t.oiAlt == null ? '—' : t.oiAlt.toFixed(1)) + 'B，占山寨＋BTC＋ETH 合約的 ' + (t.altShare == null ? '—' : t.altShare.toFixed(1) + '%') + '。滑過名稱看說明。'));
+    host.appendChild(box);
+  }
+  function rdStart() {
+    var d = RD.series.d, i0 = 0;
+    if (rd.range === '1y') { var cut = new Date(Date.parse(RD.asof + 'T00:00:00Z') - 365 * 864e5).toISOString().slice(0, 10); while (i0 < d.length && d[i0] < cut) i0++; }
+    return i0;
+  }
+  function rdCharts() {
+    var S = RD.series, i0 = rdStart(), d = S.d.slice(i0), mc = S.mc.slice(i0), alr = S.alr.slice(i0);
+    var pos = {}; d.forEach(function (x, i) { pos[x] = i; });
+    var byDay = {}; RD.alerts.forEach(function (a, k) { byDay[a.d] = k; });
+    var xf = function (x) { return x.slice(2, 7).replace('-', '/'); };
+    var xe = Math.max(1, Math.ceil(d.length / ((document.getElementById('ch-rd-mc').clientWidth || 600) < 560 ? 4 : 7)));
+    function nearest(i) { var best = null, bd = 1e9; RD.alerts.forEach(function (a, k) { if (pos[a.d] == null) return; var dd = Math.abs(pos[a.d] - i); if (dd < bd) { bd = dd; best = k; } }); return bd <= Math.max(5, Math.round(d.length / 60)) ? best : null; }
+    lineChart(document.getElementById('ch-rd-mc'), {
+      x: d, height: 280, left: 56, xFmt: xf, xEvery: xe,
+      series: [{ name: '山寨市值', color: 'var(--price)', y: mc, width: 1.6 }],
+      yFmt: function (v) { return '$' + v.toFixed(0) + 'B'; },
+      tipHead: function (i) { return rdD(d[i]); },
+      tipRows: function (i) {
+        var rows = [{ color: 'var(--price)', value: mc[i] == null ? '—' : '$' + mc[i].toFixed(0) + 'B', label: '山寨市值' }, { value: alr[i] == null ? '—' : alr[i].toFixed(0), label: 'ALR' }];
+        var k = byDay[d[i]]; if (k != null) { var kk = rdKind(RD.alerts[k]); rows.push({ color: kk[1], value: kk[0], label: '這天發出警報' }); }
+        return rows;
+      },
+      after: function (svg, g) {
+        RD.alerts.forEach(function (a, k) {
+          var i = pos[a.d]; if (i == null || mc[i] == null) return;
+          var x = g.xs(i), y = g.y(mc[i]) - 7;
+          var tri = el('path', { d: 'M' + (x - 6) + ',' + (y - 10) + 'L' + (x + 6) + ',' + (y - 10) + 'L' + x + ',' + y + 'Z' }, svg);
+          tri.style.fill = rdKind(a)[1];
+          if (k === rd.sel) { tri.style.stroke = 'var(--ink)'; tri.style.strokeWidth = 1.6; }
+        });
+      },
+      onClick: function (i) { var k = nearest(i); if (k != null) { rd.sel = k; rdCharts(); rdList(); } },
+      aria: '山寨市值與每一次警報，點三角形看那次警報後的 30 天'
+    });
+    rdPath();
+    lineChart(document.getElementById('ch-rd-alr'), {
+      x: d, height: 160, left: 56, domain: [0, 100], xFmt: xf, xEvery: xe,
+      series: [{ name: 'ALR', color: 'var(--stat)', y: alr, width: 1.1 }],
+      yFmt: function (v) { return String(v); }, tipFmt: function (v) { return v.toFixed(0); }, tipHead: function (i) { return rdD(d[i]); },
+      after: function (svg, g) { var yy = g.y(RD.params.thr), ln = el('line', { x1: g.m.l, x2: g.W - g.m.r, y1: yy, y2: yy }, svg); ln.style.stroke = 'var(--neg)'; ln.style.strokeDasharray = '4 4'; ln.style.strokeWidth = 1; },
+      aria: 'ALR 走勢'
+    });
+    var share = d.map(function (x, i) { var a = S.oiAlt[i0 + i], b = S.oiMajor[i0 + i]; return a == null || b == null || a + b <= 0 ? null : a / (a + b) * 100; });
+    lineChart(document.getElementById('ch-rd-oi'), {
+      x: d, height: 160, left: 56, xFmt: xf, xEvery: xe,
+      series: [{ name: '山寨持倉占比', color: 'var(--accent)', y: share, width: 1.4 }],
+      yFmt: function (v) { return v.toFixed(0) + '%'; }, tipHead: function (i) { return rdD(d[i]); },
+      tipRows: function (i) { var a = S.oiAlt[i0 + i], b = S.oiMajor[i0 + i]; return [{ color: 'var(--accent)', value: share[i] == null ? '—' : share[i].toFixed(1) + '%', label: '山寨持倉占比' }, { value: a == null ? '—' : '$' + a.toFixed(1) + 'B', label: '山寨合約持倉' }, { value: b == null ? '—' : '$' + b.toFixed(1) + 'B', label: 'BTC＋ETH 合約持倉' }]; },
+      aria: '山寨永續合約持倉占山寨＋BTC＋ETH 合約持倉的比例'
+    });
+  }
+  function rdPath() {
+    var A = RD.alerts, H = RD.params.horizon, pick = document.getElementById('rd-pick');
+    if (!A.length) { pick.replaceChildren(rdN('p', 'empty', '還沒有警報。')); document.getElementById('ch-rd-path').replaceChildren(); return; }
+    if (rd.sel == null || rd.sel >= A.length) rd.sel = A.length - 1;
+    var k = rd.sel, a = A[k], kk = rdKind(a);
+    pick.replaceChildren();
+    var t = rdN('div', 't');
+    t.appendChild(rdN('b', null, rdD(a.d) + ' 警報'));
+    var l1 = rdN('span', 'small ink2'); l1.append('ALR ' + a.alr.toFixed(0) + ' · 當天山寨市值 $' + Math.round(a.mc) + 'B · '); l1.appendChild(rdChip(a)); t.appendChild(l1);
+    t.appendChild(rdN('span', 'small ink2', (a.done ? H + ' 天內' : '到第 ' + a.path.length + ' 天為止') + '最多跌 ' + rdP(a.dd) + (a.dd < 0 && a.ddDay ? '（第 ' + a.ddDay + ' 天）' : '') + '，最多漲 ' + rdP(a.up) + (a.up > 0 && a.upDay ? '（第 ' + a.upDay + ' 天）' : '') + (a.done ? '；第 ' + H + ' 天 ' + rdP(a.ret) : '') + '。'));
+    pick.appendChild(t);
+    var nav = rdN('div', 'seg'); nav.setAttribute('role', 'group'); nav.setAttribute('aria-label', '選擇警報');
+    var prev = rdN('button', null, '‹ 上一次'), cnt = rdN('button', null, (k + 1) + ' / ' + A.length), next = rdN('button', null, '下一次 ›');
+    [prev, cnt, next].forEach(function (b) { b.type = 'button'; nav.appendChild(b); });
+    prev.disabled = k === 0; cnt.disabled = true; next.disabled = k === A.length - 1;
+    prev.addEventListener('click', function () { if (rd.sel > 0) { rd.sel--; rdCharts(); rdList(); } });
+    next.addEventListener('click', function () { if (rd.sel < A.length - 1) { rd.sel++; rdCharts(); rdList(); } });
+    pick.appendChild(nav);
+    var done = A.filter(function (x) { return x.done; }), med = [0];
+    for (var j = 1; j <= H; j++) {
+      var v = done.map(function (x) { return x.path[j - 1]; }).filter(function (q) { return q != null; }).sort(function (p, q) { return p - q; });
+      med.push(v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null);
+    }
+    document.getElementById('rd-med-lab').textContent = '過去 ' + done.length + ' 次已滿 ' + H + ' 天的警報，中位數路徑';
+    document.getElementById('rd-this-key').style.background = kk[1];
+    var cur = [0].concat(a.path); while (cur.length < H + 1) cur.push(null);
+    var xs0 = []; for (var q = 0; q <= H; q++) xs0.push(q);
+    lineChart(document.getElementById('ch-rd-path'), {
+      x: xs0, height: 210, left: 56, includeZero: true, xShow: function (i) { return i % 5 === 0; },
+      xFmt: function (q) { return q === 0 ? '警報' : '第 ' + q + ' 天'; },
+      series: [{ name: '過去警報的中位數', color: 'var(--muted)', y: med, width: 1.4, dot: false }, { name: '這次', color: kk[1], y: cur, width: 2.2 }],
+      yFmt: function (v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(0) + '%'; }, tipFmt: function (v) { return rdP(v); },
+      tipHead: function (i) { return i === 0 ? '警報當天（' + rdD(a.d) + '）' : '警報後第 ' + i + ' 天'; },
+      after: function (svg, g) {
+        [[a.ddDay, a.dd, 'var(--neg)'], [a.upDay, a.up, 'var(--live)']].forEach(function (m) {
+          if (!m[0] || !m[1] || cur[m[0]] == null) return;
+          var cx = g.xs(m[0]), cy = g.y(cur[m[0]]), c = el('circle', { cx: cx, cy: cy, r: 4.5 }, svg);
+          c.style.fill = m[2]; c.style.stroke = 'var(--ring)'; c.style.strokeWidth = 2;
+          txt(svg, cx, cy + (m[1] < 0 ? 17 : -10), rdP(m[1]), { color: m[2], size: 11 });
+        });
+      },
+      aria: '這次警報後 30 天山寨市值的漲跌，和過去警報的中位數'
+    });
+  }
+  function rdList() {
+    var A = RD.alerts;
+    table(document.getElementById('tb-rd-list'), ['日期', 'ALR', '結果', '最多跌', '第幾天', '最多漲', '第幾天', '第 30 天'],
+      A.map(function (a, k) {
+        return { _cls: k === rd.sel ? 'sel' : '', _click: function () { rd.sel = k; rdCharts(); rdList(); document.getElementById('ch-rd-mc').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); },
+          cells: [rdD(a.d), a.alr.toFixed(0), { node: rdChip(a) }, rdP(a.dd), a.dd < 0 && a.ddDay ? String(a.ddDay) : '—', rdP(a.up), a.up > 0 && a.upDay ? String(a.upDay) : '—', a.done ? rdP(a.ret) : '觀察中'] };
+      }).reverse(), { textCols: [2] });
+  }
+  function rdStats() {
+    var st = RD.stats, A = st.all, G = RD.grid, P = RD.params;
+    if (!A) { document.getElementById('rd-stats-lede').textContent = '警報還不夠多，無法統計。'; return; }
+    document.getElementById('rd-stats-lede').textContent = A.alerts + ' 次已滿 ' + P.horizon + ' 天的警報（一年約 ' + A.per_year.toFixed(1) + ' 次）裡，' + A.kinds.down + ' 次之後跌多於漲，' + A.kinds.down_then_up + ' 次先跌後漲，' + A.kinds.up_first + ' 次先漲。警報後 30 天內山寨市值最多跌的中位數是 ' + rdF(A.median_dd) + '，隨機挑一天是 ' + rdF(A.random_dd) + '。';
+    table(document.getElementById('tb-rd-stats'), ['', '樣本', '之後 30 天跌多於漲', '最多跌（中位數）', '最多漲（中位數）'], [
+      ['警報後', A.alerts + ' 次', A.kinds.down + ' / ' + A.alerts + '（' + Math.round(A.kinds.down / A.alerts * 100) + '%）', rdF(A.median_dd), rdF(A.median_up)],
+      { _cls: 'ref', cells: ['隨機一天', A.days.toLocaleString('zh-TW') + ' 天', Math.round(A.random_down_share * 100) + '%', rdF(A.random_dd), rdF(A.random_up)] },
+      { _cls: 'ref', cells: ['漲勢相近、沒有警報的日子', A.control_days + ' 天', '—', rdF(A.control_dd), rdF(A.control_up)] }
+    ]);
+    var rob = [['全部（上表）', A], ['2025 年以前', st.before], ['2025 年以後', st.after], ['拿掉「BTC 剛大漲不發」', st.noRule], ['晚一天才進場', st.delay1]].filter(function (r) { return r[1]; })
+      .map(function (r) { var e = r[1]; return [r[0], e.alerts + ' 次', rdF(e.median_dd), rdF(e.random_dd), rdPv(e.p_rot_dd)]; });
+    if (G) rob.push({ _cls: 'ref', cells: [G.n + ' 種參數組合', '—', '中位數 ' + rdF(G.median_dd), Math.round(G.worse * 100) + '% 比隨機日差', Math.round(G.p10 * 100) + '% 的 p < 0.10'] });
+    table(document.getElementById('tb-rd-rob'), ['穩健性', '警報', '最多跌（中位數）', '隨機一天', '整批平移檢定'], rob);
+    document.getElementById('rd-stats-note').textContent = '整批平移檢定：把所有警報日期一起往後挪幾百種天數，看挪過去之後的跌幅有多常跟原本一樣大；p 越小越不像運氣。目前的結果方向和 CoinKarma 一致，但 p 值只在 0.1 附近、樣本只有十幾次，而且主要效果來自「BTC 剛大漲後第一次過熱不發」這條規則（拿掉後 ' + rdPv(st.noRule && st.noRule.p_rot_dd) + '）。這條規則照 CoinKarma 的寫法，可能是看著同一段歷史調出來的。漲勢相近的日子：之前 30 天山寨漲幅和警報日相差 5 個百分點以內、前後 30 天沒有警報。';
+  }
+  function rdMethod() {
+    var h = document.getElementById('rd-method'), C = RD.coverage, P = RD.params; h.replaceChildren();
+    var lag = C.publishLagH && C.publishLagH.median != null ? Math.round(C.publishLagH.median) : 7;
+    var blocks = [
+      ['資料', ['持倉：Binance USDT 永續合約，每個合約每天一個公開檔（data.binance.vision，' + rdD(C.oiFrom) + ' 起，每 5 分鐘一筆，取每天收盤）。算進山寨的有 ' + (C.contracts.alt || 0) + ' 個合約；BTC、ETH、股票、ETF、貴金屬、指數和穩定幣合約不算（' + ((C.contracts.equity || 0) + (C.contracts['equity (weekend test)'] || 0)) + ' 個股票類合約，2025/06 以後新上的合約要週末也有在動才算加密貨幣）。',
+        '山寨市值：Coin Metrics 免費 API 的每日市值，' + C.altAssets + ' 個幣加總，扣掉 BTC、ETH、穩定幣、包裝幣、質押幣、黃金代幣和同一個幣在不同鏈上的重複。新幣加入、合約上下架不會讓指數跳動（每天只比較前後兩天都有的）。',
+        '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡傍晚更新，比 CoinKarma 的 00:10 UTC 晚。']],
+      ['ALR 怎麼算', ['資金往山寨集中：山寨持倉相對 BTC＋ETH 持倉 ' + P.L + ' 天的增速，在過去一年排第幾；BTC 同期漲跌超過 ' + Math.round(P.btc_flat * 100) + '%（不是橫盤）時記 0。',
+        '持倉長得比價格快：山寨持倉相對山寨市值 ' + P.L + ' 天的增速，在過去一年排第幾。',
+        '熱度：最近 ' + P.heat_days + ' 天裡，上面兩項平均最高的一天。',
+        '在高點附近：山寨市值在 ' + P.near_win + ' 天高點的 ' + (100 - Math.round(P.near_lo * 100)) + '% 以內才算，5% 以內算滿分。持倉開始退潮：山寨持倉從 ' + P.recede_win + ' 天高點回落，跌 ' + Math.round(P.recede_full * 100) + '% 算滿分。',
+        'ALR：熱度 × 在高點附近 × 開始退潮，在過去一年裡排第幾（0–100）。沒有熱度就是 0。']],
+      ['警報規則', ['ALR 升破 ' + P.thr + ' 發出警報，之後 ' + P.horizon + ' 天是觀察期。',
+        '兩次警報至少隔 ' + P.gap + ' 天。',
+        'BTC 30 天內剛漲超過 ' + Math.round(P.rally * 100) + '% 時的第一次過熱不發，' + P.horizon + ' 天內再過熱才發（照 CoinKarma 的規則）。',
+        '門檻 ' + P.thr + ' 是在 85、90、95 裡，挑警報頻率最接近 CoinKarma（一年約 5 次）的一個；挑的時候只看次數，沒看之後的漲跌。']],
+      ['限制', ['不是做空訊號：警報後仍有不少次是先跌後漲，用來降低山寨多單，不是反手做空。',
+        '樣本小：統計從 2023 年 4 月開始，已滿 30 天的警報只有十幾次，統計上還不夠確定（見上面的檢定）。',
+        '只有 Binance 的持倉，沒有 Bybit、OKX；結果和 CoinKarma 的山寨頂部雷達不會一樣，這是用公開資料、公式完全公開的版本。',
+        '只看山寨整體，個別幣種的走勢可能不同。']]];
+    blocks.forEach(function (b) { h.appendChild(rdN('h3', null, b[0])); var ul = rdN('ul'); b[1].forEach(function (x) { ul.appendChild(rdN('li', null, x)); }); h.appendChild(ul); });
+  }
+  function drawRadar() {
+    if (!RD || !RD.series) { document.getElementById('rd-status').replaceChildren(rdN('p', 'empty', '雷達資料還沒產生，下一次更新後會出現。')); return; }
+    rdStatus(); rdCharts(); rdList(); rdStats(); rdMethod();
+  }
+  ['all', '1y'].forEach(function (r) {
+    var b = document.getElementById('rd-' + r);
+    if (b) b.addEventListener('click', function () { rd.range = r; document.getElementById('rd-all').setAttribute('aria-pressed', String(r === 'all')); document.getElementById('rd-1y').setAttribute('aria-pressed', String(r === '1y')); if (RD && RD.series) rdCharts(); });
+  });
+  var TABS = { track: ['tab-track', 'view-track'], radar: ['tab-radar', 'view-radar'], signals: ['tab-signals', 'view-signals'], btc: ['tab-btc', 'view-btc'], trading: ['tab-trading', 'view-trading'], research: ['tab-research', 'view-research'] };
   function showTab(t, push) {
     state.tab = t;
     Object.keys(TABS).forEach(function (k) { document.getElementById(TABS[k][0]).setAttribute('aria-selected', String(k === t)); document.getElementById(TABS[k][1]).hidden = k !== t; });
-    if (t === 'research') drawResearch(); else if (t === 'trading') renderTrading(); else if (t === 'btc') drawBTC(); else if (t === 'signals') { renderStatus(); drawSignals(); } else renderAll();
+    if (t === 'research') drawResearch(); else if (t === 'trading') renderTrading(); else if (t === 'btc') drawBTC(); else if (t === 'signals') { renderStatus(); drawSignals(); } else if (t === 'radar') { renderStatus(); drawRadar(); } else renderAll();
     if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { /* ignore */ } }
   }
   var tabIds = Object.keys(TABS);
@@ -2445,7 +2763,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   buildModel();
   document.getElementById('ans-btc-link').addEventListener('click', function (e) { e.preventDefault(); showTab('btc', true); var b = document.getElementById('tab-btc'); b.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
   showTab(TABS[location.hash.slice(1)] ? location.hash.slice(1) : 'track', false);
-  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (state.tab === 'research') drawResearch(); else if (state.tab === 'trading') renderTrading(); else if (state.tab === 'btc') drawBTC(); else if (state.tab === 'signals') drawSignals(); else { renderKPIs(); renderCards(); renderIntensity(); renderDetail(); } }, 150); });
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (state.tab === 'research') drawResearch(); else if (state.tab === 'trading') renderTrading(); else if (state.tab === 'btc') drawBTC(); else if (state.tab === 'signals') drawSignals(); else if (state.tab === 'radar') { if (RD && RD.series) rdCharts(); } else { renderKPIs(); renderCards(); renderIntensity(); renderDetail(); } }, 150); });
   window.addEventListener('scroll', hideTip, { passive: true });
 })();
 </script>

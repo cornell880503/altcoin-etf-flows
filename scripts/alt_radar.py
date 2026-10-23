@@ -13,33 +13,36 @@ Series
                   indexes, stablecoins. Chain-linked the same way, so new listings do not jump it.
   major OI        BTCUSDT + ETHUSDT
 
-ALR, 0-100. PARAMS were fixed before any outcome was looked at; the sensitivity grid in the
-report shows how much the results move when they change.
+ALR, 0-100 (the site shows v2)
   concentration  14-day growth of alt OI relative to major OI, as a percentile of the past year,
                  counted only while BTC moved less than 10% over the same 14 days
   leverage       14-day growth of alt OI relative to alt market cap (OI outrunning price), percentile
-  heat           best day of the last 10 for min(concentration, leverage)
   near the top   alt market cap vs its 60-day high: weight 0 at 85%, 1 from 95%
   receding       alt OI vs its 7-day high: weight 0 at the high, 1 from 5% below
-  ALR = 100 x heat x near x receding
-Alert: ALR crosses 90; at least 14 days after the previous alert; when BTC rose 20%+ over the past
-30 days the first overheat is skipped and only a second one within 30 days alerts (CoinKarma's
-rule; the report shows results with and without it).
+  v1  heat = best day of the last 10 for min(concentration, leverage); ALR = 100 x heat x near x
+      receding; alert at 90. Parameters fixed before any outcome was looked at. Alerted 0.8 times a
+      year: too strict.
+  v2  same components; heat = best day of the last 10 for the mean of the two; ALR = where today's
+      heat x near x receding ranks within the past year (0 when there is no heat); alert at 95,
+      the threshold among 85/90/95 closest to CoinKarma's ~5 alerts a year (alert counts only).
+Alert: ALR crosses the threshold; at least 14 days after the previous alert; when BTC rose 20%+ over
+the past 30 days the first overheat is skipped and only a second one within 30 days alerts
+(CoinKarma's rule; the backtest shows results with and without it).
 
-Usage: python3 research/alt_radar.py [--out research/alt_radar]
+Usage: python3 scripts/alt_radar.py [--out research/alt_radar] [--no-grid]   (backtest)
+       scripts/radar_update.py builds the site's data/oi/radar.json with payload() below.
 """
 import argparse
 import bisect
-import csv
 import datetime as dt
-import glob
-import gzip
 import json
 import math
 import os
 import random
 import statistics
 from collections import defaultdict
+
+import oi_store as store
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data", "oi")
@@ -93,46 +96,38 @@ def s2d(s):
 def load_oi():
     """symbol -> {date: (oi_usd_last, qty_last, n)}"""
     oi = defaultdict(dict)
-    for fn in sorted(glob.glob(os.path.join(DATA, "binance", "*.csv.gz"))):
-        with gzip.open(fn, "rt", newline="") as f:
-            r = csv.reader(f)
-            next(r, None)
-            for row in r:
-                if len(row) < 8:
-                    continue
-                date, sym, oi_last, _, qty_last = row[:5]
-                try:
-                    v = float(oi_last)
-                    q = float(qty_last) if qty_last else None
-                    n = int(row[7] or 0)
-                except ValueError:
-                    continue
-                if v > 0:
-                    oi[sym][date] = (v, q, n)
+    for row in store.read_all(os.path.join(DATA, "binance")):
+        if len(row) < 8:
+            continue
+        date, sym, oi_last, _, qty_last = row[:5]
+        try:
+            v = float(oi_last)
+            q = float(qty_last) if qty_last else None
+            n = int(row[7] or 0)
+        except ValueError:
+            continue
+        if v > 0:
+            oi[sym][date] = (v, q, n)
     return oi
 
 
 def load_cm():
     """asset -> {date: (mcap, price)}"""
     cm = defaultdict(dict)
-    for fn in sorted(glob.glob(os.path.join(DATA, "cm", "*.csv.gz"))):
-        with gzip.open(fn, "rt", newline="") as f:
-            r = csv.reader(f)
-            next(r, None)
-            for row in r:
-                if len(row) < 4:
-                    continue
-                date, a, mc, px = row
-                try:
-                    mc = float(mc)
-                except ValueError:
-                    continue
-                try:
-                    px = float(px) if px else None
-                except ValueError:
-                    px = None
-                if mc > 0:
-                    cm[a][date] = (mc, px)
+    for row in store.read_all(os.path.join(DATA, "cm")):
+        if len(row) < 4:
+            continue
+        date, a, mc, px = row[:4]
+        try:
+            mc = float(mc)
+        except ValueError:
+            continue
+        try:
+            px = float(px) if px else None
+        except ValueError:
+            px = None
+        if mc > 0:
+            cm[a][date] = (mc, px)
     return cm
 
 
@@ -390,7 +385,10 @@ def alr(S, P=PARAMS):
     return out, comp
 
 
-def alerts(score, S, P=PARAMS):
+def alerts(score, S, P=PARAMS, skipped=None):
+    """Alert days. If a list is passed as skipped, overheats not alerted get appended to it as
+    (day, reason): 'gap' (within 14 days of the last alert) or 'btc rally' (first overheat after
+    BTC rose 20%+ in 30 days)."""
     out, last, suppressed, above_prev = [], None, None, False
     for d in sorted(score):
         above = score[d] >= P["thr"]
@@ -399,9 +397,12 @@ def alerts(score, S, P=PARAMS):
             b0 = lagged(S["btc"], d, P["rally_win"])
             rally = b0 and S["btc"].get(d) and S["btc"][d] / b0 - 1 >= P["rally"]
             if last and (dd - last).days < P["gap"]:
-                pass
+                if skipped is not None:
+                    skipped.append((d, "gap"))
             elif P["rally_rule"] and rally and not (suppressed and (dd - suppressed).days <= 30):
                 suppressed = dd
+                if skipped is not None:
+                    skipped.append((d, "btc rally"))
             else:
                 out.append(d)
                 last, suppressed = dd, None
@@ -489,6 +490,103 @@ def run(S, P=PARAMS):
     al = alerts(score, S, P)
     return score, comp, al, {"all": evaluate(al, S, score, P), "before_" + SPLIT: evaluate(al, S, score, P, hi=SPLIT),
                              "from_" + SPLIT: evaluate(al, S, score, P, lo=SPLIT)}
+
+
+def _r(v, k=2):
+    return None if v is None else round(v, k)
+
+
+def _stats(e):
+    if not e:
+        return None
+    keep = ("alerts", "days", "per_year", "kinds", "median_dd", "median_up", "median_ret", "random_dd", "random_up",
+            "random_down_share", "control_days", "control_dd", "control_up", "p_rot_dd", "p_rot_down_share")
+    return {k: e.get(k) for k in keep if k in e}
+
+
+def payload(S, P=PARAMS_V2, grid_rows=None, meta=None):
+    """Everything the website's radar tab shows, as one JSON-ready dict."""
+    score, comp = alr(S, P)
+    skipped = []
+    al = alerts(score, S, P, skipped)
+    days = sorted(score)
+    last = days[-1]
+    idx, H = S["alt_idx"], P["horizon"]
+
+    def path_from(d):
+        out = []
+        for k in range(1, H + 1):
+            x = d2s(s2d(d) + dt.timedelta(days=k))
+            if x > last or x not in idx:
+                break
+            out.append(round((idx[x] / idx[d] - 1) * 100, 2))
+        return out
+
+    items = []
+    for d in al:
+        pth = path_from(d)
+        o = outcome(idx, d, H)
+        it = {"d": d, "alr": score[d], "mc": _r(S["alt_sum"].get(d, 0) / 1e9, 1), "path": pth}
+        if o:
+            it.update(dd=_r(o["dd"] * 100), up=_r(o["up"] * 100), kind=o["kind"], ddDay=o["day_dd"],
+                      upDay=o["day_up"], ret=_r(o["ret"] * 100), done=True)
+        else:
+            lo = min(range(len(pth)), key=lambda k: pth[k]) if pth else None
+            hi = max(range(len(pth)), key=lambda k: pth[k]) if pth else None
+            it.update(dd=_r(min(0.0, pth[lo])) if pth else 0.0, up=_r(max(0.0, pth[hi])) if pth else 0.0,
+                      kind=None, ddDay=lo + 1 if pth else None, upDay=hi + 1 if pth else None,
+                      ret=pth[-1] if pth else 0.0, done=False)
+        items.append(it)
+
+    last_alert = al[-1] if al else None
+    day_n = (s2d(last) - s2d(last_alert)).days if last_alert else None
+    state = "alert" if day_n == 0 else "watch" if day_n is not None and day_n <= H else "none"
+    recent_skip = [{"d": d, "why": w} for d, w in skipped if (s2d(last) - s2d(d)).days <= H]
+    c = comp[last]
+    hi60 = max(v for k in range(P["near_win"]) for v in [lagged(idx, last, k)] if v)
+    hi7 = max(v for k in range(P["recede_win"]) for v in [lagged(S["alt_oi_idx"], last, k)] if v)
+    b14, b30 = lagged(S["btc"], last, P["L"]), lagged(S["btc"], last, P["rally_win"])
+    tot = S["alt_oi_sum"].get(last, 0) + S["major"].get(last, 0)
+    today = {"d": last, "alr": score[last], "conc": c["conc"], "lev": c["lev"], "heat": c["heat"], "near": c["near"],
+             "rec": c["rec"], "vsHigh60": _r((idx[last] / hi60 - 1) * 100), "oiVsHigh7": _r((S["alt_oi_idx"][last] / hi7 - 1) * 100),
+             "btc14": _r((S["btc"][last] / b14 - 1) * 100) if b14 else None,
+             "btc30": _r((S["btc"][last] / b30 - 1) * 100) if b30 else None,
+             "altShare": _r(S["alt_oi_sum"].get(last, 0) / tot * 100, 1) if tot else None,
+             "mc": _r(S["alt_sum"].get(last, 0) / 1e9, 1), "oiAlt": _r(S["alt_oi_sum"].get(last, 0) / 1e9),
+             "oiMajor": _r(S["major"].get(last, 0) / 1e9)}
+
+    first = "2022-06-01"
+    ser_days = [d for d in S["dates"] if d >= first and d <= last and d in idx]
+    series = {"d": ser_days, "mc": [_r(S["alt_sum"].get(d, 0) / 1e9, 1) if d in S["alt_sum"] else None for d in ser_days],
+              "alr": [score.get(d) for d in ser_days],
+              "oiAlt": [_r(S["alt_oi_sum"][d] / 1e9) if d in S["alt_oi_sum"] else None for d in ser_days],
+              "oiMajor": [_r(S["major"][d] / 1e9) if d in S["major"] else None for d in ser_days]}
+
+    stats = {"all": _stats(evaluate(al, S, score, P)), "before": _stats(evaluate(al, S, score, P, hi=SPLIT)),
+             "after": _stats(evaluate(al, S, score, P, lo=SPLIT)),
+             "noRule": _stats(run(S, dict(P, rally_rule=False))[3]["all"]),
+             "delay1": _stats(run(S, dict(P, delay=1))[3]["all"])}
+    gsum = None
+    if grid_rows:
+        ok = [g for g in grid_rows if g.get("alerts", 0) >= 8 and g.get("median_dd") is not None]
+        rnd = stats["all"]["random_dd"] if stats["all"] else None
+        if ok and rnd is not None:
+            gsum = {"n": len(ok), "worse": round(sum(1 for g in ok if g["median_dd"] < rnd) / len(ok), 3),
+                    "median_dd": round(statistics.median(g["median_dd"] for g in ok), 4),
+                    "p10": round(sum(1 for g in ok if (g.get("p_rot_dd") or 1) < 0.10) / len(ok), 3),
+                    "p05": round(sum(1 for g in ok if (g.get("p_rot_dd") or 1) < 0.05) / len(ok), 3)}
+    cls = {}
+    for v in S["contracts"].values():
+        cls[v] = cls.get(v, 0) + 1
+    return {"asof": last, "params": {k: P[k] for k in ("thr", "gap", "horizon", "rally", "rally_win", "L", "btc_flat",
+                                                        "near_win", "near_lo", "near_hi", "recede_win", "recede_full",
+                                                        "heat_days")},
+            "status": {"state": state, "alert": last_alert, "day": day_n,
+                       "resultDay": d2s(s2d(last_alert) + dt.timedelta(days=H)) if last_alert else None,
+                       "skipped": recent_skip},
+            "today": today, "alerts": items, "series": series, "stats": stats, "grid": gsum,
+            "coverage": {"contracts": cls, "altAssets": sum(1 for v in S["assets"].values() if v == "alt"),
+                         "oiFrom": S["oi_dates"][0], "publishLagH": (meta or {}).get("publish_lag_hours")}}
 
 
 def grid(S, base=PARAMS):
