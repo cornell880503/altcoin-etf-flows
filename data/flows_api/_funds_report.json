@@ -1,7 +1,7 @@
 {
  "assets": {
   "BTC": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -9,26 +9,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1792755660"
+    "X-RateLimit-Reset": "1792760040"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 264,
-    "differ": 2,
-    "examples": [
-     [
-      "2026-10-20",
-      "valkyrie",
-      11.0,
-      29.1
-     ],
-     [
-      "2026-10-21",
-      "valkyrie",
-      0.0,
-      -14.0
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-09-23",
@@ -45,7 +32,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1792755660"
+    "X-RateLimit-Reset": "1792760040"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -68,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1792755660"
+    "X-RateLimit-Reset": "1792760040"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -83,7 +70,7 @@
    "window_days": 30
   },
   "SOL": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -103,20 +90,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1792755660"
+    "X-RateLimit-Reset": "1792760040"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 185,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-10-22",
-      "canary",
-      0.0,
-      0.4
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-09-23",
@@ -133,7 +113,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1792755660"
+    "X-RateLimit-Reset": "1792760040"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -148,5 +128,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-10-23T11:40:37Z"
+ "run_at": "2026-10-23T12:53:11Z"
 }
