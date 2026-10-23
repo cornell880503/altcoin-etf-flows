@@ -1,7 +1,7 @@
 {
  "assets": {
   "BTC": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -11,11 +11,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1792723320"
+    "X-RateLimit-Reset": "1792723440"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 252,
+    "compared": 255,
     "differ": 0,
     "examples": []
    },
@@ -26,7 +26,7 @@
    "window_days": 30
   },
   "ETH": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -36,11 +36,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1792723320"
+    "X-RateLimit-Reset": "1792723440"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 231,
+    "compared": 234,
     "differ": 0,
     "examples": []
    },
@@ -51,7 +51,7 @@
    "window_days": 30
   },
   "HYPE": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -61,11 +61,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1792723320"
+    "X-RateLimit-Reset": "1792723440"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 63,
+    "compared": 65,
     "differ": 0,
     "examples": []
    },
@@ -76,7 +76,7 @@
    "window_days": 30
   },
   "SOL": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -97,11 +97,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1792723320"
+    "X-RateLimit-Reset": "1792723440"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 176,
+    "compared": 179,
     "differ": 0,
     "examples": []
    },
@@ -112,7 +112,7 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -122,11 +122,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1792723320"
+    "X-RateLimit-Reset": "1792723440"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 105,
+    "compared": 107,
     "differ": 0,
     "examples": []
    },
@@ -137,5 +137,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-10-23T02:40:59Z"
+ "run_at": "2026-10-23T02:43:39Z"
 }
