@@ -20,7 +20,10 @@
    "stored": 50
   },
   "DOGE": {
-   "error": "<urlopen error _ssl.c:993: The handshake operation timed out>"
+   "first": "2026-09-04",
+   "last": "2026-10-22",
+   "new_rows": 22,
+   "stored": 34
   },
   "DOT": {
    "first": "2026-09-04",
@@ -95,5 +98,5 @@
    "stored": 34
   }
  },
- "run_at": "2026-10-23T17:10:28Z"
+ "run_at": "2026-10-23T18:45:51Z"
 }

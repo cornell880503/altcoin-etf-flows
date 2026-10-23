@@ -10,28 +10,7 @@
    "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "SOL": {
-   "CF-Cache-Status": "DYNAMIC",
-   "Content-Type": "text/html; charset=utf-8",
-   "Server": "cloudflare",
-   "X-Nextjs-Cache": "STALE",
-   "bytes": 481633,
-   "dated_arrays": [
-    "days"
-   ],
-   "historical_mentions": 0,
-   "partial": [
-    "2026-10-22"
-   ],
-   "sessions": 30,
-   "status": 200,
-   "total_mismatch": [],
-   "unknown_tickers": [],
-   "url": "https://cryptoetf.today/en/solana-etf-flows",
-   "used": "cols+daily",
-   "window": [
-    "2026-09-10",
-    "2026-10-22"
-   ]
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "XRP": {
    "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
