@@ -275,12 +275,54 @@ def hyperliquid():
             alt += v
             n += 1
     out = {"assets": len(ctx), "oi_bn": round(tot / 1e9, 2), "alt_oi_bn": round(alt / 1e9, 2), "alt_assets": n}
-    for name, url in [("stats_open_interest", "https://d2v1fiwobg9w6.cloudfront.net/open_interest")]:
+    live = {}
+    for a, c in zip(meta.get("universe", []), ctx):
         try:
-            r = jget(url)
-            out[name] = {"type": type(r).__name__, "sample": str(r)[:300]}
-        except Exception as e:
-            out[name] = err(e)
+            live[a["name"]] = (float(c.get("openInterest") or 0), float(c.get("markPx") or 0))
+        except (TypeError, ValueError):
+            pass
+    # the data behind stats.hyperliquid.xyz: daily OI per coin since 2023-06 (US$ or coins? up to date?)
+    try:
+        r = jget("https://d2v1fiwobg9w6.cloudfront.net/open_interest", timeout=120)
+        rows = r.get("chart_data", []) if isinstance(r, dict) else []
+        days = sorted({x["time"][:10] for x in rows})
+        coins = {x["coin"] for x in rows}
+        last = days[-1] if days else None
+        on_last = {x["coin"]: x["open_interest"] for x in rows if x["time"][:10] == last}
+        times = sorted({x["time"][11:19] for x in rows})[:5]
+        per_day = {d: 0 for d in days}
+        for x in rows:
+            per_day[x["time"][:10]] += 1
+        gaps = [d for d in (dt.date.fromisoformat(days[0]) + dt.timedelta(days=k)
+                            for k in range((dt.date.fromisoformat(days[-1]) - dt.date.fromisoformat(days[0])).days + 1))
+                if d.isoformat() not in per_day] if days else []
+        cmp = {}
+        for c in ("BTC", "ETH", "SOL", "HYPE", "DOGE", "ZEC"):
+            if c in on_last and c in live:
+                q, px = live[c]
+                cmp[c] = {"stats_last": round(on_last[c]), "live_coins": round(q), "live_usd": round(q * px)}
+        out["stats_open_interest"] = {"rows": len(rows), "coins": len(coins), "days": len(days), "first": days[0] if days else None,
+                                      "last": last, "times_of_day": times, "missing_days": len(gaps),
+                                      "missing_sample": [g.isoformat() for g in gaps[:10]],
+                                      "coins_per_day_recent": [[d, per_day[d]] for d in days[-5:]],
+                                      "coins_per_day_2024": [[d, per_day[d]] for d in days if d in ("2024-01-01", "2024-06-01", "2025-01-01")],
+                                      "keys": sorted(rows[0].keys()) if rows else None, "vs_live": cmp,
+                                      "top_keys": sorted(r.keys()) if isinstance(r, dict) else None}
+    except Exception as e:
+        out["stats_open_interest"] = err(e)
+    return out
+
+
+@source("gate_alignment")
+def gate_alignment():
+    base, out = "https://api.gateio.ws/api/v4/futures/usdt/contract_stats", {}
+    for per, lim in (("1d", 3), ("1h", 30)):
+        r = jget(f"{base}?contract=BTC_USDT&interval={per}&limit={lim}")
+        out[per] = [[iso(x["time"]), x.get("open_interest_usd"), x.get("open_interest")] for x in r]
+        time.sleep(0.3)
+    start = int(time.time()) - 179 * 86400
+    r = jget(f"{base}?contract=SOL_USDT&interval=1d&from={start}&limit=200")
+    out["last_179d"] = {"n": len(r), "first": iso(r[0]["time"]) if r else None, "last": iso(r[-1]["time"]) if r else None}
     return out
 
 
