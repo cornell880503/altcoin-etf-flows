@@ -170,7 +170,7 @@ def main(argv=None):
         todo = sorted(live | {s for s, d in last.items() if d >= recent})
         jobs = [(s, last.get(s, a.since), 1, 100 if s not in last else 20) for s in todo]
     else:
-        jobs = [(s, a.since, 40, 100) for s in sorted(live)]
+        jobs = [(s, max(a.since, last.get(s, a.since)), 40, 100) for s in sorted(live)]  # stored ones: new days only
     print(f"live USDT swaps: {len(live)}, stored contracts: {len(last)}, to ask: {len(jobs)} "
           f"({'daily' if a.daily else 'full'})", flush=True)
 
