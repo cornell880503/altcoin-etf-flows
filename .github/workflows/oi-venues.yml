@@ -1,0 +1,50 @@
+name: oi-venues
+# Open interest beyond Binance for the altcoin leverage radar: a probe of which exchanges serve free
+# history (research/probe_oi_venues.py) and the full backfill of the ones that do (scripts/fetch_oi_<venue>.py,
+# when present). The daily update runs in fetch-etf-flows (scripts/radar_update.py). Shares the
+# concurrency group of the other data workflows so they never push at the same time.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/probe_oi_venues.py", "scripts/fetch_oi_okx.py", "scripts/fetch_oi_gate.py",
+            ".github/workflows/oi-venues.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: fetch-etf-flows
+  cancel-in-progress: false
+jobs:
+  venues:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Probe the exchanges
+        run: python research/probe_oi_venues.py
+        continue-on-error: true
+        timeout-minutes: 15
+      - name: OKX open interest (full)
+        run: if [ -f scripts/fetch_oi_okx.py ]; then python scripts/fetch_oi_okx.py --budget 80; fi
+        continue-on-error: true
+        timeout-minutes: 90
+      - name: Gate open interest (full)
+        run: if [ -f scripts/fetch_oi_gate.py ]; then python scripts/fetch_oi_gate.py --budget 80; fi
+        continue-on-error: true
+        timeout-minutes: 90
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/probe_oi data/oi || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -q -m "oi venues: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do git pull --rebase -X theirs -q && git push -q && break; git rebase --abort 2>/dev/null; sleep 9; done
+          fi
