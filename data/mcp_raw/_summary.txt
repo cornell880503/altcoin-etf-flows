@@ -19,7 +19,7 @@
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-10-22",
-      "netFlowUsdM": -8.9
+      "netFlowUsdM": -8.5
     },
     {
       "symbol": "XRP",
@@ -54,19 +54,19 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-21",
-      "netFlowUsdM": 0
+      "date": "2026-10-22",
+      "netFlowUsdM": 0.1
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-21",
+      "date": "2026-10-22",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-21",
-      "netFlowUsdM": 15.2
+      "date": "2026-10-22",
+      "netFlowUsdM": 14.2
     }
   ],
-  "totalUsdM": -744.7,
-  "updatedAt": "2026-10-23T04:51:19.552Z"
+  "totalUsdM": -745.1,
+  "updatedAt": "2026-10-23T11:41:12.064Z"
 }

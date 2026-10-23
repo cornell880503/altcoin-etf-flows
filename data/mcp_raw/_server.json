@@ -127,7 +127,7 @@
     {
      "name": "get_funds",
      "title": "Crypto ETF Fund Directory",
-     "description": "Get the US spot crypto ETFs that have started trading, for one asset or all 16: ticker, name, issuer, exchange, listing date, sponsor fee (percent per year), current net assets (`netAssetsUsdM`, USD millions) and coins held, plus the total net assets of each asset. Net assets are a current snapshot, not a history. `netAssetsBasis` is reported (published by the issuer for `netAssetsDate`), repriced (the latest published figure moved to that day by the NAV change of other funds) or estimated (coins times price, for issuers without daily holdings). `coinsHeld` is null for issuers that do not publish holdings in coins.",
+     "description": "Get the US spot crypto ETFs that have started trading, for one asset or all 16: ticker, name, issuer, exchange, listing date, sponsor fee (percent per year), current net assets (`netAssetsUsdM`, USD millions) and coins held, plus the total net assets of each asset. Net assets are a current snapshot, not a history. `netAssetsBasis` is reported (published by the issuer for `netAssetsDate`), repriced (the latest published figure moved to that day by the NAV change of other funds) or estimated (coins times price, for issuers without daily holdings). `coinsHeld` is null for issuers that do not publish holdings in coins. Each fund also has `effectiveFeePct` and `feeWaiver` (a fee waiver in effect today), `feeRevenueUsdMPerYear` (net assets times the fee charged today, USD millions), `supplySharePct` (its coins as a share of circulating supply), `staking` (status from SEC filings, share staked, net yield and how rewards are paid) and `delistedAt` for a closed fund.",
      "inputSchema": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -209,6 +209,187 @@
      },
      "annotations": {
       "title": "Weekly ETF Flow Analytics",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_etf_holdings",
+     "title": "Crypto Held by ETFs",
+     "description": "Get the coins held in trust by US spot crypto ETFs for one asset or all 16, and the share of the coin's circulating supply they represent (`supplyPct`, percent). Per fund: coins held, share of the asset's ETF coins and `coinsBasis` \u2014 reported (published by the issuer, or shares times the published coins per share) or estimated (net assets per share at the same-day coin price, for issuers that do not publish coins). Includes 7- and 30-day changes in coins and the last 30 days of daily history.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "description": "Optional asset filter: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec",
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ]
+       }
+      }
+     },
+     "annotations": {
+      "title": "Crypto Held by ETFs",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_btc_etf_vs_miners",
+     "title": "Bitcoin ETFs vs Miners",
+     "description": "Get net creations of US spot Bitcoin ETFs in BTC against newly mined bitcoin. Windows: the last full week (Monday to Sunday), 30 days, year to date and since launch (11 Jan 2024), each with ETF net BTC, mined BTC and their ratio (null when ETFs had net outflows). Also the number of consecutive full weeks with ETF demand above new supply and the last 12 weeks. ETF BTC is the daily USD net flow divided by the volume-weighted bitcoin price of that day; mined BTC is the block subsidy times blocks between midnights UTC.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Bitcoin ETFs vs Miners",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_issuer_revenue",
+     "title": "Crypto ETF Issuer Fee Revenue",
+     "description": "Get estimated sponsor fee revenue of US spot crypto ETFs: net assets times the prospectus sponsor fee, with temporary fee waivers applied. Per fund: net assets, nominal and effective fee (percent per year), revenue per day and annualised at current assets, and the sum for the last 30 days where a daily series exists. Totals by issuer and for the whole market. Arithmetic on the published fee, not the issuer's reported revenue; the sponsor's share of staking rewards is not included.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "description": "Optional asset filter for the fund list: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec",
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ]
+       }
+      }
+     },
+     "annotations": {
+      "title": "Crypto ETF Issuer Fee Revenue",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_staking",
+     "title": "Staking Inside Crypto ETFs",
+     "description": "Get the staking status of US spot crypto ETFs: active, allowed_not_started, pending_amendment, no, not_stakeable (proof-of-work assets and XRP) or unknown, from SEC filings. For staking funds: cap and share of assets staked, the staking yield as disclosed by the issuer with its date, providers, whether rewards are kept in the fund or paid in cash, the last cash payout per share, and `coinsPerShare` \u2014 the annualised growth of coins behind each share from daily issuer snapshots (shown only where the series is clean). Per asset: funds staking and the estimated coins staked.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "description": "Optional asset filter: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec",
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ]
+       }
+      }
+     },
+     "annotations": {
+      "title": "Staking Inside Crypto ETFs",
+      "readOnlyHint": true,
+      "openWorldHint": false
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_cost_basis",
+     "title": "ETF Holders Average Entry Price",
+     "description": "Get the estimated average entry price per coin of US spot crypto ETF holders for one asset or all 16: coins accumulated through net flows, money invested, average entry, the latest coin price and unrealised P&L. Also how many consecutive days holders have been above or below their entry and since when. The entry is built from daily creations and redemptions valued at the volume-weighted price of each day; coins of converted trusts (GBTC, ETHE) are not included.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "asset": {
+        "description": "Optional asset filter: btc, eth, sol, xrp, hyp, doge, link, avax, hbar, ltc, bnb, dot, sui, near, trx, zec",
+        "type": "string",
+        "enum": [
+         "btc",
+         "eth",
+         "sol",
+         "xrp",
+         "hyp",
+         "doge",
+         "link",
+         "avax",
+         "hbar",
+         "ltc",
+         "bnb",
+         "dot",
+         "sui",
+         "near",
+         "trx",
+         "zec"
+        ]
+       }
+      }
+     },
+     "annotations": {
+      "title": "ETF Holders Average Entry Price",
       "readOnlyHint": true,
       "openWorldHint": false
      },
