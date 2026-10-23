@@ -464,7 +464,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div>
           <div class="eyebrow">山寨頂部雷達 · 永續合約槓桿</div>
           <h2 id="h-radar">山寨的槓桿是不是過熱了</h2>
-          <p>ALR（Altcoin Leverage Risk，0–100）在三件事同時出現時升高：山寨永續合約的持倉往山寨集中、持倉長得比價格快、山寨漲到高點附近後持倉開始退潮。升破門檻發出警報，警報是降低山寨多單的參考，不是做空訊號。</p>
+          <p>ALR（Altcoin Leverage Risk，0–100）在三件事同時出現時升高：山寨永續合約的持倉往山寨集中、持倉長得比價格快、山寨漲到高點附近後持倉開始退潮。升破門檻發出警報。過去的警報之後 30 天，山寨市值多半下跌，但也有不少次是先跌後漲，所以它不是做空訊號。</p>
         </div>
       </div>
       <div id="rd-status"></div>
@@ -2560,7 +2560,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     if (s.state === 'none' || !last) {
       sub.textContent = '最近 ' + P.horizon + ' 天沒有警報。' + (last ? '上一次警報是 ' + rdD(last.d) + '，之後 ' + P.horizon + ' 天「' + rdKind(last)[0] + '」。' : '');
     } else if (s.state === 'alert') {
-      sub.textContent = '山寨槓桿過熱：考慮降低山寨多單。' + P.horizon + ' 天觀察期從今天開始，' + rdD(s.resultDay) + ' 公布結果。';
+      var sa = RD.stats && RD.stats.all;
+      sub.textContent = '山寨槓桿過熱。' + (sa && sa.median_dd != null ? '過去 ' + sa.alerts + ' 次警報之後 ' + P.horizon + ' 天內，山寨市值最大跌幅的中位數是 ' + rdF(sa.median_dd) + '（隨機一天是 ' + rdF(sa.random_dd) + '）。' : '') + P.horizon + ' 天觀察期從今天開始，' + rdD(s.resultDay) + ' 公布結果。';
     } else {
       sub.append(rdD(s.alert) + ' 警報以來，山寨市值 '); sub.appendChild(rdN('b', null, rdP(last.ret)));
       sub.append('，期間最多跌 '); sub.appendChild(rdN('b', null, rdP(last.dd)));
@@ -2716,10 +2717,11 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   function rdMethod() {
     var h = document.getElementById('rd-method'), C = RD.coverage, P = RD.params; h.replaceChildren();
     var lag = C.publishLagH && C.publishLagH.median != null ? Math.round(C.publishLagH.median) : 7;
+    var ka = (RD.stats && RD.stats.all) || {}, kk = ka.kinds || {};
     var blocks = [
       ['資料', ['持倉：Binance USDT 永續合約，每個合約每天一個公開檔（data.binance.vision，' + rdD(C.oiFrom) + ' 起，每 5 分鐘一筆，取每天收盤）。算進山寨的有 ' + (C.contracts.alt || 0) + ' 個合約；BTC、ETH、股票、ETF、貴金屬、指數和穩定幣合約不算（' + ((C.contracts.equity || 0) + (C.contracts['equity (weekend test)'] || 0)) + ' 個股票類合約，2025/06 以後新上的合約要週末也有在動才算加密貨幣）。',
         '山寨市值：Coin Metrics 免費 API 的每日市值，' + C.altAssets + ' 個幣加總，扣掉 BTC、ETH、穩定幣、包裝幣、質押幣、黃金代幣和同一個幣在不同鏈上的重複。新幣加入、合約上下架不會讓指數跳動（每天只比較前後兩天都有的）。',
-        '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡傍晚更新，比 CoinKarma 的 00:10 UTC 晚。']],
+        '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡下午 4 點左右更新（Binance 晚發時是 5 點多），比 CoinKarma 的 00:10 UTC 晚。']],
       ['ALR 怎麼算', ['資金往山寨集中：山寨持倉相對 BTC＋ETH 持倉 ' + P.L + ' 天的增速，在過去一年排第幾；BTC 同期漲跌超過 ' + Math.round(P.btc_flat * 100) + '%（不是橫盤）時記 0。',
         '持倉長得比價格快：山寨持倉相對山寨市值 ' + P.L + ' 天的增速，在過去一年排第幾。',
         '熱度：最近 ' + P.heat_days + ' 天裡，上面兩項平均最高的一天。',
@@ -2729,7 +2731,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         '兩次警報至少隔 ' + P.gap + ' 天。',
         'BTC 30 天內剛漲超過 ' + Math.round(P.rally * 100) + '% 時的第一次過熱不發，' + P.horizon + ' 天內再過熱才發（照 CoinKarma 的規則）。',
         '門檻 ' + P.thr + ' 是在 85、90、95 裡，挑警報頻率最接近 CoinKarma（一年約 5 次）的一個；挑的時候只看次數，沒看之後的漲跌。']],
-      ['限制', ['不是做空訊號：警報後仍有不少次是先跌後漲，用來降低山寨多單，不是反手做空。',
+      ['限制', ['不是做空訊號：已滿 ' + P.horizon + ' 天的 ' + (ka.alerts || 0) + ' 次警報裡，有 ' + (kk.down_then_up || 0) + ' 次是先跌後漲。',
         '樣本小：統計從 2023 年 4 月開始，已滿 30 天的警報只有十幾次，統計上還不夠確定（見上面的檢定）。',
         '只有 Binance 的持倉，沒有 Bybit、OKX；結果和 CoinKarma 的山寨頂部雷達不會一樣，這是用公開資料、公式完全公開的版本。',
         '只看山寨整體，個別幣種的走勢可能不同。']]];
