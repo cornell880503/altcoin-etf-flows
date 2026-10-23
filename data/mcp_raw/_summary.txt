@@ -7,25 +7,25 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-10-22",
-      "netFlowUsdM": -134.4
+      "netFlowUsdM": -635.5
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-10-22",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -110.6
     },
     {
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-10-22",
-      "netFlowUsdM": -5.7
+      "netFlowUsdM": -8.9
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-10-22",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 2.6
     },
     {
       "symbol": "HYP",
@@ -100,6 +100,6 @@
       "netFlowUsdM": 15.2
     }
   ],
-  "totalUsdM": -132.4,
-  "updatedAt": "2026-10-23T02:54:16.545Z"
+  "totalUsdM": -744.7,
+  "updatedAt": "2026-10-23T04:51:19.552Z"
 }
