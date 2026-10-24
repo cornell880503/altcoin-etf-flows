@@ -32,9 +32,9 @@
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": 3.3,
+      "netFlowUsdM": 4.3,
       "tradingDays": 5,
-      "avgDailyUsdM": 0.7,
+      "avgDailyUsdM": 0.9,
       "positiveDays": 2,
       "negativeDays": 0
     },
@@ -78,7 +78,7 @@
       "symbol": "HBAR",
       "asset": "hbar",
       "netFlowUsdM": 0.1,
-      "tradingDays": 4,
+      "tradingDays": 5,
       "avgDailyUsdM": 0,
       "positiveDays": 1,
       "negativeDays": 0
@@ -87,7 +87,7 @@
       "symbol": "LTC",
       "asset": "ltc",
       "netFlowUsdM": 0.6,
-      "tradingDays": 4,
+      "tradingDays": 5,
       "avgDailyUsdM": 0.1,
       "positiveDays": 1,
       "negativeDays": 0
@@ -132,7 +132,7 @@
       "symbol": "TRX",
       "asset": "trx",
       "netFlowUsdM": 0,
-      "tradingDays": 4,
+      "tradingDays": 5,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -140,10 +140,10 @@
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "netFlowUsdM": 20.6,
-      "tradingDays": 4,
-      "avgDailyUsdM": 5.1,
-      "positiveDays": 3,
+      "netFlowUsdM": 41.1,
+      "tradingDays": 5,
+      "avgDailyUsdM": 8.2,
+      "positiveDays": 4,
       "negativeDays": 1
     }
   ]

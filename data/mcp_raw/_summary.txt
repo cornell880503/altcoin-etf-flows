@@ -54,13 +54,13 @@
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-10-22",
-      "netFlowUsdM": 0.1
+      "date": "2026-10-23",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-10-22",
+      "date": "2026-10-23",
       "netFlowUsdM": 0
     },
     {
@@ -90,16 +90,16 @@
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-10-22",
+      "date": "2026-10-23",
       "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-10-22",
-      "netFlowUsdM": 14.2
+      "date": "2026-10-23",
+      "netFlowUsdM": 20.5
     }
   ],
-  "totalUsdM": -118.2,
-  "updatedAt": "2026-10-24T04:38:21.237Z"
+  "totalUsdM": -112,
+  "updatedAt": "2026-10-24T11:03:12.794Z"
 }
