@@ -2,76 +2,76 @@
  "assets": {
   "BTC": {
    "changed": false,
-   "days": 21,
+   "days": 20,
    "gap": false,
    "ok": true,
    "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1792970280"
+    "X-RateLimit-Reset": "1792990140"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 252,
+    "compared": 240,
     "differ": 0,
     "examples": []
    },
    "window": [
-    "2026-09-25",
+    "2026-09-28",
     "2026-10-23"
    ],
    "window_days": 30
   },
   "ETH": {
    "changed": false,
-   "days": 21,
+   "days": 20,
    "gap": false,
    "ok": true,
    "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1792970280"
+    "X-RateLimit-Reset": "1792990140"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 231,
+    "compared": 220,
     "differ": 0,
     "examples": []
    },
    "window": [
-    "2026-09-25",
+    "2026-09-28",
     "2026-10-23"
    ],
    "window_days": 30
   },
   "HYPE": {
    "changed": false,
-   "days": 21,
+   "days": 20,
    "gap": false,
    "ok": true,
    "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1792970280"
+    "X-RateLimit-Reset": "1792990140"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 63,
+    "compared": 60,
     "differ": 0,
     "examples": []
    },
    "window": [
-    "2026-09-25",
+    "2026-09-28",
     "2026-10-23"
    ],
    "window_days": 30
   },
   "SOL": {
    "changed": false,
-   "days": 21,
+   "days": 20,
    "gap": false,
    "ok": true,
    "partial": [
@@ -89,22 +89,22 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1792970280"
+    "X-RateLimit-Reset": "1792990140"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 177,
+    "compared": 168,
     "differ": 0,
     "examples": []
    },
    "window": [
-    "2026-09-25",
+    "2026-09-28",
     "2026-10-23"
    ],
    "window_days": 30
   },
   "XRP": {
-   "changed": false,
+   "changed": true,
    "days": 21,
    "gap": false,
    "ok": true,
@@ -112,20 +112,20 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1792970280"
+    "X-RateLimit-Reset": "1792990140"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 105,
+    "compared": 100,
     "differ": 0,
     "examples": []
    },
    "window": [
-    "2026-09-25",
-    "2026-10-23"
+    "2026-09-28",
+    "2026-10-24"
    ],
    "window_days": 30
   }
  },
- "run_at": "2026-10-25T23:17:05Z"
+ "run_at": "2026-10-26T04:48:39Z"
 }
