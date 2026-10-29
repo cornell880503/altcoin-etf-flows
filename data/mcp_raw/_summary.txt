@@ -1,5 +1,5 @@
 {
-  "today": "2026-10-28",
+  "today": "2026-10-29",
   "referenceDate": "2026-10-27",
   "referenceIsToday": false,
   "assets": [
@@ -19,7 +19,7 @@
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-10-27",
-      "netFlowUsdM": -19.2
+      "netFlowUsdM": -19.1
     },
     {
       "symbol": "XRP",
@@ -100,6 +100,6 @@
       "netFlowUsdM": 3.5
     }
   ],
-  "totalUsdM": 94.8,
-  "updatedAt": "2026-10-28T20:16:30.364Z"
+  "totalUsdM": 94.9,
+  "updatedAt": "2026-10-29T00:58:14.424Z"
 }
