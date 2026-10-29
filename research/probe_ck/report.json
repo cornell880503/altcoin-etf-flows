@@ -1,0 +1,718 @@
+{
+ "run_at": "2026-10-29T08:08:43Z",
+ "sources": {
+  "apple_rss": {
+   "itunes_finance_free": {
+    "coinbase": 37,
+    "crypto": {
+     "Binance.US Exchange・Buy Crypto": 94,
+     "Coinbase: Buy Crypto & Stocks": 37,
+     "Robinhood Banking": 78,
+     "Robinhood: Trading & Investing": 26
+    },
+    "n": 100,
+    "top": [
+     "Capital One Mobile",
+     "Kalshi: Trade Sports & Events",
+     "Trump Accounts: Official App",
+     "PayPal - Pay, Send, Save",
+     "Venmo"
+    ]
+   },
+   "marketing_tools_top": {
+    "coinbase": null,
+    "crypto": {},
+    "n": 50,
+    "top": [
+     "TikTok Pro - Events",
+     "Muse from Meta",
+     "Vinted: Pre-loved marketplace",
+     "ChatGPT",
+     "Capital One Mobile"
+    ]
+   },
+   "ok": true,
+   "secs": 3.2
+  },
+  "binance_vision": {
+   "bookDepth_2023": {
+    "head": [
+     "timestamp,percentage,depth,notional",
+     "2023-06-01 07:03:02,-5,17245.47900000,453246381.17534000",
+     "2023-06-01 07:03:02,-4,15766.31900000,415425503.43265000",
+     "2023-06-01 07:03:02,-3,13657.63900000,360949861.61969000",
+     "2023-06-01 07:03:02,-2,10620.46000000,281710835.93843000",
+     "2023-06-01 07:03:02,-1,6550.22700000,174415063.55459000",
+     "2023-06-01 07:03:02,1,4004.99100000,107631623.16100000",
+     "2023-06-01 07:03:02,2,6092.89600000,164343770.75325000",
+     "2023-06-01 07:03:02,3,8746.75400000,237112726.96732000",
+     "2023-06-01 07:03:02,4,10163.63400000,276349257.72271000",
+     "2023-06-01 07:03:02,5,11115.29500000,302967002.36690000",
+     "2023-06-01 07:03:31,-5,17289.13600000,454399205.47824000",
+     "2023-06-01 07:03:31,-4,15807.10000000,416505131.75365000",
+     "2023-06-01 07:03:31,-3,13698.58400000,362033736.08199000"
+    ],
+    "lines": 20271,
+    "tail": [
+     "2023-06-01 23:56:03,3,9535.82700000,259193871.02052000",
+     "2023-06-01 23:56:03,4,10901.62500000,297034460.66991000",
+     "2023-06-01 23:56:03,5,11953.29000000,326463649.28874000"
+    ]
+   },
+   "bookDepth_BTCUSDT": {
+    "first": [
+     "BTCUSDT-bookDepth-2023-01-01.zip",
+     "BTCUSDT-bookDepth-2023-01-01.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "bookDepth_SOLUSDT": {
+    "first": [
+     "SOLUSDT-bookDepth-2023-01-01.zip",
+     "SOLUSDT-bookDepth-2023-01-01.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "bookDepth_sample": {
+    "head": [
+     "timestamp,percentage,depth,notional",
+     "2026-10-27 00:00:01,-5.00,11332.45600000,892102221.36810000",
+     "2026-10-27 00:00:01,-4.00,10599.72200000,836015564.65600000",
+     "2026-10-27 00:00:01,-3.00,9621.31600000,760372350.84070000",
+     "2026-10-27 00:00:01,-2.00,7742.80300000,613623422.51700000",
+     "2026-10-27 00:00:01,-1.00,3387.70700000,269757775.30500000",
+     "2026-10-27 00:00:01,-0.20,538.73900000,43113346.59490000",
+     "2026-10-27 00:00:01,0.20,643.01200000,51569725.02750000",
+     "2026-10-27 00:00:01,1.00,2732.49300000,219993619.18700000",
+     "2026-10-27 00:00:01,2.00,5608.96900000,453614606.99920000",
+     "2026-10-27 00:00:01,3.00,6541.72900000,530156506.56420000",
+     "2026-10-27 00:00:01,4.00,7002.24300000,568321380.13760000",
+     "2026-10-27 00:00:01,5.00,7410.07100000,602483056.44740000",
+     "2026-10-27 00:00:30,-5.00,11500.94900000,905516837.36750000"
+    ],
+    "lines": 34561,
+    "tail": [
+     "2026-10-27 23:59:30,3.00,7066.55900000,577528254.90040000",
+     "2026-10-27 23:59:30,4.00,7693.67300000,630030768.10650000",
+     "2026-10-27 23:59:30,5.00,7872.38100000,645141413.78020000"
+    ]
+   },
+   "cm_BTCUSD_PERP_1d_monthly": {
+    "first": [
+     "BTCUSD_PERP-1d-2020-08.zip",
+     "BTCUSD_PERP-1d-2020-08.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "cm_quarterlies": [
+    "BTCUSD_200925",
+    "BTCUSD_201225",
+    "BTCUSD_210326",
+    "BTCUSD_210625",
+    "BTCUSD_210924",
+    "BTCUSD_211231",
+    "BTCUSD_220325",
+    "BTCUSD_220624",
+    "BTCUSD_220930",
+    "BTCUSD_221230",
+    "BTCUSD_230331",
+    "BTCUSD_230630",
+    "BTCUSD_230929",
+    "BTCUSD_231229",
+    "BTCUSD_240329",
+    "BTCUSD_240628",
+    "BTCUSD_240927",
+    "BTCUSD_241227",
+    "BTCUSD_250328",
+    "BTCUSD_250627",
+    "BTCUSD_250926",
+    "BTCUSD_251226",
+    "BTCUSD_260327",
+    "BTCUSD_260626",
+    "BTCUSD_260925",
+    "BTCUSD_261225"
+   ],
+   "fundingRate_BTCUSDT_monthly": {
+    "first": [
+     "BTCUSDT-fundingRate-2020-01.zip",
+     "BTCUSDT-fundingRate-2020-01.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "ok": true,
+   "secs": 10.5,
+   "spot_BTCUSDC_1h_monthly": {
+    "first": [
+     "BTCUSDC-1h-2018-12.zip",
+     "BTCUSDC-1h-2018-12.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "spot_BTCUSDT_1d_monthly": {
+    "first": [
+     "BTCUSDT-1d-2017-08.zip",
+     "BTCUSDT-1d-2017-08.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "spot_USDCUSDT_1h_monthly": {
+    "first": [
+     "USDCUSDT-1h-2018-12.zip",
+     "USDCUSDT-1h-2018-12.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "um_metrics_BTCUSDT_daily": {
+    "first": [
+     "BTCUSDT-metrics-2020-09-01.zip",
+     "BTCUSDT-metrics-2020-09-01.zip.CHECKSUM"
+    ],
+    "more": true
+   },
+   "um_quarterlies": [
+    "BTCUSDT_210326",
+    "BTCUSDT_210625",
+    "BTCUSDT_210924",
+    "BTCUSDT_211231",
+    "BTCUSDT_220325",
+    "BTCUSDT_220624",
+    "BTCUSDT_220930",
+    "BTCUSDT_221230",
+    "BTCUSDT_230331",
+    "BTCUSDT_230630",
+    "BTCUSDT_230929",
+    "BTCUSDT_231229",
+    "BTCUSDT_240329",
+    "BTCUSDT_240628",
+    "BTCUSDT_240927",
+    "BTCUSDT_241227",
+    "BTCUSDT_250328",
+    "BTCUSDT_250627",
+    "BTCUSDT_250926",
+    "BTCUSDT_251226",
+    "BTCUSDT_260327",
+    "BTCUSDT_260626",
+    "BTCUSDT_260925",
+    "BTCUSDT_261225",
+    "BTCUSDT_270326"
+   ]
+  },
+  "bitfinex": {
+   "candles_BTCUSD_1D_2021": {
+    "n": 3,
+    "rows": [
+     [
+      "2021-01-01 00:00",
+      28939,
+      29349,
+      29620,
+      28716,
+      8332.17329653
+     ],
+     [
+      "2021-01-02 00:00",
+      29349.83250154,
+      32183,
+      33292,
+      29000,
+      22012.92431526
+     ],
+     [
+      "2021-01-03 00:00",
+      32185,
+      32968,
+      34873,
+      31975,
+      18908.90248876
+     ]
+    ]
+   },
+   "candles_BTCUSD_1h": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 08:00",
+      79864,
+      79983,
+      79999,
+      79856,
+      4.28885584
+     ],
+     [
+      "2026-10-29 07:00",
+      79985,
+      79856,
+      80005,
+      79846,
+      8.76954332
+     ],
+     [
+      "2026-10-29 06:00",
+      80249,
+      79976,
+      80306,
+      79915,
+      4.61985293
+     ]
+    ]
+   },
+   "credits_fUSD": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 08:08",
+      5767653075.298504
+     ],
+     [
+      "2026-10-29 08:07",
+      5767653075.298504
+     ],
+     [
+      "2026-10-29 08:06",
+      5767653075.298504
+     ]
+    ]
+   },
+   "funding_fUSD_1D_p30": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 00:00",
+      0.00013326,
+      0.00015589,
+      0.00023067,
+      0.000121,
+      30604.67369834
+     ],
+     [
+      "2026-10-28 00:00",
+      0.00029801,
+      0.00015,
+      0.00029892,
+      0.00013,
+      142406381.0586867
+     ],
+     [
+      "2026-10-27 00:00",
+      0.00015781,
+      0.00016,
+      0.0003,
+      0.00013699,
+      52904570.03445217
+     ]
+    ]
+   },
+   "funding_fUSD_2021": {
+    "n": 3,
+    "rows": [
+     [
+      "2021-01-01 00:00",
+      0.0002803,
+      0.00026,
+      0.00031889,
+      5.39e-05,
+      4386263.81176364
+     ],
+     [
+      "2021-01-02 00:00",
+      0.00026517,
+      0.00022082,
+      0.00030517,
+      5.39e-05,
+      42839330.67837997
+     ],
+     [
+      "2021-01-03 00:00",
+      0.000219,
+      0.00030188,
+      0.0004,
+      5.39e-05,
+      138915690.90750405
+     ]
+    ]
+   },
+   "funding_fUSD_a30p2p30": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 00:00",
+      0.00012605,
+      0.00014,
+      0.00023639,
+      8e-05,
+      31015775.6449161
+     ],
+     [
+      "2026-10-28 00:00",
+      0.000124,
+      0.00015,
+      0.00029892,
+      7.945e-05,
+      274861666.3088559
+     ],
+     [
+      "2026-10-27 00:00",
+      0.00012834,
+      0.00012363,
+      0.0003,
+      7.233e-05,
+      288604782.6685771
+     ]
+    ]
+   },
+   "funding_fUST_1D_p30": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 00:00",
+      0.00016438,
+      0.000124,
+      0.00019279,
+      0.00012,
+      87148.21176832
+     ],
+     [
+      "2026-10-28 00:00",
+      0.00012,
+      0.000179,
+      0.000179,
+      0.00010959,
+      1362671.24524292
+     ],
+     [
+      "2026-10-27 00:00",
+      0.000151,
+      0.000133,
+      0.000151,
+      0.00012,
+      147175.31624157
+     ]
+    ]
+   },
+   "ok": true,
+   "pos_long_BTCUSD": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 08:08",
+      89708.83750734
+     ],
+     [
+      "2026-10-29 08:07",
+      89708.84203519
+     ],
+     [
+      "2026-10-29 08:06",
+      89708.77137019
+     ]
+    ]
+   },
+   "pos_long_BTCUSD_2021": {
+    "n": 3,
+    "rows": [
+     [
+      "2021-01-01 00:00",
+      16266.17814226
+     ],
+     [
+      "2021-01-01 00:01",
+      16264.58127137
+     ],
+     [
+      "2021-01-01 00:02",
+      16263.37582832
+     ]
+    ]
+   },
+   "pos_long_ETHBTC": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 08:08",
+      116880.15416733
+     ],
+     [
+      "2026-10-29 08:07",
+      116880.15416733
+     ],
+     [
+      "2026-10-29 08:06",
+      116880.15416733
+     ]
+    ]
+   },
+   "pos_short_BTCUSD": {
+    "n": 3,
+    "rows": [
+     [
+      "2026-10-29 08:08",
+      171.18806571
+     ],
+     [
+      "2026-10-29 08:07",
+      170.33341877
+     ],
+     [
+      "2026-10-29 08:06",
+      170.30211126
+     ]
+    ]
+   },
+   "secs": 17.2
+  },
+  "deribit": {
+   "dvol": {
+    "error": "IndexError: list index out of range"
+   },
+   "history_trades_2022": {
+    "n": 5,
+    "sample": {
+     "index_price": 31944.97,
+     "instrument_name": "BTC-17JUN22-32000-C",
+     "iv": 65.37,
+     "timestamp": 1654045033700
+    }
+   },
+   "ok": true,
+   "options": {
+    "keys": [
+     "ask_price",
+     "base_currency",
+     "bid_price",
+     "creation_timestamp",
+     "estimated_delivery_price",
+     "high",
+     "instrument_name",
+     "interest_rate",
+     "last",
+     "low",
+     "mark_iv",
+     "mark_price",
+     "mid_price",
+     "open_interest",
+     "price_change",
+     "quote_currency",
+     "underlying_index",
+     "underlying_price",
+     "volume",
+     "volume_usd"
+    ],
+    "n": 988,
+    "sample": {
+     "ask_iv": null,
+     "bid_iv": null,
+     "instrument_name": "BTC-31OCT26-87000-C",
+     "mark_iv": 46.14,
+     "open_interest": 0.8,
+     "underlying_price": 79885.9
+    }
+   },
+   "secs": 1.4,
+   "ticker_greeks": {
+    "greeks": {
+     "delta": 0.00649,
+     "gamma": 1e-05,
+     "rho": 0.02801,
+     "theta": -5.6667,
+     "vega": 1.07615
+    },
+    "mark_iv": 46.14
+   }
+  },
+  "equities_macro": {
+   "binance_insurance": {
+    "body": "{\"error\":\"Not Found\",\"timestamp\":1793261369420,\"message\":\"No message available\",\"status\":404,\"path\":\"/v1/public/future/common/get-insurance-fund-balance\"}",
+    "status": 404
+   },
+   "cftc_btc_first": {
+    "fields": [
+     "asset_mgr_positions_long",
+     "asset_mgr_positions_short",
+     "asset_mgr_positions_spread",
+     "dealer_positions_long_all",
+     "dealer_positions_short_all",
+     "dealer_positions_spread_all",
+     "lev_money_positions_long",
+     "lev_money_positions_short",
+     "lev_money_positions_spread",
+     "other_rept_positions_long",
+     "other_rept_positions_short",
+     "other_rept_positions_spread",
+     "pct_of_oi_asset_mgr_long",
+     "pct_of_oi_asset_mgr_short",
+     "pct_of_oi_asset_mgr_spread",
+     "pct_of_oi_dealer_long_all",
+     "pct_of_oi_dealer_short_all",
+     "pct_of_oi_dealer_spread_all",
+     "pct_of_oi_lev_money_long",
+     "pct_of_oi_lev_money_short",
+     "pct_of_oi_lev_money_spread",
+     "pct_of_oi_other_rept_long",
+     "pct_of_oi_other_rept_short",
+     "pct_of_oi_other_rept_spread",
+     "traders_asset_mgr_short_all",
+     "traders_asset_mgr_spread",
+     "traders_dealer_long_all",
+     "traders_dealer_short_all",
+     "traders_dealer_spread_all",
+     "traders_lev_money_long_all",
+     "traders_lev_money_short_all",
+     "traders_other_rept_short"
+    ],
+    "first": "2018-04-10T00:00:00.000",
+    "n": 3
+   },
+   "defillama_usdc": {
+    "first": "2018-09-11 00:00",
+    "n": 2971
+   },
+   "fred_walcl": {
+    "head": [
+     "observation_date,WALCL",
+     "2020-01-01,4173626"
+    ],
+    "lines": 357
+   },
+   "hl_funding_2023": {
+    "first": "2023-06-01 00:00",
+    "n": 500
+   },
+   "ok": true,
+   "secs": 7.6,
+   "stooq_mstr": {
+    "head": [
+     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"></head><body><noscript>This site requires JavaScript to verify your browser. Please enable JavaScript and reload.</noscript><script nonce=\"GDBEPPOdXe8O_YSanw0LVg\">",
+     "(async()=>{const c=\"AAAAAGri_zMlEhoPlllCLWxOzFUSmiSPnhcTlWXV3kXv72Tjlub6yTlSmIc\",d=4,t=\"0\".repeat(d),e=new TextEncoder;let n=0;while(1){const h=await crypto.subtle.digest(\"SHA-256\",e.encode(c+n)),x=Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,\"0\")).join(\"\");if(x.startsWith(t))break;n++}const r=await fetch(\"/__verify\",{method:\"POST\",headers:{\"Content-Type\":\"application/x-www-form-urlencoded\"},body:\"c=\"+encodeURIComponent(c)+\"&n=\"+n,credentials:\"same-origin\"});if(r.ok)location.reload()})();"
+    ],
+    "n": 3,
+    "tail": [
+     "</script></body></html>"
+    ]
+   },
+   "strategy_bitcoin_kpis": {
+    "head": "{\"timestamp\":\"2026-10-29T08:08:00\",\"results\":{\"ufPrice\":79840.65,\"msTimestamp\":1793261301463,\"latestPrice\":79841,\"latestPriceString\":\"79,841\",\"prevDayPrice\":79738,\"prevDayPriceString\":\"79,738\",\"priceVarVal\":\"102\",\"priceVarPerc\":\"0.13\",\"btcHoldings\":\"848,517\",\"pctOfBtcTotalSupply\":4.0406,\"satsPerShare\":187752.5543,\"btcPerShareUsd\":149.9029,\"btcPerShareUsdVarVal\":\"0.1922\",\"btcPerShareUsdVarPerc\":\"0.",
+    "len": 2211
+   },
+   "strategy_kpi": {
+    "head": "[{\"company\":\"MSTR\",\"ufPrice\":145.16,\"sharesVolume\":12207333.597165,\"msTimeStamp\":1793217600000,\"timeStamp\":\"10/28/2026 04:00 PM\",\"timeStampUtc\":\"2026-10-28T20:00:00\",\"price\":\"145.16\",\"priceVarVal\":\"3.76\",\"priceVarPerc\":\"2.66\",\"negative\":false,\"threeMonth\":\"50.9567\",\"oneYear\":\"-49.0022\",\"bse\":\"1,074.2436\",\"bseAnnualized\":48.5968,\"bseAnnualizedString\":\"48.5968%\",\"dailyVolume\":\"1,772\",\"averageVolume\"",
+    "len": 1004
+   },
+   "strategy_purchases": {
+    "body": "{\"requestId\":\"40a9c70e-cf66-4c61-b82e-e7a83939c093\",\"status\":\"API_ERROR\",\"errorCode\":\"invalid_endpoint\",\"message\":\"Not Found\",\"timestamp\":\"2026-10-29T08:09:24.837Z\"}",
+    "status": 404
+   },
+   "yahoo_mstr": {
+    "first": "2021-10-29 13:30",
+    "keys": [
+     "volume",
+     "close",
+     "open",
+     "low",
+     "high"
+    ],
+    "last": "2026-10-28 13:30",
+    "n": 1254
+   }
+  },
+  "okx": {
+   "funding_depth": {
+    "oldest": "2026-07-27 16:00",
+    "rows": 282
+   },
+   "funding_hist": {
+    "code": "0",
+    "msg": "",
+    "n": 100,
+    "range": [
+     "2026-09-26 08:00",
+     "2026-10-29 08:00"
+    ],
+    "sample": {
+     "formulaType": "withRate",
+     "fundingRate": "0.0000338041564747",
+     "fundingTime": "1793260800000",
+     "instId": "BTC-USDT-SWAP",
+     "instType": "SWAP",
+     "method": "current_period",
+     "realizedRate": "0.0000338041564747"
+    }
+   },
+   "insurance_fund": {
+    "code": "0",
+    "first": {
+     "adlType": "",
+     "amt": "0",
+     "balance": "93078412.1235",
+     "ccy": "USDT",
+     "decRate": "",
+     "maxBal": "",
+     "maxBalTs": "",
+     "ts": "1793255349000",
+     "type": "regular_update"
+    },
+    "last": {
+     "adlType": "",
+     "amt": "0",
+     "balance": "93078757.6237",
+     "ccy": "USDT",
+     "decRate": "",
+     "maxBal": "",
+     "maxBalTs": "",
+     "ts": "1793261294000",
+     "type": "regular_update"
+    },
+    "n": 100,
+    "total": "2967036450.5774"
+   },
+   "insurance_fund_all": {
+    "body": "{\"code\":\"51000\",\"data\":[],\"msg\":\"Parameter type error\"}",
+    "status": 400
+   },
+   "lending_rate_hist": {
+    "code": "0",
+    "msg": "",
+    "n": 100,
+    "range": [
+     "2026-10-25 05:00",
+     "2026-10-29 08:00"
+    ],
+    "sample": {
+     "amt": "",
+     "ccy": "USDT",
+     "lendingRate": "0.0445",
+     "rate": "0.049",
+     "ts": "1793260800000"
+    }
+   },
+   "long_short_acct": {
+    "code": "0",
+    "msg": "",
+    "n": 180,
+    "range": [
+     "2026-05-02 16:00",
+     "2026-10-28 16:00"
+    ],
+    "sample": [
+     "1793203200000",
+     "2.17"
+    ]
+   },
+   "ok": true,
+   "secs": 7.4,
+   "taker_volume": {
+    "code": "0",
+    "msg": "",
+    "n": 72,
+    "range": [
+     "2026-08-18 16:00",
+     "2026-10-28 16:00"
+    ],
+    "sample": [
+     "1793203200000",
+     "2378668387.407",
+     "2438443684.513"
+    ]
+   }
+  }
+ }
+}
