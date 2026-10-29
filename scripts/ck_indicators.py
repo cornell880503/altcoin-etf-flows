@@ -75,6 +75,7 @@ def btc_close():
 
 
 BTC = {}
+DAILY = {}  # daily series other items reuse (the market-pulse composite): name -> {date: value}
 
 
 def fwd(d, H):
@@ -153,6 +154,25 @@ def item(**kw):
 
 
 # ------------------------------------------------------------------ ETF
+def etf_v30():
+    """US spot BTC ETFs' net flow over the last 30 calendar days, in thousands of BTC, by day."""
+    try:
+        rows = json.load(open(os.path.join(ROOT, "data", "flows", "BTC.json")))["rows"]
+    except (OSError, ValueError, KeyError):
+        return {}
+    days = sorted((r["date"], r) for r in rows if r.get("total") is not None)
+    if not days:
+        return {}
+    flow = {d: r["total"] for d, r in days}
+    price = {d: r.get("btcPrice") or BTC.get(d) for d, r in days}
+    cal, d, end = [], s2d(days[0][0]), s2d(days[-1][0])
+    while d <= end:
+        cal.append(d2s(d))
+        d += dt.timedelta(days=1)
+    bf = [(flow[x] * 1e6 / price[x]) if x in flow and price.get(x) else 0.0 for x in cal]
+    return {cal[i]: sum(bf[i - 29:i + 1]) / 1000 for i in range(29, len(cal))}
+
+
 def etf_items():
     try:
         rows = json.load(open(os.path.join(ROOT, "data", "flows", "BTC.json")))["rows"]
@@ -274,6 +294,7 @@ def usdc_premium_items():
     if len(ds) < 100:
         return []
     prem = [(s[d]["mean"] - 1) * 100 for d in ds]  # % ; below 0: USDC cheaper than USDT
+    DAILY["usdcprem"] = dict(zip(ds, prem))
     flags = {d: p < 0 for d, p in zip(ds, prem)}
     ev = first_days(flags, gap=14)
     st = event_stats(ev, 30, lo=ds[0])
@@ -308,6 +329,7 @@ def basis_items():
     if len(ds) < 100:
         return []
     apy = [s[d]["apy_pct"] for d in ds]
+    DAILY["basis"] = dict(zip(ds, apy))
     # what BTC did after each zone (30 days), every day counted
     stats = []
     for lo, hi, lab, tone in BASIS_ZONES:
@@ -365,6 +387,7 @@ def funding_items():
         else:
             vals.append(None)
         used.append(len(pairs) or len(plain))
+    DAILY["funding"] = {d: v for d, v in zip(ds, vals) if v is not None}
     hot = {d: (v is not None and v >= 0.03) for d, v in zip(ds, vals)}
     neg = {d: (v is not None and v < 0) for d, v in zip(ds, vals)}
     st_hot, st_neg = event_stats(first_days(hot, 14), 30, lo=ds[0]), event_stats(first_days(neg, 14), 30, lo=ds[0])
@@ -400,6 +423,7 @@ def lsur_items():
     if len(ds) < 60:
         return []
     ls = [sum(o * v for o, v in by[d]) / sum(o for o, v in by[d]) for d in ds]
+    DAILY["lsur"] = dict(zip(ds, ls))
     z = []
     for i in range(len(ds)):
         win = ls[max(0, i - 13):i + 1]
@@ -539,18 +563,22 @@ def bitfinex_items():
 
 # ------------------------------------------------------------------ institutional liquidity (ours)
 def pct_rank_series(ds, vals, window=730, min_n=180):
-    out = []
-    hist = []
+    """Each value's percentile among the values of the past `window` days (itself included)."""
+    out, srt, q = [], [], []  # srt: the window's values sorted; q: (date, value) in arrival order
+    k = 0
     for d, v in zip(ds, vals):
         if v is None:
             out.append(None)
             continue
-        hist.append((d, v))
-        past = [x for dd, x in hist if (s2d(d) - s2d(dd)).days <= window]
-        if len(past) < min_n:
+        q.append((d, v))
+        bisect.insort(srt, v)
+        dd = s2d(d)
+        while (dd - s2d(q[k][0])).days > window:
+            del srt[bisect.bisect_left(srt, q[k][1])]
+            k += 1
+        if len(srt) < min_n:
             out.append(None)
             continue
-        srt = sorted(past)
         lo, hi = bisect.bisect_left(srt, v), bisect.bisect_right(srt, v)
         out.append((lo + 0.5 * (hi - lo)) / len(srt) * 100)
     return out
@@ -694,6 +722,122 @@ def forward_items():
     return out
 
 
+# ------------------------------------------------------------------ market pulse (ours)
+PULSE = [  # name, label, +1 if a high value is "hot" (CoinKarma's sell side), -1 if a high value is a buy signal
+    ("basis", "季度合約年化基差", 1), ("funding", "持倉加權資金費率", 1), ("lsur", "多空人數比", 1),
+    ("usdcprem", "USDC/USDT 溢價", -1), ("liq", "Overall LIQ（日平均）", -1), ("liqacc", "BTC 累積 LIQ（日平均）", -1),
+    ("ari", "ARI（日最高）", -1)]
+
+
+def pulse_items():
+    """CoinKarma's Market Pulse: 0-100 from 11 of their indicators (<= 20 a buying chance for a reversal, >= 80 a
+    selling chance); the components and the scoring are not published. Ours: the indicators here whose direction
+    CoinKarma states, each as its percentile over the past 365 days (turned so that 100 = the sell side), averaged."""
+    comps = [(k, lab, sgn) for k, lab, sgn in PULSE if len(DAILY.get(k, {})) > 200]
+    if len(comps) < 4:
+        return []
+    days = sorted(set().union(*[set(DAILY[k]) for k, _, _ in comps]))
+    pr = {}
+    for k, lab, sgn in comps:
+        ser = DAILY[k]
+        ds = sorted(ser)
+        vals = [ser[d] * sgn for d in ds]
+        pr[k] = dict(zip(ds, pct_rank_series(ds, vals, window=365, min_n=120)))
+    mpi, used = [], []
+    for d in days:
+        xs = [pr[k].get(d) for k, _, _ in comps]
+        xs = [x for x in xs if x is not None]
+        mpi.append(sum(xs) / len(xs) if len(xs) >= 4 else None)
+        used.append(len(xs))
+    ok = [(d, v) for d, v in zip(days, mpi) if v is not None]
+    if len(ok) < 60:
+        return []
+    ds = [d for d, _ in ok]
+    vs = [v for _, v in ok]
+    lo_ev = first_days({d: v <= 20 for d, v in ok}, 14)
+    hi_ev = first_days({d: v >= 80 for d, v in ok}, 14)
+    s_lo, s_hi = event_stats(lo_ev, 30, lo=ds[0]), event_stats(hi_ev, 30, lo=ds[0])
+    if s_lo:
+        s_lo["label"] = "≤ 20（買點）"
+    if s_hi:
+        s_hi["label"] = "≥ 80（賣點）"
+    dn, vn = ds[-1], vs[-1]
+    now_parts = []
+    for k, lab, sgn in comps:
+        x = pr[k].get(dn)
+        if x is not None:
+            now_parts.append(f"{lab} {x:.0f}")
+    return [item(id="pulse", group="綜合", name="Market Pulse Index", zh="市場脈動（我們的版本）", fidelity="ours",
+                 what="把幾個情緒與流動性指標合成一個 0–100 的分數：越低越接近反轉向上的買點，越高越接近反轉向下的賣點。",
+                 ck="由 11 個 CoinKarma 指標算出 0–100；≤ 20 可能是反轉向上的買點，≥ 80 可能是反轉向下的賣點。11 個指標與算法沒有公開。",
+                 ours=f"用這裡 {len(comps)} 個 CoinKarma 有寫明方向的指標：{'、'.join(lab for _, lab, _ in comps)}。每個換成過去 365 天的百分位（讓 100 = 偏賣方），再平均；至少 4 個有值的日子才算。訊號取第一次越過 20／80 的日子（前 14 天沒有）。",
+                 diff="CoinKarma 用 11 個指標，組成與權重都沒公開，這是我們的組合；LIQ 系列從 2023 年起才有。",
+                 unit="分", dec=0, lines=[{"k": "v", "label": "市場脈動（0–100）"}],
+                 series=pack(ds, {"v": vs}, {"v": 1}),
+                 zones=[{"from": 80, "to": None, "tone": "bad", "label": "≥ 80"}, {"from": None, "to": 20, "tone": "good", "label": "≤ 20"}],
+                 marks=[{"d": d, "label": "≤ 20", "tone": "good"} for d in lo_ev] + [{"d": d, "label": "≥ 80", "tone": "bad"} for d in hi_ev],
+                 now={"d": dn, "v": r2(vn, 0), "state": "偏買方" if vn <= 20 else "偏賣方" if vn >= 80 else "中間", "tone": "good" if vn <= 20 else "bad" if vn >= 80 else "mid"},
+                 stats=[x for x in (s_lo, s_hi) if x], statsKind="labeled", src="本頁各指標", parts=now_parts)]
+
+
+# ------------------------------------------------------------------ does CoinKarma's reading hold on our data?
+CLAIMS = {  # item id -> [(text in the stat's label, or None for the first stat), CoinKarma's direction, signal name]
+    "etfflow": [(None, "up", "IBIT 5 日合計轉淨流出")],
+    "cme": [(None, "down", "其他申報者轉為淨空")],
+    "ili": [("局部頂", "down", "局部頂（我們的 ILI）"), ("週期頂", "down", "週期頂（我們的 ILI）")],
+    "stables": [(None, "up", "USDC 逆勢增發 ≥ 10 億美元")],
+    "usdcprem": [(None, "down", "溢價跌破 0")],
+    "basis": [("FOMO", "down", "年化基差 > 20%（每一天）")],
+    "funding": [("0.03", "down", "資金費率 ≥ 0.03%")],
+    "lsur": [(None, "up", "Z 值 ≤ −2")],
+    "bfxprem": [("> +0.25", "up", "溢價 > +0.25%"), ("< −0.25", "down", "溢價 < −0.25%")],
+    "liq": [("綠色", "up", "綠色箭頭"), ("紅色", "down", "紅色箭頭")],
+    "liqacc": [("≥", "up", "累積 LIQ ≥ +60"), ("≤", "down", "累積 LIQ ≤ −60")],
+    "liqdif": [("≥", "up", "掛單差 ≥ +2,000 BTC"), ("≤", "down", "掛單差 ≤ −2,000 BTC")],
+    "liqtotal": [("≥", "up", "全市場掛單差 ≥ +3 億"), ("≤", "down", "全市場掛單差 ≤ −3 億")],
+    "resonance": [("__verdict__", "up", "共振的幣，到波段結束")],
+    "screener": [("__verdict__", "up", "第 I 象限（強勢）對全部幣")],
+    "ari": [("且 BTC", "up", "ARI ≥ 3（BTC 急跌中）")],
+    "pulse": [("≤ 20", "up", "市場脈動 ≤ 20"), ("≥ 80", "down", "市場脈動 ≥ 80")],
+}
+
+
+def verdict(st, claim):
+    """支持 / 相反 / 看不出差別 / 樣本太少: the signal's median return and up share against the random baseline."""
+    if not st or st.get("ret") is None or st.get("base_ret") is None:
+        return None
+    if st["n"] < 8:
+        return "樣本太少"
+    days = st["h"] / 24 if st.get("unit") == "h" else st["h"]
+    margin = 0.25 * math.sqrt(max(days, 0.5))
+    d = st["ret"] - st["base_ret"]
+    du = (st.get("up_share") or 0) - (st.get("base_up_share") or 0)
+    sgn = 1 if claim == "up" else -1
+    if sgn * d >= margin and sgn * du >= 5:
+        return "支持"
+    if sgn * d <= -margin and sgn * du <= -5:
+        return "相反"
+    return "看不出差別"
+
+
+def verdicts(items):
+    out = []
+    for it in items:
+        for key, claim, name in CLAIMS.get(it["id"], []):
+            if key == "__verdict__":
+                st = it.get("verdict_stat")
+            else:
+                sts = it.get("stats") or []
+                st = sts[0] if key is None and sts else next((x for x in sts if key in (x.get("label") or "")), None)
+            v = verdict(st, claim)
+            if v is None:
+                continue
+            out.append({"id": it["id"], "zh": it["zh"], "signal": name, "claim": "偏多" if claim == "up" else "偏空", "n": st["n"],
+                        "h": st.get("hl") or f"{st['h']} 天", "ret": st["ret"], "base": st["base_ret"], "up": st.get("up_share"),
+                        "base_up": st.get("base_up_share"), "verdict": v})
+    return out
+
+
 def main():
     BTC.update(btc_close())
     items = []
@@ -705,9 +849,29 @@ def main():
             import traceback
             print(f"{fn.__name__} failed: {type(e).__name__}: {e}", flush=True)
             traceback.print_exc()
-    last = max((it["now"]["d"] for it in items if it.get("now", {}).get("d")), default=None)
+    hbtc = None
+    try:  # the LIQ family (order-book depth; scripts/ck_liq.py)
+        import ck_liq
+        li, hbtc = ck_liq.items(item, ctx={"pack": pack, "etf30d": etf_v30(), "btc": BTC, "daily": DAILY})
+        items += li
+    except Exception as e:
+        import traceback
+        print(f"ck_liq failed: {type(e).__name__}: {e}", flush=True)
+        traceback.print_exc()
+    try:
+        items += pulse_items()
+    except Exception as e:
+        import traceback
+        print(f"pulse_items failed: {type(e).__name__}: {e}", flush=True)
+        traceback.print_exc()
+    order = ["ETF 與機構", "訂單簿流動性", "資金流", "衍生品情緒", "大戶部位", "散戶情緒", "選擇權", "綜合"]
+    items.sort(key=lambda it: order.index(it["group"]) if it["group"] in order else len(order))  # stable: keeps the order inside a group
+    last = max((it["now"]["d"][:10] for it in items if it.get("now", {}).get("d")), default=None)
     out = {"asof": last, "built": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "items": items,
            "btc_last": max(BTC) if BTC else None}
+    if hbtc:
+        out["hbtc"] = hbtc
+    out["verdicts"] = verdicts(items)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     tmp = OUT + ".tmp"
     with open(tmp, "w") as f:

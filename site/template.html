@@ -306,6 +306,8 @@ tr.mutrow td { color: var(--muted); }
 .ck-text { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 22px; font-size: 13.5px; color: var(--ink-2); }
 .ck-text b { display: block; color: var(--ink); font-size: 12.5px; margin-bottom: 2px; }
 .ck-chart-mini { height: 120px; }
+.ck-tt { margin: 4px 0 -4px; font-size: 13.5px; }
+.ck-xt td.txt, .ck-xt td:first-child { white-space: normal; min-width: 7em; }
 .ck-todo { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
 @media (max-width: 900px) { .ck-text { grid-template-columns: minmax(0, 1fr); } }
 .rd-method { font-size: 14px; color: var(--ink-2); }
@@ -488,7 +490,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         <div>
           <div class="eyebrow">指標庫 · CoinKarma 指標的開源復刻</div>
           <h2 id="h-ck">CoinKarma 的指標，用免費資料重做一遍</h2>
-          <p>照 CoinKarma 官方文件（docs.coinkarma.co）的定義，用公開資料重做他們的指標。每個指標都標出和原版的接近程度；有訊號的，附上訊號之後 BTC 的表現，和隨機一天比。</p>
+          <p>照 CoinKarma 官方文件（docs.coinkarma.co）的定義，用公開資料重做他們的指標。每個指標都標出和原版的接近程度；有訊號的，附上訊號之後 BTC 的表現，和隨機挑的日子（訂單簿系列是小時）比。</p>
         </div>
         <div class="seg" role="group" aria-label="期間">
           <button type="button" id="ck-all" aria-pressed="false">全部</button>
@@ -497,6 +499,12 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       </div>
       <div class="legend" id="ck-fid-legend"></div>
       <div class="panel"><div class="tablewrap"><table id="tb-ck-overview"></table></div><p class="note" id="ck-asof"></p></div>
+    </section>
+    <section aria-labelledby="h-ck-verdict">
+      <div class="sec-head"><div><h2 id="h-ck-verdict">CoinKarma 的說法，在我們的資料上成立嗎？</h2>
+        <p>每個有訊號的指標：CoinKarma 說訊號之後偏多或偏空，我們回測訊號之後 BTC 的報酬，和隨機時間點比。</p></div></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-ck-verdicts"></table></div>
+        <p class="note">「支持」：中位數報酬比隨機時間點好（或差）超過一個門檻（30 天約 1.4 個百分點、3 天約 0.4），而且上漲比例也差 5 個百分點以上；「相反」是反方向；少於 8 次算樣本太少。年化基差是每一天都算，彼此高度相關，實際的獨立樣本少很多。過去的統計不代表未來，這不是投資建議。</p></div>
     </section>
     <div id="ck-cards" class="ck-cards"></div>
     <section aria-labelledby="h-ck-todo">
@@ -2820,12 +2828,25 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   var CK_TONE = { good: 'var(--pos)', bad: 'var(--neg)', warn: 'var(--accent)', mid: 'var(--muted)', ref: 'var(--stat)' };
   var CK_COLORS = ['var(--accent)', 'var(--pos)', 'var(--stat)', 'var(--live)', 'var(--neg)'];
   function ckNum(v, dec) { if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v), s = a.toLocaleString('en-US', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }); return (v < 0 ? '−' : '') + s; }
-  function ckSlice(S) {
+  function ckTW(h) { // an hour of ours (UTC, candle open) as CoinKarma shows it: the candle's close, Taiwan time
+    var t = new Date(Date.parse(h + ':00:00Z') + 9 * 36e5);
+    return (t.getUTCMonth() + 1) + '/' + t.getUTCDate() + ' ' + String(t.getUTCHours()).padStart(2, '0') + ':00';
+  }
+  function ckWhen(d) { return !d ? '—' : d.length > 10 ? ckTW(d) + '（台灣）' : d.replace(/-/g, '/'); }
+  function ckHourly(it) { // hourly series are sent as a start hour + values; BTC comes from the shared hourly closes
+    var s = it.series || {}, n = s.n || 0, t0 = Date.parse(s.h0 + ':00:00Z'), out = { d: [] };
+    for (var i = 0; i < n; i++) out.d.push(new Date(t0 + i * 36e5).toISOString().slice(0, 13));
+    Object.keys(s).forEach(function (k) { if (Array.isArray(s[k])) out[k] = s[k]; });
+    var hb = (CK && CK.hbtc) || {}, off = hb.h0 ? Math.round((t0 - Date.parse(hb.h0 + ':00:00Z')) / 36e5) : 0;
+    out.btc = out.d.map(function (x, j) { var k = j + off; return hb.v && k >= 0 && k < hb.v.length ? hb.v[k] : null; });
+    return out;
+  }
+  function ckSlice(S, range) {
     // the charts space points evenly, so keep an even step: 近一年 = every day, 全部 = the last day of each week
     var d = S.d, keep = [];
     if (!d || !d.length) return S;
     var monday = function (x) { var t = Date.parse(x + 'T00:00:00Z'); return t - ((new Date(t).getUTCDay() + 6) % 7) * 864e5; };
-    if (ck.range === '1y') {
+    if ((range || ck.range) === '1y') {
       var cut = new Date(Date.parse(d[d.length - 1] + 'T00:00:00Z') - 365 * 864e5).toISOString().slice(0, 10);
       d.forEach(function (x, i) { if (x >= cut) keep.push(i); });
     } else {
@@ -2834,7 +2855,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var out = {}; Object.keys(S).forEach(function (k) { out[k] = keep.map(function (i) { return S[k][i]; }); }); return out;
   }
   function ckChart(host, it, S, which) {
-    var xf = function (x) { return x.slice(2, 7).replace('-', '/'); };
+    var hourly = it.res === 'h';
+    var xf = hourly ? function (x) { return ckTW(x).split(' ')[0]; } : function (x) { return x.slice(2, 7).replace('-', '/'); };
     var w = host.clientWidth || 600, xe = Math.max(1, Math.ceil(S.d.length / (w < 560 ? 4 : 7)));
     var pos = {}; S.d.forEach(function (x, i) { pos[x] = i; });
     var nearest = function (day) { if (pos[day] != null) return pos[day]; for (var i = 0; i < S.d.length; i++) if (S.d[i] >= day) return i; return null; };
@@ -2842,6 +2864,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     if (which === 'btc') {
       lineChart(host, { x: S.d, height: 120, left: 56, series: [{ name: 'BTC', y: S.btc, color: 'var(--price)', width: 1.5, dot: false }],
         xEvery: xe, xFmt: xf, yFmt: function (v) { return (v / 1000).toFixed(0) + 'K'; }, tipFmt: function (v) { return '$' + ckNum(v, 0); },
+        tipHead: function (i) { return hourly ? ckTW(S.d[i]) + '（台灣）' : S.d[i]; },
         after: function (svg, g) {
           marks.forEach(function (mk) {
             var i = nearest(mk.d); if (i == null || S.btc[i] == null) return;
@@ -2856,10 +2879,16 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var zones = it.zones || [];
     var inv = lines.length && lines[0].invert;
     lineChart(host, { x: S.d, height: 190, left: 56, series: series, includeZero: !inv && series.some(function (s2) { return s2.y.some(function (v) { return v != null && v < 0; }); }),
-      xEvery: xe, xFmt: xf, yFmt: function (v) { return ckNum(v, Math.abs(v) < 1 && v !== 0 ? 2 : 0); }, tipFmt: function (v) { return ckNum(v, it.dec); },
-      tipHead: function (i) { return S.d[i] + (S.btc[i] != null ? '　BTC $' + ckNum(S.btc[i], 0) : ''); },
+      xEvery: xe, xFmt: xf, yFmt: function (v) { return ckNum(v, it.ydec != null ? it.ydec : Math.abs(v) < 1 && v !== 0 ? 2 : 0); }, tipFmt: function (v) { return ckNum(v, it.dec); },
+      tipHead: function (i) { return (hourly ? ckTW(S.d[i]) + '（台灣）' : S.d[i]) + (S.btc[i] != null ? '　BTC $' + ckNum(S.btc[i], 0) : ''); },
       after: function (svg, g) {
         var top = g.m.t, bot = g.H - g.m.b;
+        (it.spans || []).forEach(function (sp) {
+          var a = nearest(sp.from), b = sp.to && pos[sp.to] != null ? pos[sp.to] : (nearest(sp.to) == null ? S.d.length - 1 : nearest(sp.to));
+          if (a == null) return;
+          var r = el('rect', { x: g.xs(a), width: Math.max(1.5, g.xs(b) - g.xs(a)), y: top, height: bot - top }, svg);
+          r.style.fill = 'var(--pos)'; r.style.opacity = 0.16;
+        });
         zones.forEach(function (z) {
           var y1 = z.to == null ? top : Math.max(top, Math.min(bot, g.y(z.to))), y2 = z.from == null ? bot : Math.max(top, Math.min(bot, g.y(z.from)));
           if (y2 - y1 < 1) return;
@@ -2885,8 +2914,8 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var rows = st.map(function (r) {
       return [(r.label || (it.statsKind === 'zones' ? '' : '訊號之後')) , r.n + (it.statsKind === 'zones' ? ' 天' : ' 次'), pct(r.ret, 1), r.up_share + '%', pct(r.dd, 1), pct(r.upmax, 1)];
     });
-    rows.push({ _cls: 'ref', cells: ['隨機一天', '—', pct(first.base_ret, 1), first.base_up_share + '%', pct(first.base_dd, 1), pct(first.base_upmax, 1)] });
-    table(tb, ['', it.statsKind === 'zones' ? '天數' : '次數', H + ' 天後報酬（中位數）', '上漲比例', '期間最多跌', '期間最多漲'], rows);
+    rows.push({ _cls: 'ref', cells: [it.baseLabel || '隨機一天', '—', pct(first.base_ret, 1), first.base_up_share + '%', pct(first.base_dd, 1), pct(first.base_upmax, 1)] });
+    table(tb, ['', it.statsKind === 'zones' ? '天數' : '次數', (first.hl || (H + ' 天')) + '後報酬（中位數）', '上漲比例', '期間最多跌', '期間最多漲'], rows);
     return tb;
   }
   function ckCard(it) {
@@ -2896,24 +2925,30 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     card.appendChild(head);
     var nw = node('div', 'ck-now');
     nw.appendChild(node('span', 'v', it.now && it.now.v != null ? ckNum(it.now.v, it.dec) : '—'));
-    nw.appendChild(node('span', 'u', (it.unit || '') + (it.now && it.now.d ? ' · ' + it.now.d.replace(/-/g, '/') : '')));
+    nw.appendChild(node('span', 'u', (it.unit || '') + (it.now && it.now.d ? ' · ' + ckWhen(it.now.d) : '')));
     if (it.now && it.now.state) nw.appendChild(node('span', 'ck-tone ' + (it.now.tone || 'mid'), it.now.state));
     card.appendChild(nw);
-    var S = ckSlice(it.series || { d: [] });
+    var S = it.res === 'h' ? ckHourly(it) : it.res === 'table' ? { d: [] } : ckSlice(it.series || { d: [] }, it.range);
     var lg = node('div', 'legend');
     it.lines.filter(function (l) { return !l.hidden && !l.right; }).forEach(function (l, k) { var sp = node('span'); var key = node('span', 'key'); key.style.background = CK_COLORS[k % CK_COLORS.length]; sp.appendChild(key); sp.appendChild(document.createTextNode(l.label)); lg.appendChild(sp); });
     if ((it.marks || []).length) { var sp2 = node('span'); var tr = node('span', 'sq'); tr.style.background = 'var(--accent)'; sp2.appendChild(tr); sp2.appendChild(document.createTextNode('訊號（上圖三角形）')); lg.appendChild(sp2); }
     if ((it.marks || []).some(function (m2) { return m2.tone === 'ref'; })) { var sp3 = node('span'); var tr3 = node('span', 'sq'); tr3.style.background = 'var(--stat)'; sp3.appendChild(tr3); sp3.appendChild(document.createTextNode('CoinKarma 公布的訊號')); lg.appendChild(sp3); }
     card.appendChild(lg);
     var c1 = node('div', 'chart ck-chart-mini'), c2 = node('div', 'chart');
-    card.appendChild(c1); card.appendChild(c2);
+    if (it.res !== 'table') { card.appendChild(c1); card.appendChild(c2); }
+    if (it.chartNote) card.appendChild(node('p', 'note', it.chartNote));
     var txt3 = node('div', 'ck-text');
     [['它在看什麼', it.what], ['CoinKarma 的用法', it.ck], ['我們怎麼算', it.ours + (it.diff ? ' ' + it.diff : '')]].forEach(function (p2) { var d = node('div'); d.appendChild(node('b', null, p2[0])); d.appendChild(document.createTextNode(p2[1] || '')); txt3.appendChild(d); });
     card.appendChild(txt3);
     var tb = ckStats(it);
     if (tb) { var w = node('div', 'tablewrap'); w.appendChild(tb); card.appendChild(w); }
+    (it.tables || []).forEach(function (t) {
+      card.appendChild(node('h4', 'ck-tt', t.title));
+      var tt = document.createElement('table'); tt.className = 'ck-xt'; table(tt, t.head, t.rows || [], { textCols: t.text || [] });
+      var w2 = node('div', 'tablewrap'); w2.appendChild(tt); card.appendChild(w2);
+    });
     if (it.src) card.appendChild(node('p', 'note', '資料：' + it.src));
-    return { card: card, draw: function () { if (S.d.length) { ckChart(c1, it, S, 'btc'); ckChart(c2, it, S, 'ind'); } else { c2.replaceChildren(node('p', 'empty', '資料還在累積。')); } } };
+    return { card: card, draw: function () { if (it.res === 'table') return; if (S.d.length) { ckChart(c1, it, S, 'btc'); ckChart(c2, it, S, 'ind'); } else { c2.replaceChildren(node('p', 'empty', '資料還在累積。')); } } };
   }
   var ckDrawn = [];
   function drawCK() {
@@ -2924,9 +2959,15 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var rows = CK.items.map(function (it) {
       var st = it.now && it.now.state ? node('span', 'ck-tone ' + (it.now.tone || 'mid'), it.now.state) : null;
       return { _click: function () { var e = document.getElementById('ck-' + it.id); if (e) e.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); },
-        cells: [it.zh, it.group, { node: node('span', 'ck-fid ' + it.fidelity, (CK_FID[it.fidelity] || [it.fidelity])[0]) }, it.now && it.now.v != null ? ckNum(it.now.v, it.dec) + ' ' + (it.unit || '') : '—', st ? { node: st } : '—', it.now && it.now.d ? it.now.d.replace(/-/g, '/') : '—'] };
+        cells: [it.zh, it.group, { node: node('span', 'ck-fid ' + it.fidelity, (CK_FID[it.fidelity] || [it.fidelity])[0]) }, it.now && it.now.v != null ? ckNum(it.now.v, it.dec) + ' ' + (it.unit || '') : '—', st ? { node: st } : '—', ckWhen(it.now && it.now.d)] };
     });
     table(document.getElementById('tb-ck-overview'), ['指標', '類別', '接近程度', '目前', '狀態', '資料日'], rows, { textCols: [1, 2, 4] });
+    var vrows = (CK.verdicts || []).map(function (v) {
+      var tone = v.verdict === '支持' ? 'good' : v.verdict === '相反' ? 'bad' : 'mid';
+      return { _click: function () { var e = document.getElementById('ck-' + v.id); if (e) e.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); },
+        cells: [v.zh, v.signal, v.claim, v.n, v.h, pct(v.ret, 1), pct(v.base, 1), { node: node('span', 'ck-tone ' + tone, v.verdict) }] };
+    });
+    table(document.getElementById('tb-ck-verdicts'), ['指標', '訊號', 'CoinKarma 說之後', '次數', '看多久', '之後（中位數）', '隨機時間點', '結論'], vrows, { textCols: [1, 2, 4, 7] });
     document.getElementById('ck-asof').textContent = '每天更新幾次（UTC 午夜後與白天）；點一列跳到該指標。計算：scripts/ck_indicators.py。這是研究工具，不是投資建議。';
     host.replaceChildren(); ckDrawn = [];
     var lastGroup = null;
@@ -2936,11 +2977,10 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     });
     ckDrawn.forEach(function (c) { c.draw(); });
     var todo = document.getElementById('ck-todo'); todo.replaceChildren();
-    ['LIQ 系列（LIQ、Overall LIQ、Accumulated LIQ、10% 掛單差）與流動性共振、Token Screener：CoinKarma 用現貨訂單簿；免費歷史只有 Binance 合約 ±5% 深度（2023 年起），下一批做近似版。',
-     'Karma Index、Market Pulse Index（11 個指標合成）、ALT Resilient Index：沒有公開公式，會做「我們的版本」並清楚標示。',
+    ['Karma Index：CoinKarma 用現貨流動性、鏈上資料、場外情緒、交易所資金流與衍生品合成，沒有公開組成；鏈上資料要付費，先不做。',
      'Binance 保險基金：Binance 的網頁資料擋美國 IP；可能改用 OKX 的保險基金。',
      'Cumberland USDT Distribution 與 No-Short Filter：需要鏈上地址標籤與 Etherscan 金鑰。',
-     'Triton 訊號（流動性共振 + ETF 30 日淨流量 + ILI 的策略）：規則公開，等 LIQ 共振做出來就能回測；Ultron、DCA Martingale 沒有公開規則，做不了。'].forEach(function (t) { todo.appendChild(node('li', null, t)); });
+     'Exchange Balance（交易所餘額）：需要付費的鏈上資料；Ultron、DCA Martingale 沒有公開規則，做不了。'].forEach(function (t) { todo.appendChild(node('li', null, t)); });
   }
   ['all', '1y'].forEach(function (r) {
     var b = document.getElementById('ck-' + r);
