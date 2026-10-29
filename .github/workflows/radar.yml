@@ -1,0 +1,95 @@
+name: radar
+# The altcoin leverage radar's own schedule (scripts/radar_update.py). GitHub starts scheduled runs
+# late or drops them under load: in late October 2026 fetch-etf-flows' ten daily slots ran five to
+# seven times a day, often hours late, so the radar came in hours late and Hyperliquid's midnight
+# snapshot was missed on four of six days. The two time-critical moments therefore get many cheap
+# attempts here: Hyperliquid's open-interest snapshot around midnight UTC (the one nearest midnight is
+# kept) and Binance's new day (published about 06:40-08:00 UTC). A run with nothing new does nothing;
+# the site is rebuilt and published only when data/oi/radar.json changed.
+# Every writer of data/oi shares the concurrency group "radar" (oi-data, oi-venues); fetch-etf-flows
+# no longer touches data/oi and only reads radar.json when it builds the site.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/radar.yml"]
+  schedule:
+    - cron: "9 22 * * *"
+    - cron: "39 22 * * *"
+    - cron: "9 23 * * *"
+    - cron: "39 23 * * *"
+    - cron: "9 0 * * *"
+    - cron: "39 0 * * *"
+    - cron: "9 1 * * *"
+    - cron: "39 1 * * *"
+    - cron: "39 2 * * *"
+    - cron: "44 6 * * *"
+    - cron: "14 7 * * *"
+    - cron: "44 7 * * *"
+    - cron: "14 8 * * *"
+    - cron: "44 8 * * *"
+    - cron: "14 9 * * *"
+    - cron: "14 10 * * *"
+    - cron: "14 11 * * *"
+    - cron: "14 13 * * *"
+    - cron: "14 16 * * *"
+permissions:
+  contents: write
+concurrency:
+  group: radar
+  cancel-in-progress: false
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Update the radar (Hyperliquid snapshot, new open-interest days on each venue, Coin Metrics market caps)
+        id: radar
+        run: |
+          python -m pip install --quiet numpy
+          before=$(git hash-object data/oi/radar.json 2>/dev/null || echo none)
+          python scripts/radar_update.py
+          after=$(git hash-object data/oi/radar.json 2>/dev/null || echo none)
+          if [ "$before" != "$after" ]; then echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+        continue-on-error: true
+        timeout-minutes: 25
+      - name: Commit if changed
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/oi
+          if git diff --cached --quiet; then
+            echo "no data changes"
+          else
+            git commit -q -m "radar: $(date -u +%Y-%m-%dT%H:%MZ)"
+            ok=0
+            for i in 1 2 3 4; do
+              if git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main; then ok=1; break; fi
+              git rebase --abort 2>/dev/null || true
+              sleep 7
+            done
+            if [ "$ok" = 1 ]; then echo "data pushed"; else echo "::warning::could not push the radar commit"; fi
+          fi
+      - name: Build the website with the new radar (and the newest flows on main)
+        if: steps.radar.outputs.changed == '1'
+        run: |
+          git pull -q --rebase origin main || true
+          python scripts/build_site.py --out "$RUNNER_TEMP/site"
+      - name: Publish it to the "site" branch
+        if: steps.radar.outputs.changed == '1'
+        run: |
+          cd "$RUNNER_TEMP/site"
+          git init -q -b site
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "site: $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:site && break; sleep 5; done
+        env:
+          GH_TOKEN: ${{ github.token }}

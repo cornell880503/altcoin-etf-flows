@@ -2737,7 +2737,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           '算進山寨的有 ' + (C.contracts.alt || 0) + ' 個合約；BTC、ETH、股票、ETF、貴金屬、指數和穩定幣合約不算（' + ((C.contracts.equity || 0) + (C.contracts['equity (weekend test)'] || 0)) + ' 個股票類合約，2025/06 以後新上的合約要週末也有在動才算加密貨幣）。',
         '沒算進來的：Bybit（擋美國的雲端主機，抓不到）和 Bitget（沒有歷史資料）。2026/10/23 的快照裡，六大交易所（Binance、Hyperliquid、Gate、Bybit、Bitget、OKX）的山寨永續持倉，這兩家約占四分之一。',
         '山寨市值：Coin Metrics 免費 API 的每日市值，' + C.altAssets + ' 個幣加總，扣掉 BTC、ETH、穩定幣、包裝幣、質押幣、黃金代幣和同一個幣在不同鏈上的重複。新幣加入、合約上下架不會讓指數跳動（每天只比較前後兩天都有的）。',
-        '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡下午 4 點左右更新（Binance 晚發時是 5 點多），比 CoinKarma 的 00:10 UTC 晚。']],
+        '更新：Binance 每天的檔案約在 UTC 收盤後 ' + lag + ' 小時（新加坡下午 3 點左右）才公布，所以這頁通常在新加坡下午 3 點到 5 點之間更新，比 CoinKarma 的 00:10 UTC 晚；GitHub 的排程忙的時候會晚幾個小時。其他交易所午夜一過就有前一天的資料，Hyperliquid 取最接近午夜（UTC）的一次快照。']],
       ['ALR 怎麼算', ['資金往山寨集中：山寨持倉相對 BTC＋ETH 持倉 ' + P.L + ' 天的增速，在過去一年排第幾；BTC 同期漲跌超過 ' + Math.round(P.btc_flat * 100) + '%（不是橫盤）時記 0。',
         '持倉長得比價格快：山寨持倉相對山寨市值 ' + P.L + ' 天的增速，在過去一年排第幾。',
         '熱度：最近 ' + P.heat_days + ' 天裡，上面兩項平均最高的一天。',

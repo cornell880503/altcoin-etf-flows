@@ -7,12 +7,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["research/probe_oi_venues.py", "scripts/fetch_oi_okx.py", "scripts/fetch_oi_gate.py",
-            "scripts/fetch_oi_hyperliquid.py", ".github/workflows/oi-venues.yml"]
+    paths: ["research/probe_oi_venues.py", "scripts/fetch_oi_okx.py", "scripts/fetch_oi_gate.py"]
 permissions:
   contents: write
 concurrency:
-  group: fetch-etf-flows
+  group: radar  # every writer of data/oi (radar, oi-data, oi-venues)
   cancel-in-progress: false
 jobs:
   venues:

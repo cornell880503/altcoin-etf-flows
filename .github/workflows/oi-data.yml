@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["scripts/fetch_oi_binance.py", "scripts/fetch_cm_mcap.py", ".github/workflows/oi-data.yml"]
+    paths: ["scripts/fetch_oi_binance.py", "scripts/fetch_cm_mcap.py"]
 permissions:
   contents: write
 concurrency:
-  group: fetch-etf-flows
+  group: radar  # every writer of data/oi (radar, oi-data, oi-venues)
   cancel-in-progress: false
 jobs:
   oi:

@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: "17 */3 * * *"
     - cron: "47 14 * * *"  # extra run mid-morning New York, when the previous day's flows are usually complete
-    - cron: "52 7 * * *"   # extra run after Binance publishes yesterday's open-interest files (~06:45 UTC)
   workflow_dispatch:
   push:
     branches: [main]
@@ -53,12 +52,6 @@ jobs:
       - name: Build the cleaned daily series (data/daily.json)
         run: python scripts/build_daily.py
         continue-on-error: true
-      - name: Altcoin leverage radar (new open-interest day on each venue, Coin Metrics market caps, data/oi/radar.json)
-        run: |
-          python -m pip install --quiet numpy
-          python scripts/radar_update.py
-        continue-on-error: true
-        timeout-minutes: 20
       - name: Check that every coin's flows are current (alarm at most once a day while data are missing)
         id: fresh
         run: python scripts/check_fresh.py
@@ -85,7 +78,9 @@ jobs:
         run: python -m pip install --quiet numpy
         continue-on-error: true
       - name: Build the website (one static page with all the data)
-        run: python scripts/build_site.py --out "$RUNNER_TEMP/site"
+        run: |
+          git pull -q --rebase origin main || true  # the newest radar.json (workflow radar writes it)
+          python scripts/build_site.py --out "$RUNNER_TEMP/site"
       - name: Publish it to the "site" branch (servers pull it from there)
         run: |
           cd "$RUNNER_TEMP/site"

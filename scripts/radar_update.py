@@ -4,7 +4,8 @@
 1. When yesterday (UTC) is not stored yet and Binance has published it (about 7 hours after
    midnight UTC), fetch the new days: open interest (fetch_oi_binance --daily) and Coin Metrics
    market caps (fetch_cm_mcap). The other open-interest venues in alt_radar.VENUES serve yesterday
-   right after midnight; each is fetched (fetch_oi_<venue> --daily) on any run while it lacks it.
+   right after midnight; each is fetched (fetch_oi_<venue> --daily) on any run while it lacks it,
+   and Hyperliquid's snapshot is tried on every run (it keeps the one nearest to midnight UTC).
 2. When data/oi/radar.json is older than the newest day both sources have, rebuild it with
    alt_radar.payload(): ALR v2, status (alert / watch / none), every alert with its 30-day path,
    and the backtest statistics. The grid summary comes from research/alt_radar/backtest.json.
@@ -44,14 +45,15 @@ def published(day):
 
 def other_venues(yday):
     """Daily update of the radar's other open-interest venues: each serves a finished UTC day right
-    after midnight (hours before Binance), so each is fetched on any run while it lacks yesterday.
+    after midnight (hours before Binance), so each is fetched on any run while it lacks yesterday; a
+    snapshot venue (Hyperliquid) is asked on every run and keeps the snapshot nearest to midnight.
     One failing never stops the rest. Returns {venue: latest stored day}."""
     import alt_radar as R
     out = {}
     for venue in R.VENUES:
         if venue == "binance":
             continue
-        if latest(venue) < yday:
+        if venue in R.SNAPSHOT_VENUES or latest(venue) < yday:
             try:
                 mod = __import__(f"fetch_oi_{venue}")
                 mod.main(["--daily", "--budget", "4"])
