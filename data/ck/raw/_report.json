@@ -1,0 +1,88 @@
+{
+ "parts": {
+  "appstore": {
+   "first": "2026-10-29",
+   "last": "2026-10-29",
+   "ok": true,
+   "rows": 1,
+   "secs": 0.7
+  },
+  "basis": {
+   "first": "2020-08-01",
+   "last": "2026-10-27",
+   "ok": true,
+   "rows": 2275,
+   "secs": 80.1
+  },
+  "bitfinex": {
+   "error": "HTTPError: HTTP Error 429: Too Many Requests",
+   "ok": false,
+   "secs": 167.2,
+   "trace": "^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py\", line 492, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py\", line 639, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 429: Too Many Requests\n"
+  },
+  "cftc": {
+   "first": "2018-04-10",
+   "last": "2026-10-20",
+   "ok": true,
+   "rows": 446,
+   "secs": 1.1
+  },
+  "coinbase": {
+   "first": 1609459200,
+   "last": 1793260800,
+   "ok": true,
+   "rows": 51044,
+   "secs": 91.0
+  },
+  "deribit": {
+   "first": "2026-10-29",
+   "last": "2026-10-29",
+   "ok": true,
+   "rows": 1,
+   "secs": 2.5
+  },
+  "fred": {
+   "first": "2019-01-02",
+   "last": "2026-10-28",
+   "ok": true,
+   "rows": 1959,
+   "secs": 4.1
+  },
+  "funding": {
+   "first": "2020-01-01",
+   "last": "2026-10-28",
+   "ok": true,
+   "rows": 2493,
+   "secs": 53.5
+  },
+  "mstr": {
+   "first": "1998-07-01",
+   "last": "2026-10-29",
+   "ok": true,
+   "rows": 342,
+   "secs": 0.5
+  },
+  "okx_lending": {
+   "first": "2024-07-18",
+   "last": "2026-10-28",
+   "ok": true,
+   "rows": 833,
+   "secs": 150.0
+  },
+  "stablecoins": {
+   "first": "2017-11-29",
+   "last": "2026-10-29",
+   "ok": true,
+   "rows": 3257,
+   "secs": 3.4
+  },
+  "usdc_usdt": {
+   "first": "2018-12-15",
+   "last": "2026-10-28",
+   "ok": true,
+   "rows": 2708,
+   "secs": 81.6
+  }
+ },
+ "run_at": "2026-10-29T08:13:29Z"
+}
