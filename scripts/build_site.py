@@ -111,11 +111,21 @@ def radar():
 
 
 def indicators():
+    """The indicator library (data/ck/indicators.json), with the LIQ cards brought up to the last complete hour
+    from the live order books (scripts/ck_liq.py patch_live; needs numpy, skipped without)."""
     try:
-        return json.load(open(P("data", "ck", "indicators.json"), encoding="utf-8"))
+        ck = json.load(open(P("data", "ck", "indicators.json"), encoding="utf-8"))
     except (OSError, ValueError) as e:
         print("indicator library data missing:", e, file=sys.stderr)
         return None
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import ck_indicators
+        import ck_liq
+        ck = ck_liq.patch_live(ck, ck_indicators.item)
+    except Exception as e:  # numpy missing, or no live data yet
+        print("live LIQ hours skipped:", type(e).__name__, e, file=sys.stderr)
+    return ck
 
 
 def render(snap, research, built_at, sig=None, rd=None, ck=None):

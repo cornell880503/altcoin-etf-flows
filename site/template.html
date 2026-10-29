@@ -2837,6 +2837,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var s = it.series || {}, n = s.n || 0, t0 = Date.parse(s.h0 + ':00:00Z'), out = { d: [] };
     for (var i = 0; i < n; i++) out.d.push(new Date(t0 + i * 36e5).toISOString().slice(0, 13));
     Object.keys(s).forEach(function (k) { if (Array.isArray(s[k])) out[k] = s[k]; });
+    out.liveFrom = s.liveFrom;
     var hb = (CK && CK.hbtc) || {}, off = hb.h0 ? Math.round((t0 - Date.parse(hb.h0 + ':00:00Z')) / 36e5) : 0;
     out.btc = out.d.map(function (x, j) { var k = j + off; return hb.v && k >= 0 && k < hb.v.length ? hb.v[k] : null; });
     return out;
@@ -2854,6 +2855,16 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     }
     var out = {}; Object.keys(S).forEach(function (k) { out[k] = keep.map(function (i) { return S[k][i]; }); }); return out;
   }
+  function ckLive(svg, g, S, pos, label) { // the hours after Binance's last published hour: live estimates
+    if (!S.liveFrom) return;
+    var i0 = pos[S.liveFrom];
+    if (i0 == null) { for (var i = 0; i < S.d.length; i++) if (S.d[i] >= S.liveFrom) { i0 = i; break; } }
+    if (i0 == null) return;
+    var x0 = g.xs(i0), x1 = g.W - g.m.r, top = g.m.t, bot = g.H - g.m.b;
+    var r = el('rect', { x: x0, width: Math.max(2, x1 - x0), y: top, height: bot - top }, svg);
+    r.style.fill = 'var(--accent)'; r.style.opacity = 0.10;
+    if (label) txt(svg, Math.max(g.m.l + 30, x0 - 4), top + 10, '即時估計 →', { anchor: 'end', size: 10.5, color: 'var(--accent)' });
+  }
   function ckChart(host, it, S, which) {
     var hourly = it.res === 'h';
     var xf = hourly ? function (x) { return ckTW(x).split(' ')[0]; } : function (x) { return x.slice(2, 7).replace('-', '/'); };
@@ -2866,6 +2877,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
         xEvery: xe, xFmt: xf, yFmt: function (v) { return (v / 1000).toFixed(0) + 'K'; }, tipFmt: function (v) { return '$' + ckNum(v, 0); },
         tipHead: function (i) { return hourly ? ckTW(S.d[i]) + '（台灣）' : S.d[i]; },
         after: function (svg, g) {
+          ckLive(svg, g, S, pos, false);
           marks.forEach(function (mk) {
             var i = nearest(mk.d); if (i == null || S.btc[i] == null) return;
             var x = g.xs(i), y = g.y(S.btc[i]) - 7, tri = el('path', { d: 'M' + (x - 4.5) + ',' + (y - 8) + 'L' + (x + 4.5) + ',' + (y - 8) + 'L' + x + ',' + y + 'Z' }, svg);
@@ -2883,6 +2895,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       tipHead: function (i) { return (hourly ? ckTW(S.d[i]) + '（台灣）' : S.d[i]) + (S.btc[i] != null ? '　BTC $' + ckNum(S.btc[i], 0) : ''); },
       after: function (svg, g) {
         var top = g.m.t, bot = g.H - g.m.b;
+        ckLive(svg, g, S, pos, true);
         (it.spans || []).forEach(function (sp) {
           var a = nearest(sp.from), b = sp.to && pos[sp.to] != null ? pos[sp.to] : (nearest(sp.to) == null ? S.d.length - 1 : nearest(sp.to));
           if (a == null) return;

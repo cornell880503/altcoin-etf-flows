@@ -21,7 +21,11 @@ statistics (calibrate()), and the choice is reported with the items.
 
     python3 scripts/ck_liq.py            print the calibration grid and the waves
 """
+import copy
+import csv
 import datetime as dt
+import glob
+import gzip
 import math
 import os
 import statistics
@@ -290,7 +294,9 @@ def compute(D, depth=5, window=720, smooth=1, mode="avg_z", norm="level"):
         overall = np.where(den > 0, num / np.where(den > 0, den, 1), np.nan)
     if mode != "avg_z":
         overall = standardize(overall, norm, window)
-    return {"liq": liq, "elig": elig, "overall": overall, "depth": depth, "window": window, "smooth": smooth, "mode": mode, "norm": norm}
+    sd = {c: rolling_sd(raw[c], window, max(48, window // 2)) for c in COINS}
+    return {"liq": liq, "elig": elig, "overall": overall, "raw": raw, "sd": sd, "depth": depth, "window": window, "smooth": smooth,
+            "mode": mode, "norm": norm}
 
 
 def waves(D, R):
@@ -404,6 +410,243 @@ def calibrate(D, grid=None, lo=None):
         out.append({"norm": nm, "depth": d, "window": w, "smooth": s, "mode": m, "score": stats_score(st), "examples": ex, "stats": st})
     out.sort(key=lambda r: r["score"])
     return out
+
+
+# ------------------------------------------------------------------ live hours (after Binance's last published hour)
+LIVE = os.path.join(ROOT, "data", "ck", "live", "hours")
+LIVE_VENUES = {"okx": "OKX 永續", "cb": "Coinbase 現貨", "hl": "Hyperliquid"}
+FIT_MIN, FIT_FULL = 6, 48  # hours both have: an offset-only map from 6, a linear map from 48
+LIVE_PENDING = ("即時估計：每小時另外抓 OKX、Coinbase、Hyperliquid 的訂單簿；Binance 的檔案隔天才公布，兩者重疊滿 6 小時、"
+                "完成校準後，這裡會接上到最近一小時的估計值。")
+
+
+def load_live():
+    """Live books (scripts/fetch_book_live.py): {(venue, coin): {hour: log(bidR / askR)}}, {coin: {hour: close}}."""
+    feats, px = {}, {}
+    for p in sorted(glob.glob(os.path.join(LIVE, "*.csv.gz"))):
+        with gzip.open(p, "rt", newline="") as f:
+            rd = csv.reader(f)
+            next(rd, None)
+            for row in rd:
+                if len(row) < 4 or ":" not in row[1]:
+                    continue
+                v, c = row[1].split(":", 1)
+                c = ALIAS.get(c, c)
+                h = hidx(row[0])
+                if v == "px":
+                    try:
+                        px.setdefault(c, {})[h] = float(row[3])
+                    except ValueError:
+                        pass
+                    continue
+                try:
+                    b, a = float(row[9]), float(row[10])
+                except (ValueError, IndexError):
+                    continue
+                if b > 0 and a > 0:
+                    feats.setdefault((v, c), {})[h] = math.log(b / a)
+    return feats, px
+
+
+def live_extend(D, R, now=None):
+    """Extend LIQ past Binance's last published hour T with the live books: per coin, the venue whose
+    imbalance best tracks Binance's on the hours both have is mapped onto Binance's (x = a + b * live;
+    an offset only until FIT_FULL hours), divided by the coin's trailing standard deviation at T.
+    Returns None when there is nothing to add."""
+    feats, px = load_live()
+    if not feats:
+        return None
+    now = now or dt.datetime.now(dt.timezone.utc)
+    done = (now.date().toordinal() - EPOCH) * 24 + now.hour - 1  # the last complete hour
+    Tabs = D.h0 + D.n - 1
+    L = min(done, max(max(f) for f in feats.values()))
+    fits = {}
+    k = max(0, L - Tabs)
+    liq_live = {}
+    for c in COINS:
+        x, sd = R["raw"][c], R["sd"][c]
+        fin = np.flatnonzero(np.isfinite(sd))
+        sdv = float(sd[fin[-1]]) if len(fin) else None
+        best = None
+        for v in LIVE_VENUES:
+            f = feats.get((v, c))
+            if not f:
+                continue
+            pairs = [(x[h - D.h0], fv) for h, fv in f.items() if D.h0 <= h <= Tabs and np.isfinite(x[h - D.h0])]
+            m = len(pairs)
+            if m < FIT_MIN:
+                continue
+            xs, fs = np.array([q[0] for q in pairs]), np.array([q[1] for q in pairs])
+            if m >= FIT_FULL and fs.std() > 1e-9:
+                b, a = (float(t) for t in np.polyfit(fs, xs, 1))
+                kind = "線性"
+            else:
+                b, a = 1.0, float(np.mean(xs - fs))
+                kind = "只校正偏移"
+            ss = float(((xs - xs.mean()) ** 2).sum())
+            r2 = 1 - float(((xs - (a + b * fs)) ** 2).sum()) / ss if ss > 0 else None
+            live_n = sum(1 for h in f if Tabs < h <= L)
+            rank = (kind == "線性", -9.0 if r2 is None else r2, m)
+            if live_n and (best is None or rank > best[0]):
+                best = (rank, v, kind, a, b, r2, m)
+        if best is None or not sdv:
+            continue
+        _, v, kind, a, b, r2, m = best
+        arr = np.full(k, np.nan)
+        for h, fv in feats[(v, c)].items():
+            if Tabs < h <= L:
+                arr[h - Tabs - 1] = (a + b * fv) / sdv
+        liq_live[c] = arr
+        fits[c] = {"venue": v, "kind": kind, "a": a, "b": b, "r2": r2, "overlap": m}
+    if k == 0 or "BTC" not in liq_live:
+        return {"fits": fits, "k": 0} if fits else None
+    # Overall LIQ: the last market caps; at least half of the counted market cap must have a live value
+    elig_T = {c: bool(D.eligible(c)[-1]) for c in COINS}
+    w = {}
+    for c in COINS:
+        fin = np.flatnonzero(np.isfinite(D.mcap[c]))
+        if elig_T[c] and len(fin):
+            w[c] = float(D.mcap[c][fin[-1]])
+    total = sum(w.values())
+    num, den = np.zeros(k), np.zeros(k)
+    for c, arr in liq_live.items():
+        if c in w:
+            ok = np.isfinite(arr)
+            num += np.where(ok, w[c] * np.nan_to_num(arr), 0.0)
+            den += np.where(ok, w[c], 0.0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        o_live = np.where(den >= 0.5 * total, num / np.where(den > 0, den, 1), np.nan)
+    E = copy.copy(D)
+    E.n = D.n + k
+    E.close = {}
+    for c in COINS:
+        lp = np.full(k, np.nan)
+        for h, v in px.get(c, {}).items():
+            if Tabs < h <= L:
+                lp[h - Tabs - 1] = v
+        E.close[c] = np.concatenate([D.close[c], lp])
+    X = {"liq": {c: np.concatenate([R["liq"][c], liq_live.get(c, np.full(k, np.nan))]) for c in COINS},
+         "elig": {c: np.concatenate([R["elig"][c], np.full(k, elig_T[c] and c in w) & np.isfinite(liq_live.get(c, np.full(k, np.nan)))])
+                  for c in COINS},
+         "overall": np.concatenate([R["overall"], o_live])}
+    return {"E": E, "R": X, "fits": fits, "k": k, "cover": float(np.nanmin(den / total)) if total else 0.0}
+
+
+def wave_view(D, W, O, r0, live_from=None):
+    """What the page shows of the waves: shaded spans, the latest waves, and the state now."""
+    n = D.n
+    spans = [{"from": D.hour(max(w["start"], r0)), "to": D.hour(w["end"] if w["end"] is not None else n - 1)}
+             for w in W if (w["end"] is None or w["end"] >= r0)]
+    recent = []
+    for w in reversed(W[-12:]):
+        end = w["end"]
+        avg = statistics.mean(w["ret"].values()) * 100 if w["ret"] else None
+        live = live_from is not None and (w["start"] >= live_from or (end is None and max(w["join"].values()) >= live_from))
+        recent.append([short(D.label(w["start"])) + ("（即時）" if live_from is not None and w["start"] >= live_from else ""),
+                       short(D.label(end)) if end is not None else "進行中", f"{w['hours'] // 24} 天 {w['hours'] % 24} 小時",
+                       len(w["join"]), "、".join(w["order"][:6]) + ("…" if len(w["order"]) > 6 else "") + ("（含即時加入）" if live and w["start"] < live_from else ""),
+                       f"{avg:+.1f}%" if avg is not None else "—"])
+    cur = W[-1] if W and W[-1]["end"] is None else None
+    last = n - 1
+    while last > 0 and np.isnan(O[last]):
+        last -= 1
+    o_now = O[last]
+    if cur:
+        state = f"波段進行中：{len(cur['join'])} 個幣（{'可加入' if o_now >= 2 else '延續中、不再加入'}）"
+    else:
+        state = "等待中（沒有波段）"
+    return spans, recent, last, o_now, state, cur
+
+
+def apply_live(out, D, R, lo, ext, now=None):
+    """Put the live hours into the LIQ and resonance cards (their statistics stay on Binance's data); returns the
+    shared hourly BTC closes over the extended window, or None."""
+    if not ext:
+        return None
+    fits = ext.get("fits") or {}
+    rows = []
+    for c in COINS:
+        f = fits.get(c)
+        rows.append([c, LIVE_VENUES[f["venue"]] if f else "—", f["kind"] if f else "重疊不足", f["overlap"] if f else 0,
+                     f"{f['r2']:.2f}" if f and f["r2"] is not None else "—"])
+    fit_table = {"title": "即時估計的校準（每個幣選最貼近 Binance 的一家）", "head": ["幣", "即時資料", "方式", "重疊小時", "R²"], "rows": rows, "text": [1, 2]}
+    if not ext.get("k"):
+        for it in out:
+            if it["id"] == "liq":
+                it["tables"] = [fit_table]
+        return None
+    E, X = ext["E"], ext["R"]
+    T = D.n - 1
+    n_e = E.n
+    r0 = max(lo, n_e - RECENT_H)
+    r0c = max(lo, D.n - RECENT_H)
+    hrs = [E.hour(i) for i in range(r0, n_e)]
+    live_from = T + 1
+    O, B = X["overall"], X["liq"]["BTC"]
+    note = (f"最後 {n_e - 1 - T} 小時（{short(E.label(live_from))} 起，台灣時間）是即時估計：Binance 的訂單簿檔案隔天才公布，"
+            "這段改用 OKX、Coinbase、Hyperliquid 每小時抓的訂單簿，換算成 Binance 的尺度（校準見下表）；Binance 檔案到了就換回正式值。")
+    for it in out:
+        if it["id"] == "liq":
+            with np.errstate(invalid="ignore"):
+                green, red = (O > 2) & (B > 3), (O < -2) & (B < -3)
+            known = np.isfinite(O) & np.isfinite(B)
+            g_ev, r_ev = first_hours(green, 24, known, lo), first_hours(red, 24, known, lo)
+            last = n_e - 1
+            while last > T and not np.isfinite(O[last]):
+                last -= 1
+            ov, bv = O[last], B[last]
+            st = "綠色箭頭" if green[last] else "紅色箭頭" if red[last] else "偏多" if ov > 2 else "偏空" if ov < -2 else "中性"
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "b": [_r(v, 2) for v in B[r0:n_e]],
+                            "liveFrom": E.hour(live_from)}
+            it["marks"] = ([{"d": E.hour(i), "label": "綠色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "good"} for i in g_ev if i >= r0]
+                           + [{"d": E.hour(i), "label": "紅色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "bad"} for i in r_ev if i >= r0])
+            live_txt = "（即時估計）" if last > T else ""
+            it["now"] = {"d": E.hour(last), "v": _r(ov, 2), "state": f"{st}，BTC LIQ {bv:+.1f}{live_txt}" if np.isfinite(bv) else st + live_txt,
+                         "tone": "good" if ov > 2 else "bad" if ov < -2 else "mid"}
+            it["chartNote"] = CHART_NOTE + " " + note
+            it["tables"] = [fit_table]
+        elif it["id"] == "resonance":
+            W = waves(E, X)
+            spans, recent, last, o_now, state, cur = wave_view(E, W, O, r0, live_from)
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "liveFrom": E.hour(live_from)}
+            it["spans"] = spans
+            live_txt = "（即時估計）" if last > T else ""
+            it["now"] = {"d": E.hour(last), "v": _r(o_now, 2), "state": state + live_txt, "tone": "good" if cur else "mid"}
+            it["chartNote"] = CHART_NOTE + " " + note
+            for t in it.get("tables", []):
+                if t["title"] == "最近的波段":
+                    t["rows"] = recent
+            if cur is not None:
+                it["live_wave"] = {"start": E.label(cur["start"]), "coins": cur["order"],
+                                   "ret": {c: _r(r * 100, 1) for c, r in cur["ret"].items()}}
+    return {"h0": E.hour(r0c), "v": [_r(v, 0) for v in E.close["BTC"][r0c:n_e]]}
+
+
+def patch_live(ck, item):
+    """For the site build: the live hours into an indicators.json computed earlier (only the LIQ and
+    resonance cards and the shared BTC closes change)."""
+    def pending():
+        for it in ck.get("items", []):
+            if it.get("id") in ("liq", "resonance") and "即時估計：" not in (it.get("chartNote") or ""):
+                it["chartNote"] = CHART_NOTE + " " + LIVE_PENDING
+        return ck
+
+    if not glob.glob(os.path.join(LIVE, "*.csv.gz")):
+        return pending()
+    D = Data()
+    if not D.ok or D.first.get("BTC") is None:
+        return ck
+    R = compute(D, **PARAMS)
+    ext = live_extend(D, R)
+    if not ext:
+        return pending()
+    lo = D.first["BTC"] + NEED_H
+    hb = apply_live(ck.get("items", []), D, R, lo, ext)
+    if hb:
+        ck["hbtc"] = hb
+    elif not ext.get("k"):
+        pending()
+    return ck
 
 
 # ------------------------------------------------------------------ the page's items
@@ -647,6 +890,17 @@ def items(item, D=None, ctx=None):
     if daily is not None:
         daily["ari"] = to_daily(D, ari, "max")
     hbtc = {"h0": hrs[0], "v": [_r(v, 0) for v in btc[r0:n]]}
+    try:  # the hours Binance has not published yet, from the live books
+        ext = live_extend(D, R)
+        hb = apply_live(out, D, R, lo, ext)
+        if hb:
+            hbtc = hb
+        if not ext or not ext.get("k"):
+            for it in out:
+                if it["id"] in ("liq", "resonance"):
+                    it["chartNote"] = CHART_NOTE + " " + LIVE_PENDING
+    except Exception as e:
+        print(f"live hours skipped: {type(e).__name__}: {e}", flush=True)
     return out, hbtc
 
 
@@ -928,23 +1182,7 @@ def resonance_item(item, D, R, W, lo, r0, hrs, diff_common):
         else:
             ours = "同一時間沒有波段"
         ex_rows.append([ck_desc, ours])
-    recent = []
-    for w in reversed(W[-12:]):
-        end = w["end"]
-        avg = statistics.mean(w["ret"].values()) * 100 if w["ret"] else None
-        recent.append([short(D.label(w["start"])), short(D.label(end)) if end is not None else "進行中", f"{w['hours'] // 24} 天 {w['hours'] % 24} 小時",
-                       len(w["join"]), "、".join(w["order"][:6]) + ("…" if len(w["order"]) > 6 else ""), f"{avg:+.1f}%" if avg is not None else "—"])
-    cur = W[-1] if W and W[-1]["end"] is None else None
-    last = n - 1
-    while last > 0 and np.isnan(O[last]):
-        last -= 1
-    o_now = O[last]
-    if cur:
-        state = f"波段進行中：{len(cur['join'])} 個幣（{'可加入' if o_now >= 2 else '延續中、不再加入'}）"
-    else:
-        state = "等待中（沒有波段）"
-    spans = [{"from": D.hour(max(w["start"], r0)), "to": D.hour(w["end"] if w["end"] is not None else n - 1)}
-             for w in W if (w["end"] is None or w["end"] >= r0)]
+    spans, recent, last, o_now, state, cur = wave_view(D, W, O, r0)
     vst = None
     if own and rand:
         vst = {"n": len(own), "h": int(statistics.median([w["hours"] for w in fin])) if fin else 0, "unit": "h", "hl": "到波段結束",
