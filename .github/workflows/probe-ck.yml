@@ -1,0 +1,37 @@
+name: probe-ck
+# One-off probe for the indicator library (copies of CoinKarma's indicators): which free sources
+# answer a GitHub runner and how far back they go. Writes research/probe_ck/report.json.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/probe_ck.py", ".github/workflows/probe-ck.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: probe-ck
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Probe
+        run: python research/probe_ck.py
+        continue-on-error: true
+        timeout-minutes: 15
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/probe_ck || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "probe ck: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do git pull --rebase -X theirs -q && git push -q && break; git rebase --abort 2>/dev/null; sleep 9; done
+          fi
