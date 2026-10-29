@@ -339,7 +339,7 @@ def wave_stats(D, W, lo=None, hi=None):
     months = span_h / 24 / 30.44
     hours = [w["hours"] for w in ws]
     coins = [len(w["join"]) for w in ws]
-    j24 = [sum(1 for j in w["join"].values() if j - w["start"] <= 24) for w in ws]
+    j24 = [sum(1 for j in w["join"].values() if j - w["start"] < 24) for w in ws]
     avg = [statistics.mean(w["ret"].values()) for w in ws if w["ret"]]
     return {"n": len(ws), "per_month": len(ws) / months if months > 0 else None, "median_days": float(statistics.median(hours)) / 24,
             "short_share": sum(h < 24 for h in hours) / len(ws), "long_share": sum(h > 168 for h in hours) / len(ws),
@@ -365,7 +365,7 @@ def match_ck(D, W):
             s = from_ck_label(ck["start"]) - D.h0
             e = from_ck_label(ck["end"]) - D.h0 if ck.get("end") else s + ck["hours"]
         else:  # a day only (UTC+8): the wave that starts that day
-            d0 = from_ck_label(ck["start"] + " 01:00") - D.h0
+            d0 = from_ck_label(ck["start"] + " 00:00") - D.h0
             cands = [w for w in W if d0 <= w["start"] < d0 + 24]
             s = cands[0]["start"] if cands else d0
             e = s + ck["hours"]
@@ -435,13 +435,20 @@ def to_daily(D, arr, how="mean", min_n=12):
     return {dt.date.fromordinal(EPOCH + d0 + j).isoformat(): float(v[j]) for j in range(k) if cnt[j] >= min_n}
 
 
-def first_hours(flag, gap=24):
-    """Signal hours: the condition holds after at least `gap` hours without it."""
+def first_hours(flag, gap=24, valid=None, lo=0):
+    """Signal hours (from grid index lo on): the condition holds after at least `gap` hours with data in which it
+    did not (hours without data are skipped, not counted as "no signal")."""
+    flag = np.asarray(flag, dtype=bool)
+    valid = np.ones(len(flag), dtype=bool) if valid is None else np.asarray(valid, dtype=bool)
+    seen = np.cumsum(valid)  # hours with data so far
     out, last = [], None
-    for i in np.flatnonzero(flag):
-        if last is None or i - last > gap:
+    for i in np.flatnonzero(flag & valid):
+        if i < lo:
+            last = int(seen[i])
+            continue
+        if last is None or seen[i] - last > gap:
             out.append(int(i))
-        last = int(i)
+        last = int(seen[i])
     return out
 
 
@@ -523,7 +530,8 @@ def items(item, D=None, ctx=None):
     with np.errstate(invalid="ignore"):
         green = (O > 2) & (B > 3)
         red = (O < -2) & (B < -3)
-    g_ev, r_ev = first_hours(green, 24), first_hours(red, 24)
+    known = ~np.isnan(O) & ~np.isnan(B)
+    g_ev, r_ev = first_hours(green, 24, known, lo), first_hours(red, 24, known, lo)
     st = [x for x in (ev_stats_h(btc, g_ev, H_FWD, lo, "綠色箭頭（Overall > 2 且 BTC LIQ > 3）"),
                       ev_stats_h(btc, r_ev, H_FWD, lo, "紅色箭頭（Overall < −2 且 BTC LIQ < −3）")) if x]
     ov = O[last]
@@ -553,7 +561,7 @@ def items(item, D=None, ctx=None):
         if cn[i + 1] - cn[i - 23] >= 20 and vb[i]:
             acc[i] = c1[i + 1] - c1[i - 23]
     with np.errstate(invalid="ignore"):
-        a_up, a_dn = first_hours(acc >= 60, 24), first_hours(acc <= -60, 24)
+        a_up, a_dn = first_hours(acc >= 60, 24, ~np.isnan(acc), lo), first_hours(acc <= -60, 24, ~np.isnan(acc), lo)
     st = [x for x in (ev_stats_h(btc, a_up, H_FWD, lo, "≥ +60"), ev_stats_h(btc, a_dn, H_FWD, lo, "≤ −60")) if x]
     av = acc[last]
     if daily is not None:
@@ -586,7 +594,7 @@ def items(item, D=None, ctx=None):
             ("liqdif", dif, "5% 掛單差（BTC，以顆計）", "BTC", 2000, "10% Orderbook DIF：單一幣 ±10% 內買單減賣單，> 2000 偏多、< −2000 偏空（可切換成美元）。", "BTC"),
             ("liqtotal", tot, "5% 全市場掛單差（美元）", "百萬美元", 300, "10% Overall Liquidity：全市場訂單簿 ±10% 內買單減賣單，> 3 億美元偏多、< −3 億偏空（或 ±3000 BTC）。", "全部")):
         with np.errstate(invalid="ignore"):
-            up_e, dn_e = first_hours(arr >= thr, 24), first_hours(arr <= -thr, 24)
+            up_e, dn_e = first_hours(arr >= thr, 24, ~np.isnan(arr), lo), first_hours(arr <= -thr, 24, ~np.isnan(arr), lo)
         st = [x for x in (ev_stats_h(btc, up_e, H_FWD, lo, f"≥ +{thr:,}"), ev_stats_h(btc, dn_e, H_FWD, lo, f"≤ −{thr:,}")) if x]
         v = arr[last]
         valid = arr[lo:][~np.isnan(arr[lo:])]
@@ -658,14 +666,15 @@ def ari_item(item, D, R, lo, r0, hrs):
         with np.errstate(invalid="ignore", divide="ignore"):
             lr = np.concatenate([[np.nan], np.log(p[1:] / p[:-1])])
         w = D.mcap[c]
-        ok = R["elig"][c] & ~np.isnan(lr) & ~np.isnan(w)
+        ok = D.eligible(c) & ~np.isnan(lr) & ~np.isnan(w)  # the 60-day rule and a price, whether or not the book file exists
         num += np.where(ok, w * np.nan_to_num(lr), 0.0)
         den += np.where(ok, w, 0.0)
     with np.errstate(invalid="ignore", divide="ignore"):
-        alt_lr = np.where(den > 0, num / np.where(den > 0, den, 1), 0.0)
-        b_lr = np.concatenate([[0.0], np.log(btc[1:] / btc[:-1])])
-    b_lr = np.where(np.isfinite(b_lr), b_lr, 0.0)
-    rel = np.cumsum(alt_lr - b_lr)  # log(alt index / BTC)
+        alt_lr = np.where(den > 0, num / np.where(den > 0, den, 1), np.nan)
+        b_lr = np.concatenate([[np.nan], np.log(btc[1:] / btc[:-1])])
+    step = alt_lr - b_lr
+    step[~np.isfinite(step)] = 0.0  # an hour without both sides moves neither
+    rel = np.cumsum(step)  # log(alt index / BTC)
     d24 = np.full(n, np.nan)
     d24[24:] = rel[24:] - rel[:-24]
     d24[:lo] = np.nan
@@ -675,8 +684,9 @@ def ari_item(item, D, R, lo, r0, hrs):
         dd30 = btc / hi30 - 1
         sig = (ari >= 3) & (dd30 <= -0.10)
         sig_any = ari >= 3
-    ev = first_hours(sig, 72)
-    ev_any = first_hours(sig_any, 72)
+    known = ~np.isnan(ari) & ~np.isnan(dd30)
+    ev = first_hours(sig, 72, known, lo)
+    ev_any = first_hours(sig_any, 72, ~np.isnan(ari), lo)
     H = 168
     st = [x for x in (ev_stats_h(btc, ev, H, lo, "ARI ≥ 3，且 BTC 比 30 天高點低 10% 以上"), ev_stats_h(btc, ev_any, H, lo, "ARI ≥ 3（不看跌幅）")) if x]
     last = n - 1
@@ -731,9 +741,9 @@ def triton(D, R, W, lo, etf30d=None, btc_daily=None, filters=True, funding=None)
             for d in ds:
                 if d < r:
                     continue
+                bear[d] = True  # also on the day whose close breaks the top: that close is known only at its end
                 if d > r30 and btc_daily[d] > top:
                     break
-                bear[d] = True
     hi48 = rolling_max(btc, 48)
     last_px = {c: np.nan for c in COINS}
     pos = {}  # coin -> [entry price, notional, entry hour, wave]
@@ -765,9 +775,10 @@ def triton(D, R, W, lo, etf30d=None, btc_daily=None, filters=True, funding=None)
                 cool = i + 24
         if i in ends and pos:
             close_all(i, "波段結束")
-        if i in joins and i > cool:
+        if i in joins and i >= cool:
             day = D.hour(i)[:10]
-            prev = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
+            lag = 1 if (i + D.h0) % 24 >= 14 else 2  # a US day's ETF flows are complete around 14:00 UTC the next day
+            prev = (dt.date.fromisoformat(day) - dt.timedelta(days=lag)).isoformat()
             if filters and bear.get(day) and prev in (etf30d or {}) and not etf30d[prev] > 0:  # no ETF yet (before 2024): no filter
                 skipped_bear += len(joins[i])
             else:
@@ -779,7 +790,7 @@ def triton(D, R, W, lo, etf30d=None, btc_daily=None, filters=True, funding=None)
                     realized -= notional * FEE
                     pos[c] = [last_px[c], notional, i, k]
         if pos:  # funding paid by longs, hourly share of the day's 8-hour rate (BTC's OI-weighted rate as the proxy)
-            f8 = (funding or {}).get(D.hour(i)[:10], 0.01)
+            f8 = (funding or {}).get((dt.date.fromisoformat(D.hour(i)[:10]) - dt.timedelta(days=1)).isoformat(), 0.01)
             cost = sum(nt for p0, nt, i0, k in pos.values()) * f8 / 100 / 8
             realized -= cost
             paid += cost
@@ -824,9 +835,9 @@ def triton_item(item, D, R, W, lo, ctx):
     yrows = []
     for y in sorted({d[:4] for d in days}):
         idx = [k for k, d in enumerate(days) if d[:4] == y]
-        k0 = idx[0] - 1 if idx[0] > 0 else idx[0]
+        k0 = idx[0] - 1 if idx[0] > 0 else None  # the first year starts from the backtest's start (all series = 1)
         k1 = idx[-1]
-        f = lambda a: f"{(a[k1] / a[k0] - 1) * 100:+.0f}%" if a[k0] and a[k1] else "—"  # noqa: E731
+        f = lambda a: f"{(a[k1] / (a[k0] if k0 is not None else 1.0) - 1) * 100:+.0f}%" if a[k1] and (k0 is None or a[k0]) else "—"  # noqa: E731
         ntr = sum(1 for t in tr if D.hour(t["out"])[:4] == y)
         yrows.append([y + ("（至今）" if y == days[-1][:4] else ""), f(v), f(v0), f(vb), ntr])
     fmtp = lambda p, k: (f"{p[k] * 100:+.0f}%" if p and p.get(k) is not None else "—")  # noqa: E731
