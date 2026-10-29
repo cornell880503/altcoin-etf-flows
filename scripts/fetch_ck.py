@@ -355,25 +355,34 @@ def cftc():
 
 
 BFX_LAST = [0.0]
+BFX_GAP = [4.0]  # seconds between calls; widened after each 429, narrowed slowly after a run of successes
+BFX_OK = [0]
 
 
 def bfx(url):
-    """Bitfinex public API. Calls are spaced 3.2 s apart (Bitfinex allows 10 to 90 a minute depending
-    on the endpoint); a 429 blocks the address for about a minute, so wait that out and go on."""
+    """Bitfinex public API. A 429 blocks the address for about a minute: wait that out, and space the
+    calls further apart (the first backfill lost more time to 429 waits than it saved by going fast)."""
     for k in range(6):
-        wait = BFX_LAST[0] + 3.2 - time.time()
+        wait = BFX_LAST[0] + BFX_GAP[0] - time.time()
         if wait > 0:
             time.sleep(wait)
         BFX_LAST[0] = time.time()
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"}), timeout=60) as r:
-                return json.loads(r.read())
+                out = json.loads(r.read())
+            BFX_OK[0] += 1
+            if BFX_OK[0] % 40 == 0:
+                BFX_GAP[0] = max(4.0, BFX_GAP[0] * 0.9)
+            return out
         except urllib.error.HTTPError as e:
             if e.code not in (429, 500, 502, 503, 504):
                 raise
-            REPORT.setdefault("notes", {}).setdefault("bitfinex_retries", 0)
-            REPORT["notes"]["bitfinex_retries"] += 1
-            time.sleep(70 if e.code == 429 else 10)
+            notes = REPORT.setdefault("notes", {})
+            notes["bitfinex_retries"] = notes.get("bitfinex_retries", 0) + 1
+            if e.code == 429:
+                BFX_GAP[0] = min(12.0, BFX_GAP[0] * 1.5)
+                notes["bitfinex_gap_s"] = round(BFX_GAP[0], 1)
+            time.sleep(65 if e.code == 429 else 10)
         except Exception:
             time.sleep(10)
     raise RuntimeError(f"Bitfinex kept refusing: {url[:120]}")
@@ -421,8 +430,8 @@ def bitfinex():
     # 2) per-minute statistics (about 300 calls a series from 2021), the most used first; each page is
     #    merged and saved as it comes, so a run that hits its time budget keeps what it got
     pages = 0
-    for name, key in (("btcusd_long", "pos.size:1m:tBTCUSD:long"), ("fust_used", "credits.size:1m:fUST"),
-                      ("fusd_used", "credits.size:1m:fUSD"), ("ethbtc_long", "pos.size:1m:tETHBTC:long")):
+    for name, key in (("btcusd_long", "pos.size:1m:tBTCUSD:long"), ("ethbtc_long", "pos.size:1m:tETHBTC:long"),
+                      ("fust_used", "credits.size:1m:fUST"), ("fusd_used", "credits.size:1m:fUSD")):
         i = BFX_NAMES.index(name) + 1
         done = [d for d, r in have.items() if r[i] is not None]
         start = ms(first) if not done else ms(dt.date.fromisoformat(max(done)) - dt.timedelta(days=2))

@@ -544,16 +544,22 @@ def bitfinex_items():
     if len(rd) > 100:
         bfx = [((s[d].get("fust_rate") or s[d].get("fusd_rate")) or 0) * 365 * 100 for d in rd]
         okx = [ok.get(d, {}).get("usdt_rate_pct_apr") for d in rd]
-        both = [(d, b, o) for d, b, o in zip(rd, bfx, okx) if o is not None]
+        # the two rates are different products (OKX's is a savings rate and sits lower), so the level of one against the
+        # other says little; what moves is the spread: today's 7-day spread against its own history
+        bfx7 = [statistics.mean(bfx[max(0, i - 6):i + 1]) for i in range(len(rd))]
+        sp = [(d, b - o) for d, b, o in zip(rd, bfx7, okx) if o is not None]
         state = None
-        if both:
-            d0, b0, o0 = both[-1]
-            state = "Bitfinex 高於 OKX（偏底部結構）" if b0 > o0 else "Bitfinex 低於 OKX（偏頂部結構）"
+        if len(sp) > 60:
+            d0, s0 = sp[-1]
+            vals = sorted(v for _, v in sp)
+            pctl = bisect.bisect_left(vals, s0) / len(vals) * 100
+            state = (f"利差 {s0:+.1f} 個百分點，{sp[0][0][:4]} 年以來第 {pctl:.0f} 百分位"
+                     + ("：Bitfinex 相對偏高（偏底部）" if pctl >= 70 else "：Bitfinex 相對偏低（偏頂部）" if pctl <= 30 else ""))
         out.append(item(id="rates", group="資金流", name="USD/USDT Interest Rate", zh="現貨借貸利率（Bitfinex 對交易所散戶）", fidelity="proxy",
                         what="中心化交易所的 USD／USDT 現貨借貸利率；Bitfinex 多是幣圈原生大戶，Binance 多是散戶。",
                         ck="Bitfinex 利率高於 Binance，常出現在底部；低於 Binance，常出現在頂部。",
-                        ours="Bitfinex USDT（fUST）30 天期資金利率的日收盤 × 365；對照 OKX USDT 出借利率（年化）。",
-                        diff="Binance 的融資利率要 API 金鑰、而且擋美國 IP，改用 OKX 當散戶交易所的代表；OKX 的歷史只從 2026/10 起累積。", unit="% 年化", dec=1,
+                        ours="Bitfinex USDT（fUST）30 天期資金利率的日收盤 × 365；對照 OKX USDT 出借利率（年化）。OKX 的是存款利率、本來就比較低，所以狀態看兩者利差（Bitfinex 7 日平均 − OKX）在自己歷史中的位置。",
+                        diff="Binance 的融資利率要 API 金鑰、而且擋美國 IP，改用 OKX 當散戶交易所的代表；OKX 的出借利率歷史從 2024/07 起。", unit="% 年化", dec=1,
                         lines=[{"k": "v", "label": "Bitfinex USDT（%/年）"}, {"k": "okx", "label": "OKX USDT 出借（%/年）"}],
                         series=pack(rd, {"v": bfx, "okx": okx}, {"v": 2, "okx": 2}),
                         now={"d": rd[-1], "v": r2(bfx[-1], 1), "state": state or "OKX 資料還在累積", "tone": "mid"},
