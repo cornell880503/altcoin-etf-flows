@@ -1,0 +1,37 @@
+name: probe-live
+# One-off probe for the hourly (live) LIQ: which live order books answer a GitHub runner and how far
+# from the price they reach. Writes research/probe_live/report.json.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/probe_live_book.py"]
+permissions:
+  contents: write
+concurrency:
+  group: probe-live
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Probe
+        run: python research/probe_live_book.py
+        continue-on-error: true
+        timeout-minutes: 10
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/probe_live || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "probe live: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do git pull --rebase -X theirs -q && git push -q && break; git rebase --abort 2>/dev/null; sleep 9; done
+          fi
