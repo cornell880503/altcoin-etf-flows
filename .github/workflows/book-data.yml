@@ -1,12 +1,13 @@
 name: book-data
-# Hourly Binance order-book depth for the LIQ copies (scripts/fetch_book_binance.py; data/ck/book).
-# The first run backfills from 2023-01-01 (about 34,000 daily files); a run that reaches its time budget
-# stops and the next one goes on. Scheduled twice a day, after Binance publishes the day's files.
+# Data for the LIQ copies: hourly candles (scripts/fetch_px_binance.py; data/ck/px1h) and hourly
+# order-book depth (scripts/fetch_book_binance.py; data/ck/book) of Binance USD-M perpetuals.
+# The first run backfills from 2023-01-01 (about 34,000 daily depth files); a run that reaches its time
+# budget stops and the next one goes on. Scheduled twice a day, after Binance publishes the day's files.
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["scripts/fetch_book_binance.py"]
+    paths: ["scripts/fetch_book_binance.py", "scripts/fetch_px_binance.py"]
   schedule:
     - cron: "37 5 * * *"
     - cron: "37 17 * * *"
@@ -18,7 +19,7 @@ concurrency:
 jobs:
   book:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 190
     steps:
       - uses: actions/checkout@v5
         with:
@@ -26,17 +27,34 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - name: Hourly candles
+        run: python scripts/fetch_px_binance.py --budget 20
+        continue-on-error: true
+        timeout-minutes: 25
+      - name: Commit the candles
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data/ck/px1h || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "candles: $(date -u +%Y-%m-%dT%H:%MZ)"
+            ok=0
+            for i in 1 2 3 4 5; do
+              if git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main; then ok=1; break; fi
+              git rebase --abort 2>/dev/null || true
+              sleep 9
+            done
+            if [ "$ok" = 1 ]; then echo "pushed"; else echo "::warning::could not push the candles commit"; fi
+          fi
       - name: Order-book depth
         run: |
           budget=25
           if [ "${{ github.event_name }}" != schedule ]; then budget=140; fi
           python scripts/fetch_book_binance.py --budget "$budget"
         continue-on-error: true
-        timeout-minutes: 165
-      - name: Commit
+        timeout-minutes: 160
+      - name: Commit the order book
         run: |
-          git config user.name "etf-flows-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A data/ck/book || true
           if git diff --cached --quiet; then echo "no changes"; else
             git commit -q -m "order book: $(date -u +%Y-%m-%dT%H:%MZ)"
