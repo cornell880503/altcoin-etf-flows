@@ -84,8 +84,8 @@ def write_rows(folder, header, rows, today=None):
     day files. Returns the number of files written."""
     cur = this_month(today)
     months, days = {}, {}
-    for r in rows:
-        (months if r[0][:7] < cur else days).setdefault(r[0][:7] if r[0][:7] < cur else r[0], []).append(r)
+    for r in rows:  # the key's first 10 characters are the day (a key may carry an hour: 2026-10-28T05)
+        (months if r[0][:7] < cur else days).setdefault(r[0][:7] if r[0][:7] < cur else r[0][:10], []).append(r)
     n = 0
     for ym, rr in sorted(months.items()):
         mp = os.path.join(folder, f"{ym}.csv.gz")

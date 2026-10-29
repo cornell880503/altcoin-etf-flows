@@ -9,8 +9,9 @@ data/ck/raw/_report.json. Parts are incremental: each refetches only its last st
   usdc_usdt     Binance spot USDCUSDT, daily mean / low / high / last of the 1h closes (from 2018-12)
   basis         Binance COIN-M BTCUSD quarterly vs spot BTCUSDT daily closes (from 2020-08)
   funding       BTC perpetual funding per day (8h-equivalent mean): Binance BTCUSDT (monthly files,
-                from 2020), Hyperliquid BTC (hourly x 8, from 2023-05), OKX BTC-USDT-SWAP (its API keeps
-                about 3 months; stored from the first run on)
+                from 2020; the latest days, before the month's file is out, estimated from Binance's
+                premium index), Hyperliquid BTC (hourly x 8, from 2023-05), OKX BTC-USDT-SWAP (its API
+                keeps about 3 months; stored from the first run on)
   cftc          CFTC Traders in Financial Futures, CME Bitcoin (5 BTC a contract), weekly, from 2018
   bitfinex      Bitfinex BTCUSD and ETHBTC margin longs, USD/USDT funding used, daily close (from 2021);
                 funding rates fUSD/fUST (30-day period candles, daily); BTCUSD 1h candles
@@ -125,7 +126,7 @@ def months(first, last):
         y, m = (y + 1, 1) if m == 12 else (y, m + 1)
 
 
-def bv_klines(path, sym, interval, first, last=None):
+def bv_klines(path, sym, interval, first, last=None, kind="klines"):
     """Klines [open_ms, o, h, l, c] from data.binance.vision: monthly files, then daily files for
     the running month (and the last month while its monthly file is not out yet)."""
     last = last or TODAY - dt.timedelta(days=1)
@@ -135,7 +136,7 @@ def bv_klines(path, sym, interval, first, last=None):
         got = False
         if (y, m) < (TODAY.year, TODAY.month):
             try:
-                out.update(_kl(f"https://data.binance.vision/data/{path}/monthly/klines/{sym}/{interval}/{sym}-{interval}-{ym}.zip"))
+                out.update(_kl(f"https://data.binance.vision/data/{path}/monthly/{kind}/{sym}/{interval}/{sym}-{interval}-{ym}.zip"))
                 got = True
             except Exception:
                 pass
@@ -144,7 +145,7 @@ def bv_klines(path, sym, interval, first, last=None):
             while d.month == m and d <= last:
                 if d >= first:
                     try:
-                        out.update(_kl(f"https://data.binance.vision/data/{path}/daily/klines/{sym}/{interval}/{sym}-{interval}-{d.isoformat()}.zip"))
+                        out.update(_kl(f"https://data.binance.vision/data/{path}/daily/{kind}/{sym}/{interval}/{sym}-{interval}-{d.isoformat()}.zip"))
                     except Exception:
                         pass
                 d += dt.timedelta(days=1)
@@ -270,7 +271,8 @@ def funding():
         time.sleep(0.3)
     mean = lambda xs: sum(xs) / len(xs) if xs else None  # noqa: E731
     for d in set(bn) | set(hl) | set(okx):
-        row = have.get(d, [d, None, None, None])
+        row = (have.get(d) or [d]) + [None] * 4
+        row = row[:5]
         if d in bn and len(bn[d]) >= 2:
             row[1] = g(mean(bn[d]) * 100, 5)
         if d in hl and len(hl[d]) >= 12:
@@ -278,7 +280,59 @@ def funding():
         if d in okx and len(okx[d]) >= 2:
             row[3] = g(mean(okx[d]) * 100, 5)
         have[d] = row
-    return save("funding", ["date", "binance_pct8h", "hyperliquid_pct8h", "okx_pct8h"], [r for r in have.values() if r[0] < TODAY.isoformat()])
+    # Binance publishes the month's funding file only after the month: estimate the last 40 days from
+    # its premium index (done once a day; the days that also have the real rate measure the error)
+    want = [d.isoformat() for d in (TODAY - dt.timedelta(days=k) for k in range(1, 41))]
+    todo = [d for d in want if ((have.get(d) or [d]) + [None] * 5)[4] is None]
+    est = binance_funding_est(todo)
+    for d, v in est.items():
+        row = ((have.get(d) or [d]) + [None] * 4)[:5]
+        row[4] = g(v * 100, 5)
+        have[d] = row
+    both = [(r[1], r[4]) for r in have.values() if len(r) > 4 and r[1] is not None and r[4] is not None]
+    rows = [((r + [None] * 5)[:5]) for r in have.values() if r[0] < TODAY.isoformat()]
+    out = save("funding", ["date", "binance_pct8h", "hyperliquid_pct8h", "okx_pct8h", "binance_est_pct8h"], rows)
+    out["binance_est"] = {"new_days": len(est), "asked": len(todo), "overlap_days": len(both),
+                          "mae_pct8h": g(sum(abs(a - b) for a, b in both) / len(both), 3) if both else None}
+    return out
+
+
+def binance_funding_est(days):
+    """Binance BTCUSDT funding estimated with Binance's formula from its premium index (1-minute
+    closes): each settlement (00:00, 08:00, 16:00 UTC) = P + clamp(0.01% - P, -0.05%, +0.05%), P = the
+    premium of the 8 hours before it, weighted 1..n toward the end; the day's value is the mean of its
+    three settlements (the same days as the monthly file: a settlement belongs to the day it falls on)."""
+    cache = {}
+
+    def prem(day):
+        if day not in cache:
+            try:
+                k = _kl(f"https://data.binance.vision/data/futures/um/daily/premiumIndexKlines/BTCUSDT/1m/BTCUSDT-1m-{day}.zip")
+                cache[day] = {t: c for t, o, h, lo, c in k.values()}
+            except Exception:
+                cache[day] = None
+        return cache[day]
+
+    out = {}
+    for d in days:
+        D = dt.date.fromisoformat(d)
+        a, b = prem((D - dt.timedelta(days=1)).isoformat()), prem(d)
+        if not a or not b:
+            continue
+        pts = {**a, **b}
+        ts = sorted(pts)
+        rates = []
+        for h in (0, 8, 16):
+            T = ms(D) + h * 3600000
+            xs = [pts[t] for t in ts if T - 8 * 3600000 <= t < T]
+            if len(xs) < 400:
+                break
+            wsum = len(xs) * (len(xs) + 1) / 2
+            P = sum(x * (i + 1) for i, x in enumerate(xs)) / wsum
+            rates.append(P + min(max(0.0001 - P, -0.0005), 0.0005))
+        if len(rates) == 3:
+            out[d] = sum(rates) / 3
+    return out
 
 
 @part
@@ -300,52 +354,61 @@ def cftc():
                          "other_long", "other_short", "nonrept_long", "nonrept_short"], rows)
 
 
-def bfx_daily(key, have_last, first):
-    """Daily close (last minute of the UTC day) of a Bitfinex stats1 1m series."""
-    out = {}
-    start = ms(first if not have_last else dt.date.fromisoformat(have_last) - dt.timedelta(days=2))
-    while start < NOW.timestamp() * 1000 and time.time() < DEADLINE[0]:
-        j = jget(f"https://api-pub.bitfinex.com/v2/stats1/{key}/hist?limit=10000&sort=1&start={start}")
-        if not j:
-            break
-        for t, v in j:
-            out[day_of(t)] = v  # sorted ascending: the last minute of each day wins
-        nxt = max(int(r[0]) for r in j) + 60000
-        if nxt <= start:
-            break
-        start = nxt
-        time.sleep(2.2)
-    return out
+BFX_LAST = [0.0]
+
+
+def bfx(url):
+    """Bitfinex public API. Calls are spaced 3.2 s apart (Bitfinex allows 10 to 90 a minute depending
+    on the endpoint); a 429 blocks the address for about a minute, so wait that out and go on."""
+    for k in range(6):
+        wait = BFX_LAST[0] + 3.2 - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        BFX_LAST[0] = time.time()
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"}), timeout=60) as r:
+                return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            if e.code not in (429, 500, 502, 503, 504):
+                raise
+            REPORT.setdefault("notes", {}).setdefault("bitfinex_retries", 0)
+            REPORT["notes"]["bitfinex_retries"] += 1
+            time.sleep(70 if e.code == 429 else 10)
+        except Exception:
+            time.sleep(10)
+    raise RuntimeError(f"Bitfinex kept refusing: {url[:120]}")
+
+
+BFX_NAMES = ["btcusd_long", "ethbtc_long", "fusd_used", "fust_used", "fusd_rate", "fust_rate"]
 
 
 @part
 def bitfinex():
     have = rows_of("bitfinex")
-    last = max(have) if have else None
     first = dt.date(2021, 1, 1)
-    series = {}
-    for name, key in (("btcusd_long", "pos.size:1m:tBTCUSD:long"), ("ethbtc_long", "pos.size:1m:tETHBTC:long"),
-                      ("fusd_used", "credits.size:1m:fUSD"), ("fust_used", "credits.size:1m:fUST")):
-        series[name] = bfx_daily(key, last, first)
-    rates = {}
-    for name, key in (("fusd_rate", "trade:1D:fUSD:p30"), ("fust_rate", "trade:1D:fUST:p30")):
-        j = jget(f"https://api-pub.bitfinex.com/v2/candles/{key}/hist?limit=10000&sort=1&start={ms(first)}")
-        rates[name] = {day_of(r[0]): r[2] for r in j}  # close: rate per day
-        time.sleep(2.2)
-    names = ["btcusd_long", "ethbtc_long", "fusd_used", "fust_used", "fusd_rate", "fust_rate"]
-    for d in set().union(*[set(v) for v in series.values()], *[set(v) for v in rates.values()]):
-        row = have.get(d, [d] + [None] * len(names))
-        for i, n in enumerate(names):
-            src = series.get(n) or rates.get(n)
-            if src and d in src:
-                row[1 + i] = g(src[d])
-        have[d] = row
-    # BTCUSD 1h closes for the premium versus Coinbase
+
+    def put(name, vals):
+        i = BFX_NAMES.index(name) + 1
+        for d, v in vals.items():
+            row = have.get(d) or [d] + [None] * len(BFX_NAMES)
+            row[i] = g(v)
+            have[d] = row
+
+    def keep():
+        return save("bitfinex", ["date"] + BFX_NAMES, list(have.values()))
+
+    # 1) the cheap ones: daily funding-rate candles (one call each) and BTCUSD 1h candles (about 6 calls)
+    for name, key in (("fust_rate", "trade:1D:fUST:p30"), ("fusd_rate", "trade:1D:fUSD:p30")):
+        try:
+            put(name, {day_of(r[0]): r[2] for r in bfx(f"https://api-pub.bitfinex.com/v2/candles/{key}/hist?limit=10000&sort=1&start={ms(first)}")})
+        except Exception as e:
+            REPORT.setdefault("notes", {})[f"bitfinex_{name}"] = str(e)[:120]
+    keep()
     hb = load("bitfinex_1h")
     hrows = {r[0]: r for r in hb.get("rows", [])}
     start = ms(first) if not hrows else (max(hrows) - 3 * 86400) * 1000
     while start < NOW.timestamp() * 1000 and time.time() < DEADLINE[0]:
-        j = jget(f"https://api-pub.bitfinex.com/v2/candles/trade:1h:tBTCUSD/hist?limit=10000&sort=1&start={start}")
+        j = bfx(f"https://api-pub.bitfinex.com/v2/candles/trade:1h:tBTCUSD/hist?limit=10000&sort=1&start={start}")
         if not j:
             break
         for r in j:
@@ -354,9 +417,31 @@ def bitfinex():
         if nxt <= start:
             break
         start = nxt
-        time.sleep(2.2)
     save("bitfinex_1h", ["t", "close"], list(hrows.values()))
-    return save("bitfinex", ["date"] + names, list(have.values()))
+    # 2) per-minute statistics (about 300 calls a series from 2021), the most used first; each page is
+    #    merged and saved as it comes, so a run that hits its time budget keeps what it got
+    pages = 0
+    for name, key in (("btcusd_long", "pos.size:1m:tBTCUSD:long"), ("fust_used", "credits.size:1m:fUST"),
+                      ("fusd_used", "credits.size:1m:fUSD"), ("ethbtc_long", "pos.size:1m:tETHBTC:long")):
+        i = BFX_NAMES.index(name) + 1
+        done = [d for d, r in have.items() if r[i] is not None]
+        start = ms(first) if not done else ms(dt.date.fromisoformat(max(done)) - dt.timedelta(days=2))
+        while start < NOW.timestamp() * 1000 and time.time() < DEADLINE[0]:
+            j = bfx(f"https://api-pub.bitfinex.com/v2/stats1/{key}/hist?limit=10000&sort=1&start={start}")
+            if not j:
+                break
+            put(name, {day_of(t): v for t, v in j})  # ascending: the last minute of each day wins
+            nxt = max(int(r[0]) for r in j) + 60000
+            if nxt <= start:
+                break
+            start = nxt
+            pages += 1
+            if pages % 20 == 0:
+                keep()
+    out = keep()
+    out["stats_pages"] = pages
+    out["complete"] = {n: max((d for d, r in have.items() if r[BFX_NAMES.index(n) + 1] is not None), default=None) for n in BFX_NAMES}
+    return out
 
 
 @part
@@ -523,7 +608,7 @@ def main():
     ap.add_argument("--budget", type=float, default=60, help="minutes for the long backfills (Bitfinex, Coinbase)")
     a = ap.parse_args()
     DEADLINE[0] = time.time() + a.budget * 60
-    want = a.parts or list(PARTS)
+    want = a.parts or [p for p in PARTS if p != "bitfinex"] + ["bitfinex"]  # the long Bitfinex backfill last
     for name in want:
         t0 = time.time()
         try:
@@ -541,6 +626,7 @@ def main():
         old = {}
     old.setdefault("parts", {}).update(REPORT["parts"])
     old["run_at"] = REPORT["run_at"]
+    old["notes"] = REPORT.get("notes", {})
     with open(rp, "w") as f:
         json.dump(old, f, indent=1, sort_keys=True)
 

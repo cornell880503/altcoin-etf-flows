@@ -285,6 +285,29 @@ tr.mutrow td { color: var(--muted); }
 .rd-pick .t b { font-size: 15px; }
 .rd-pick .seg button:disabled { opacity: 0.45; cursor: default; }
 .rd-chip { display: inline-block; font-size: 12px; padding: 0 9px; border-radius: 999px; color: var(--ink); background: var(--surface-2); border: 1px solid var(--hair); line-height: 1.7; }
+.ck-cards { display: grid; gap: 28px; min-width: 0; }
+.ck-group { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--accent); margin: 6px 0 -12px; }
+.ck-card { display: grid; gap: 12px; min-width: 0; }
+.ck-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.ck-head h3 { margin: 0; font-size: 17px; }
+.ck-head h3 small { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 8px; font-family: var(--font-mono); }
+.ck-now { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.ck-now .v { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+.ck-now .u { color: var(--muted); font-size: 12.5px; }
+.ck-tone { display: inline-block; font-size: 12px; padding: 0 9px; border-radius: 999px; line-height: 1.7; border: 1px solid var(--hair); }
+.ck-tone.good { background: var(--pos-wash); border-color: transparent; }
+.ck-tone.bad { background: var(--neg-wash); border-color: transparent; }
+.ck-tone.warn { background: var(--accent-wash); border-color: transparent; }
+.ck-fid { display: inline-block; font-size: 11.5px; padding: 0 8px; border-radius: 4px; line-height: 1.8; border: 1px solid var(--hair); color: var(--ink-2); }
+.ck-fid.close { border-color: var(--live); color: var(--live); }
+.ck-fid.proxy { border-color: var(--pos); color: var(--pos); }
+.ck-fid.ours { border-color: var(--stat); color: var(--stat); }
+.ck-fid.forward { border-color: var(--muted); color: var(--muted); }
+.ck-text { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 22px; font-size: 13.5px; color: var(--ink-2); }
+.ck-text b { display: block; color: var(--ink); font-size: 12.5px; margin-bottom: 2px; }
+.ck-chart-mini { height: 120px; }
+.ck-todo { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
+@media (max-width: 900px) { .ck-text { grid-template-columns: minmax(0, 1fr); } }
 .rd-method { font-size: 14px; color: var(--ink-2); }
 .rd-method ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
 .rd-method h3 { color: var(--ink); }
@@ -303,6 +326,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       <div class="seg tabs" role="tablist" aria-label="頁面">
         <button type="button" role="tab" id="tab-track" aria-selected="true" aria-controls="view-track">每日追蹤</button>
         <button type="button" role="tab" id="tab-radar" aria-selected="false" aria-controls="view-radar">槓桿雷達</button>
+        <button type="button" role="tab" id="tab-ck" aria-selected="false" aria-controls="view-ck">指標庫</button>
         <button type="button" role="tab" id="tab-signals" aria-selected="false" aria-controls="view-signals">訊號研究</button>
         <button type="button" role="tab" id="tab-btc" aria-selected="false" aria-controls="view-btc">BTC 研究</button>
         <button type="button" role="tab" id="tab-trading" aria-selected="false" aria-controls="view-trading">交易研究</button>
@@ -455,6 +479,29 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
           </ul>
         </div>
       </div>
+    </section>
+  </main>
+
+  <main id="view-ck" role="tabpanel" aria-labelledby="tab-ck" hidden style="display:grid;gap:36px;min-width:0">
+    <section aria-labelledby="h-ck">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">指標庫 · CoinKarma 指標的開源復刻</div>
+          <h2 id="h-ck">CoinKarma 的指標，用免費資料重做一遍</h2>
+          <p>照 CoinKarma 官方文件（docs.coinkarma.co）的定義，用公開資料重做他們的指標。每個指標都標出和原版的接近程度；有訊號的，附上訊號之後 BTC 的表現，和隨機一天比。</p>
+        </div>
+        <div class="seg" role="group" aria-label="期間">
+          <button type="button" id="ck-all" aria-pressed="false">全部</button>
+          <button type="button" id="ck-1y" aria-pressed="true">近一年</button>
+        </div>
+      </div>
+      <div class="legend" id="ck-fid-legend"></div>
+      <div class="panel"><div class="tablewrap"><table id="tb-ck-overview"></table></div><p class="note" id="ck-asof"></p></div>
+    </section>
+    <div id="ck-cards" class="ck-cards"></div>
+    <section aria-labelledby="h-ck-todo">
+      <div class="sec-head"><div><h2 id="h-ck-todo">還沒做、或做不了的</h2></div></div>
+      <div class="panel"><ul class="ck-todo" id="ck-todo"></ul></div>
     </section>
   </main>
 
@@ -941,6 +988,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
 <script id="snap-data" type="application/json">/*SNAP*/</script>
 <script id="sig-data" type="application/json">/*SIG*/</script>
 <script id="radar-data" type="application/json">/*RADAR*/</script>
+<script id="ck-data" type="application/json">/*CK*/</script>
 <script>
 (function () {
   'use strict';
@@ -2763,11 +2811,146 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     var b = document.getElementById('rd-' + r);
     if (b) b.addEventListener('click', function () { rd.range = r; document.getElementById('rd-all').setAttribute('aria-pressed', String(r === 'all')); document.getElementById('rd-1y').setAttribute('aria-pressed', String(r === '1y')); if (RD && RD.series) rdCharts(); });
   });
-  var TABS = { track: ['tab-track', 'view-track'], radar: ['tab-radar', 'view-radar'], signals: ['tab-signals', 'view-signals'], btc: ['tab-btc', 'view-btc'], trading: ['tab-trading', 'view-trading'], research: ['tab-research', 'view-research'] };
+  // ---------------------------------------------------------------- indicator library (CoinKarma copies)
+  var CK = null;
+  try { CK = JSON.parse(document.getElementById('ck-data').textContent); } catch (e) { CK = null; }
+  var ck = { range: '1y' };
+  var CK_FID = { close: ['接近原版', '資料與規則和 CoinKarma 的文件相同'], proxy: ['代理資料', '同一個概念，換了資料來源'],
+    ours: ['自製版本', 'CoinKarma 沒公開公式，照描述自己做'], forward: ['從現在累積', '沒有免費歷史，從 2026/10 開始記錄'] };
+  var CK_TONE = { good: 'var(--pos)', bad: 'var(--neg)', warn: 'var(--accent)', mid: 'var(--muted)', ref: 'var(--stat)' };
+  var CK_COLORS = ['var(--accent)', 'var(--pos)', 'var(--stat)', 'var(--live)', 'var(--neg)'];
+  function ckNum(v, dec) { if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v), s = a.toLocaleString('en-US', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }); return (v < 0 ? '−' : '') + s; }
+  function ckSlice(S) {
+    // the charts space points evenly, so keep an even step: 近一年 = every day, 全部 = the last day of each week
+    var d = S.d, keep = [];
+    if (!d || !d.length) return S;
+    var monday = function (x) { var t = Date.parse(x + 'T00:00:00Z'); return t - ((new Date(t).getUTCDay() + 6) % 7) * 864e5; };
+    if (ck.range === '1y') {
+      var cut = new Date(Date.parse(d[d.length - 1] + 'T00:00:00Z') - 365 * 864e5).toISOString().slice(0, 10);
+      d.forEach(function (x, i) { if (x >= cut) keep.push(i); });
+    } else {
+      d.forEach(function (x, i) { if (i === d.length - 1 || monday(d[i + 1]) !== monday(x)) keep.push(i); });
+    }
+    var out = {}; Object.keys(S).forEach(function (k) { out[k] = keep.map(function (i) { return S[k][i]; }); }); return out;
+  }
+  function ckChart(host, it, S, which) {
+    var xf = function (x) { return x.slice(2, 7).replace('-', '/'); };
+    var w = host.clientWidth || 600, xe = Math.max(1, Math.ceil(S.d.length / (w < 560 ? 4 : 7)));
+    var pos = {}; S.d.forEach(function (x, i) { pos[x] = i; });
+    var nearest = function (day) { if (pos[day] != null) return pos[day]; for (var i = 0; i < S.d.length; i++) if (S.d[i] >= day) return i; return null; };
+    var marks = (it.marks || []).filter(function (mk) { return S.d.length && mk.d >= S.d[0] && mk.d <= S.d[S.d.length - 1]; });
+    if (which === 'btc') {
+      lineChart(host, { x: S.d, height: 120, left: 56, series: [{ name: 'BTC', y: S.btc, color: 'var(--price)', width: 1.5, dot: false }],
+        xEvery: xe, xFmt: xf, yFmt: function (v) { return (v / 1000).toFixed(0) + 'K'; }, tipFmt: function (v) { return '$' + ckNum(v, 0); },
+        after: function (svg, g) {
+          marks.forEach(function (mk) {
+            var i = nearest(mk.d); if (i == null || S.btc[i] == null) return;
+            var x = g.xs(i), y = g.y(S.btc[i]) - 7, tri = el('path', { d: 'M' + (x - 4.5) + ',' + (y - 8) + 'L' + (x + 4.5) + ',' + (y - 8) + 'L' + x + ',' + y + 'Z' }, svg);
+            tri.style.fill = CK_TONE[mk.tone || 'warn'] || 'var(--accent)'; tri.style.opacity = mk.tone === 'ref' ? 0.65 : 0.95;
+          });
+        } });
+      return;
+    }
+    var lines = it.lines.filter(function (l) { return !l.hidden && !l.right; });
+    var series = lines.map(function (l, k) { return { name: l.label, y: S[l.k], color: CK_COLORS[k % CK_COLORS.length], width: k ? 1.4 : 2, area: !!l.bar, dot: k === 0 }; });
+    var zones = it.zones || [];
+    var inv = lines.length && lines[0].invert;
+    lineChart(host, { x: S.d, height: 190, left: 56, series: series, includeZero: !inv && series.some(function (s2) { return s2.y.some(function (v) { return v != null && v < 0; }); }),
+      xEvery: xe, xFmt: xf, yFmt: function (v) { return ckNum(v, Math.abs(v) < 1 && v !== 0 ? 2 : 0); }, tipFmt: function (v) { return ckNum(v, it.dec); },
+      tipHead: function (i) { return S.d[i] + (S.btc[i] != null ? '　BTC $' + ckNum(S.btc[i], 0) : ''); },
+      after: function (svg, g) {
+        var top = g.m.t, bot = g.H - g.m.b;
+        zones.forEach(function (z) {
+          var y1 = z.to == null ? top : Math.max(top, Math.min(bot, g.y(z.to))), y2 = z.from == null ? bot : Math.max(top, Math.min(bot, g.y(z.from)));
+          if (y2 - y1 < 1) return;
+          var r = el('rect', { x: g.m.l, width: g.W - g.m.l - g.m.r, y: y1, height: y2 - y1 }, svg);
+          r.style.fill = CK_TONE[z.tone] || 'var(--band)'; r.style.opacity = 0.09;
+          [z.from, z.to].forEach(function (v) { if (v == null) return; var yy = g.y(v); if (yy < top || yy > bot) return; var ln = el('line', { x1: g.m.l, x2: g.W - g.m.r, y1: yy, y2: yy }, svg); ln.style.stroke = CK_TONE[z.tone] || 'var(--axis)'; ln.style.strokeDasharray = '4 4'; ln.style.strokeWidth = 1; ln.style.opacity = 0.7; });
+        });
+        marks.forEach(function (mk) {
+          var i = nearest(mk.d); if (i == null) return;
+          var ln = el('line', { x1: g.xs(i), x2: g.xs(i), y1: top, y2: bot }, svg); ln.style.stroke = CK_TONE[mk.tone || 'warn'] || 'var(--accent)'; ln.style.strokeWidth = 1; ln.style.opacity = mk.tone === 'ref' ? 0.35 : 0.45;
+        });
+      } });
+  }
+  function ckStats(it) {
+    var st = it.stats || [];
+    if (!st.length) return null;
+    var tb = document.createElement('table');
+    if (it.statsKind === 'compare') {
+      table(tb, ['', 'CoinKarma 公布', '我們（同期間）', '我們（全部期間）'], st.map(function (r) { return [r.k, r.ck, r.ours, r.all]; }), { textCols: [1, 2, 3] });
+      return tb;
+    }
+    var first = st[0], H = first.h || 30;
+    var rows = st.map(function (r) {
+      return [(r.label || (it.statsKind === 'zones' ? '' : '訊號之後')) , r.n + (it.statsKind === 'zones' ? ' 天' : ' 次'), pct(r.ret, 1), r.up_share + '%', pct(r.dd, 1), pct(r.upmax, 1)];
+    });
+    rows.push({ _cls: 'ref', cells: ['隨機一天', '—', pct(first.base_ret, 1), first.base_up_share + '%', pct(first.base_dd, 1), pct(first.base_upmax, 1)] });
+    table(tb, ['', it.statsKind === 'zones' ? '天數' : '次數', H + ' 天後報酬（中位數）', '上漲比例', '期間最多跌', '期間最多漲'], rows);
+    return tb;
+  }
+  function ckCard(it) {
+    var card = node('section', 'panel ck-card'); card.id = 'ck-' + it.id;
+    var head = node('div', 'ck-head'), h = node('h3', null, it.zh); h.appendChild(node('small', null, it.name)); head.appendChild(h);
+    var fid = node('span', 'ck-fid ' + it.fidelity, (CK_FID[it.fidelity] || [it.fidelity])[0]); fid.title = (CK_FID[it.fidelity] || ['', ''])[1]; head.appendChild(fid);
+    card.appendChild(head);
+    var nw = node('div', 'ck-now');
+    nw.appendChild(node('span', 'v', it.now && it.now.v != null ? ckNum(it.now.v, it.dec) : '—'));
+    nw.appendChild(node('span', 'u', (it.unit || '') + (it.now && it.now.d ? ' · ' + it.now.d.replace(/-/g, '/') : '')));
+    if (it.now && it.now.state) nw.appendChild(node('span', 'ck-tone ' + (it.now.tone || 'mid'), it.now.state));
+    card.appendChild(nw);
+    var S = ckSlice(it.series || { d: [] });
+    var lg = node('div', 'legend');
+    it.lines.filter(function (l) { return !l.hidden && !l.right; }).forEach(function (l, k) { var sp = node('span'); var key = node('span', 'key'); key.style.background = CK_COLORS[k % CK_COLORS.length]; sp.appendChild(key); sp.appendChild(document.createTextNode(l.label)); lg.appendChild(sp); });
+    if ((it.marks || []).length) { var sp2 = node('span'); var tr = node('span', 'sq'); tr.style.background = 'var(--accent)'; sp2.appendChild(tr); sp2.appendChild(document.createTextNode('訊號（上圖三角形）')); lg.appendChild(sp2); }
+    if ((it.marks || []).some(function (m2) { return m2.tone === 'ref'; })) { var sp3 = node('span'); var tr3 = node('span', 'sq'); tr3.style.background = 'var(--stat)'; sp3.appendChild(tr3); sp3.appendChild(document.createTextNode('CoinKarma 公布的訊號')); lg.appendChild(sp3); }
+    card.appendChild(lg);
+    var c1 = node('div', 'chart ck-chart-mini'), c2 = node('div', 'chart');
+    card.appendChild(c1); card.appendChild(c2);
+    var txt3 = node('div', 'ck-text');
+    [['它在看什麼', it.what], ['CoinKarma 的用法', it.ck], ['我們怎麼算', it.ours + (it.diff ? ' ' + it.diff : '')]].forEach(function (p2) { var d = node('div'); d.appendChild(node('b', null, p2[0])); d.appendChild(document.createTextNode(p2[1] || '')); txt3.appendChild(d); });
+    card.appendChild(txt3);
+    var tb = ckStats(it);
+    if (tb) { var w = node('div', 'tablewrap'); w.appendChild(tb); card.appendChild(w); }
+    if (it.src) card.appendChild(node('p', 'note', '資料：' + it.src));
+    return { card: card, draw: function () { if (S.d.length) { ckChart(c1, it, S, 'btc'); ckChart(c2, it, S, 'ind'); } else { c2.replaceChildren(node('p', 'empty', '資料還在累積。')); } } };
+  }
+  var ckDrawn = [];
+  function drawCK() {
+    var host = document.getElementById('ck-cards');
+    if (!CK || !CK.items) { host.replaceChildren(node('p', 'empty', '指標資料還沒產生，下一次更新後會出現。')); return; }
+    var lg = document.getElementById('ck-fid-legend'); lg.replaceChildren();
+    Object.keys(CK_FID).forEach(function (k) { var sp = node('span'); sp.appendChild(node('span', 'ck-fid ' + k, CK_FID[k][0])); sp.appendChild(document.createTextNode(CK_FID[k][1])); lg.appendChild(sp); });
+    var rows = CK.items.map(function (it) {
+      var st = it.now && it.now.state ? node('span', 'ck-tone ' + (it.now.tone || 'mid'), it.now.state) : null;
+      return { _click: function () { var e = document.getElementById('ck-' + it.id); if (e) e.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); },
+        cells: [it.zh, it.group, { node: node('span', 'ck-fid ' + it.fidelity, (CK_FID[it.fidelity] || [it.fidelity])[0]) }, it.now && it.now.v != null ? ckNum(it.now.v, it.dec) + ' ' + (it.unit || '') : '—', st ? { node: st } : '—', it.now && it.now.d ? it.now.d.replace(/-/g, '/') : '—'] };
+    });
+    table(document.getElementById('tb-ck-overview'), ['指標', '類別', '接近程度', '目前', '狀態', '資料日'], rows, { textCols: [1, 2, 4] });
+    document.getElementById('ck-asof').textContent = '每天更新幾次（UTC 午夜後與白天）；點一列跳到該指標。計算：scripts/ck_indicators.py。這是研究工具，不是投資建議。';
+    host.replaceChildren(); ckDrawn = [];
+    var lastGroup = null;
+    CK.items.forEach(function (it) {
+      if (it.group !== lastGroup) { host.appendChild(node('div', 'ck-group', it.group)); lastGroup = it.group; }
+      var c = ckCard(it); host.appendChild(c.card); ckDrawn.push(c);
+    });
+    ckDrawn.forEach(function (c) { c.draw(); });
+    var todo = document.getElementById('ck-todo'); todo.replaceChildren();
+    ['LIQ 系列（LIQ、Overall LIQ、Accumulated LIQ、10% 掛單差）與流動性共振、Token Screener：CoinKarma 用現貨訂單簿；免費歷史只有 Binance 合約 ±5% 深度（2023 年起），下一批做近似版。',
+     'Karma Index、Market Pulse Index（11 個指標合成）、ALT Resilient Index：沒有公開公式，會做「我們的版本」並清楚標示。',
+     'Binance 保險基金：Binance 的網頁資料擋美國 IP；可能改用 OKX 的保險基金。',
+     'Cumberland USDT Distribution 與 No-Short Filter：需要鏈上地址標籤與 Etherscan 金鑰。',
+     'Triton 訊號（流動性共振 + ETF 30 日淨流量 + ILI 的策略）：規則公開，等 LIQ 共振做出來就能回測；Ultron、DCA Martingale 沒有公開規則，做不了。'].forEach(function (t) { todo.appendChild(node('li', null, t)); });
+  }
+  ['all', '1y'].forEach(function (r) {
+    var b = document.getElementById('ck-' + r);
+    if (b) b.addEventListener('click', function () { ck.range = r; document.getElementById('ck-all').setAttribute('aria-pressed', String(r === 'all')); document.getElementById('ck-1y').setAttribute('aria-pressed', String(r === '1y')); drawCK(); });
+  });
+  var TABS = { track: ['tab-track', 'view-track'], radar: ['tab-radar', 'view-radar'], ck: ['tab-ck', 'view-ck'], signals: ['tab-signals', 'view-signals'], btc: ['tab-btc', 'view-btc'], trading: ['tab-trading', 'view-trading'], research: ['tab-research', 'view-research'] };
   function showTab(t, push) {
     state.tab = t;
     Object.keys(TABS).forEach(function (k) { document.getElementById(TABS[k][0]).setAttribute('aria-selected', String(k === t)); document.getElementById(TABS[k][1]).hidden = k !== t; });
-    if (t === 'research') drawResearch(); else if (t === 'trading') renderTrading(); else if (t === 'btc') drawBTC(); else if (t === 'signals') { renderStatus(); drawSignals(); } else if (t === 'radar') { renderStatus(); drawRadar(); } else renderAll();
+    if (t === 'research') drawResearch(); else if (t === 'trading') renderTrading(); else if (t === 'btc') drawBTC(); else if (t === 'signals') { renderStatus(); drawSignals(); } else if (t === 'radar') { renderStatus(); drawRadar(); } else if (t === 'ck') drawCK(); else renderAll();
     if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { /* ignore */ } }
   }
   var tabIds = Object.keys(TABS);
@@ -2783,7 +2966,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
   buildModel();
   document.getElementById('ans-btc-link').addEventListener('click', function (e) { e.preventDefault(); showTab('btc', true); var b = document.getElementById('tab-btc'); b.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
   showTab(TABS[location.hash.slice(1)] ? location.hash.slice(1) : 'track', false);
-  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (state.tab === 'research') drawResearch(); else if (state.tab === 'trading') renderTrading(); else if (state.tab === 'btc') drawBTC(); else if (state.tab === 'signals') drawSignals(); else if (state.tab === 'radar') { if (RD && RD.series) rdCharts(); } else { renderKPIs(); renderCards(); renderIntensity(); renderDetail(); } }, 150); });
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (state.tab === 'research') drawResearch(); else if (state.tab === 'trading') renderTrading(); else if (state.tab === 'btc') drawBTC(); else if (state.tab === 'signals') drawSignals(); else if (state.tab === 'radar') { if (RD && RD.series) rdCharts(); } else if (state.tab === 'ck') { ckDrawn.forEach(function (c) { c.draw(); }); } else { renderKPIs(); renderCards(); renderIntensity(); renderDetail(); } }, 150); });
   window.addEventListener('scroll', hideTip, { passive: true });
 })();
 </script>

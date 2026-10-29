@@ -110,11 +110,20 @@ def radar():
         return None
 
 
-def render(snap, research, built_at, sig=None, rd=None):
+def indicators():
+    try:
+        return json.load(open(P("data", "ck", "indicators.json"), encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print("indicator library data missing:", e, file=sys.stderr)
+        return None
+
+
+def render(snap, research, built_at, sig=None, rd=None, ck=None):
     tpl = open(P("site", "template.html"), encoding="utf-8").read()
     body = tpl.replace("/*SNAP*/", json_for_script(snap)).replace("/*DATA*/", json_for_script(research)) \
-              .replace("/*SIG*/", json_for_script(sig)).replace("/*RADAR*/", json_for_script(rd))
-    if any(k in body for k in ("/*SNAP*/", "/*DATA*/", "/*SIG*/", "/*RADAR*/")):
+              .replace("/*SIG*/", json_for_script(sig)).replace("/*RADAR*/", json_for_script(rd)) \
+              .replace("/*CK*/", json_for_script(ck))
+    if any(k in body for k in ("/*SNAP*/", "/*DATA*/", "/*SIG*/", "/*RADAR*/", "/*CK*/")):
         raise SystemExit("template placeholders not filled")
     cut = body.index('<div class="wrap">')
     head, rest = body[:cut].strip(), body[cut:].strip()
@@ -154,14 +163,16 @@ def main():
     research.pop("_about", None)
     sig = signal_research()
     rd = radar()
-    html = render(snap, research, built_at, sig, rd)
+    ck = indicators()
+    html = render(snap, research, built_at, sig, rd, ck)
     os.makedirs(a.out, exist_ok=True)
     tmp = os.path.join(a.out, ".index.html.tmp")
     open(tmp, "w", encoding="utf-8").write(html)
     os.replace(tmp, os.path.join(a.out, "index.html"))
     health = {"built_at": built_at, "latest_date": snap["asof"], "trading_days": len(snap["dates"]),
               "missing_price_on_latest": missing, "signals": sig is not None,
-              "radar": rd.get("asof") if rd else None, "bytes": len(html.encode())}
+              "radar": rd.get("asof") if rd else None, "indicators": ck.get("asof") if ck else None,
+              "bytes": len(html.encode())}
     json.dump(health, open(os.path.join(a.out, "health.json"), "w"), indent=1)
     open(os.path.join(a.out, ".nojekyll"), "w").close()  # GitHub Pages: serve the files as they are
     print(json.dumps(health, ensure_ascii=False))
