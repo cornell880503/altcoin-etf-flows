@@ -38,7 +38,9 @@ jobs:
         run: |
           m=$(cat "$RUNNER_TEMP/live_minutes" 2>/dev/null || echo 0)
           r=$(cat "$RUNNER_TEMP/live_reason" 2>/dev/null || echo error)
-          if [ "$r" = update ] || [ "${m%.*}" -ge 20 ]; then
+          # any run that lasted a few minutes hands over (one that failed at once, e.g. on broken code, does
+          # not, so it cannot spin; live-watchdog.yml restarts the chain after a fix)
+          if [ "$r" = update ] || [ "${m%.*}" -ge 3 ]; then
             curl -s -o /dev/null -w "dispatch %{http_code}\n" -X POST \
               -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/liq-live.yml/dispatches" -d '{"ref":"main"}'
