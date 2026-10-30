@@ -17,6 +17,7 @@ import argparse
 import concurrent.futures as cf
 import csv
 import datetime as dt
+import difflib
 import gzip
 import json
 import os
@@ -29,16 +30,29 @@ import urllib.error
 import urllib.request
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "research", "ck_pulse")
 CHANNEL = "coinkarma_market_pulse_trial"
 UA = "Mozilla/5.0 (compatible; altcoin-etf-flows research; +https://github.com/cornell880503/altcoin-etf-flows)"
-# row label -> key; matched in this order on the lower-cased label (the table gained rows over time)
-KEYS = [("accumulated", "acc_btc_liq"), ("overall liquidity", "overall_liquidity_btc"), ("overall liq", "overall_liq"),
-        ("btc liq", "btc_liq"), ("eth liq", "eth_liq"), ("lsur", "lsur_z"), ("resilient", "ari"), ("bitfinex", "bitfinex_premium"),
-        ("usdc", "usdc_usdt_premium"), ("interest", "binance_usdt_rate"), ("funding", "oi_funding_apy"), ("pulse", "pulse_index")]
+# the table's row labels -> keys; an OCR'd label goes to the closest one (difflib, at least LABEL_MIN alike)
+KEYS = [("accumulated btc liq", "acc_btc_liq"), ("overall liquidity in btc", "overall_liquidity_btc"), ("overall liq", "overall_liq"),
+        ("btc liq", "btc_liq"), ("eth liq", "eth_liq"), ("lsur z-index", "lsur_z"), ("alt resilient index", "ari"),
+        ("bitfinex premium", "bitfinex_premium"), ("usdc/usdt premium", "usdc_usdt_premium"), ("binance usdt interest rate", "binance_usdt_rate"),
+        ("oi weighted funding apy", "oi_funding_apy"), ("pulse index", "pulse_index")]
+LABEL_MIN = 0.65
+# plausible values, and whether CoinKarma prints two decimals (else none): a reading outside the range or with other
+# decimals is read again
+RANGE = {"overall_liq": (-15, 15, True), "btc_liq": (-15, 15, True), "eth_liq": (-15, 15, True), "acc_btc_liq": (-400, 400, True),
+         "overall_liquidity_btc": (-60000, 60000, False), "lsur_z": (-10, 10, True), "ari": (-15, 15, True),
+         "bitfinex_premium": (-5, 5, True), "usdc_usdt_premium": (-5, 5, True), "binance_usdt_rate": (0, 300, True),
+         "oi_funding_apy": (-200, 300, True), "pulse_index": (0, 100, False)}
+
+
+def label_key(lab):
+    best = max(KEYS, key=lambda kv: difflib.SequenceMatcher(None, lab, kv[0]).ratio())
+    return best[1] if difflib.SequenceMatcher(None, lab, best[0]).ratio() >= LABEL_MIN else None
 FIELDS = ["post", "posted_at", "update_at", "btc", "eth"] + [f"{k}{s}" for _, k in KEYS for s in ("", "_st")] + ["other"]
 NUM = re.compile(r"[-−–]?\d[\d,]*(?:\.\d+)?%?")
 
@@ -93,15 +107,18 @@ def posts(stop_at=0, max_pages=400):
     return [seen[k] for k in sorted(seen) if k > stop_at]
 
 
-def mask(im, mode):
-    """Black text on white for tesseract: 'white' keeps near-white/grey text (labels, values, status words; drops
-    the coloured arrows and dots), 'bright' keeps any bright text (the coloured prices too)."""
-    a = np.asarray(im.convert("RGB")).astype(np.int16)
+def prep(im, mode, width=1500):
+    """A grey image for tesseract, dark text on white, three times the size (the preview's tables are only about 494
+    px wide): 'white' keeps white and grey text (labels, values, status words) and drops the coloured arrows and dots;
+    'bright' keeps any bright text (the coloured prices in the header too)."""
+    a = np.asarray(im.convert("RGB")).astype(np.float32)
     mn, mx = a.min(axis=2), a.max(axis=2)
-    keep = (mn > 130) & (mx - mn < 60) if mode == "white" else (mx > 120)
-    out = Image.fromarray(np.where(keep, 0, 255).astype(np.uint8))
-    f = 1400 / max(1, im.width)  # about 1400 px wide: big enough for the digits, small enough to be quick
-    return out.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS) if abs(f - 1) > 0.15 else out
+    v = np.clip(mn - 0.5 * (mx - mn), 0, 255) if mode == "white" else mx
+    g = Image.fromarray((255 - v).astype(np.uint8))
+    f = max(1.0, width / max(1, im.width))
+    if f > 1.05:
+        g = g.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS)
+    return ImageOps.autocontrast(g, cutoff=1)
 
 
 def tsv(img, psm=6):
@@ -134,55 +151,86 @@ def num(tok):
         return None, pct
 
 
+def plausible(key, v):
+    if v is None or key not in RANGE:
+        return v is not None
+    lo, hi, dec = RANGE[key]
+    return lo <= v[0] <= hi and v[1] == (2 if dec else 0)
+
+
 def read_table(path):
-    """{key: (value, status)}, update time, BTC and ETH price, and the OCR lines."""
+    """{key: (value, status)}, update time, BTC and ETH price, and the OCR lines: read at about 1500 px wide, and
+    where a value is missing or implausible, again at 2100 and 1200 px (the first plausible reading wins)."""
     im = Image.open(path)
     if im.height < im.width * 1.1:  # the chart image (landscape), not the table
         return None
-    lines = tsv(mask(im, "white"))
+    r = read_once(im, 1500)
+    for width in (2100, 1200):
+        bad = [k for k in RANGE if not plausible(k, r["vals"].get(k, (None, None))[0])]
+        if not bad:
+            break
+        r2 = read_once(im, width)
+        for k, (v, st) in r2["vals"].items():
+            if k not in r["vals"] or (not plausible(k, r["vals"][k][0]) and plausible(k, v)):
+                r["vals"][k] = (v, st or r["vals"].get(k, (None, None))[1])
+        for f in ("update_at", "btc", "eth"):
+            r[f] = r[f] or r2[f]
+        r["retried"] = r.get("retried", []) + [width]
+    r["vals"] = {k: ((v[0] if v and plausible(k, v) else None), st) for k, (v, st) in r["vals"].items()}
+    return r
+
+
+def read_once(im, width):
+    lines = tsv(prep(im, "white", width))
     text_lines = [" ".join(w[3] for w in ln) for ln in lines]
     vals, other = {}, {}
-    # columns from the header row (Indicator / Current Value / Bottom Ref / Top Ref / Status)
-    cols = None
+    # the value column from the header row (Indicator / Current Value / Bottom Ref / Top Ref / Status): from a little
+    # left of "Current" to a little left of "Bottom Ref" (tesseract may join "BottomRef")
+    x_cur = x_bot = None
     for ln in lines:
-        words = {w[3].lower(): w for w in ln}
-        if "indicator" in words and "status" in words:
-            xs = sorted([words["indicator"][0], words.get("current", words.get("value", (0,)))[0],
-                         words.get("bottom", (0,))[0], words.get("top", (0,))[0], words["status"][0]])
-            cols = xs
+        lw = [(w[0], w[3].lower()) for w in ln]
+        if any(t.startswith("indicator") for _, t in lw) and any("status" in t for _, t in lw):
+            x_cur = next((x for x, t in lw if t.startswith("current")), None)
+            x_bot = next((x for x, t in lw if t.startswith("bottom") or t.startswith("botiom")), None)
+            if x_bot is None:
+                refs = [x for x, t in lw if t.startswith("ref")]
+                x_bot = refs[0] - 80 if refs else None
             break
     for ln in lines:
-        txt = " ".join(w[3] for w in ln)
-        low = txt.lower()
-        if low.startswith(("indicator", "last update", "coinkarma")) or "pulse index" == low.strip():
+        low = " ".join(w[3] for w in ln).lower()
+        if low.startswith(("indicator", "last update")) or "coinkarma" in low or low.strip() == "pulse index":
             continue
-        # the label: the words before the first number
-        label, rest = [], []
-        for w in ln:
-            if not rest and not NUM.fullmatch(w[3].replace("O", "0")) and not (cols and w[0] >= cols[1] - 10):
-                label.append(w[3])
-            else:
-                rest.append(w)
-        lab = " ".join(label).lower()
-        key = next((k for kw, k in KEYS if kw in lab), None)
+        # the label: the words left of the value column (or, without a header, the words before the first number)
+        if x_cur is not None:
+            label = [w for w in ln if w[0] + w[2] < x_cur - 5]
+            rest = [w for w in ln if w[0] + w[2] >= x_cur - 5]
+        else:
+            k = next((i for i, w in enumerate(ln) if NUM.fullmatch(w[3])), len(ln))
+            label, rest = ln[:k], ln[k:]
+        lab = " ".join(w[3] for w in label).lower()
+        key = label_key(lab) if lab else None
         if not key or not rest:
             if lab and rest:
                 other[lab] = " ".join(w[3] for w in rest)
             continue
         value = None
         for w in rest:
-            if cols and w[0] > cols[2] - 10:  # past the value column
+            if x_bot is not None and w[0] >= x_bot - 10:  # past the value column
                 break
-            v, _ = num(NUM.search(w[3]).group(0)) if NUM.search(w[3]) else (None, False)
-            if v is not None:
-                value = v
-                break
-        status = next((s for s in ("Buy", "Hold", "Sell") if s.lower() in low.split()[-2:] or low.endswith(s.lower())), None)
+            m = NUM.search(w[3])
+            if m:
+                value = num(m.group(0))[0]
+                if value is not None:
+                    tok = m.group(0).rstrip("%")
+                    value = (value, len(tok.split(".")[1]) if "." in tok else 0)
+                    break
+        tail = " ".join(w[3] for w in ln[-2:]).lower()
+        status = next((st for st in ("Buy", "Hold", "Sell") if st.lower() in tail), None)
         if key not in vals:
             vals[key] = (value, status)
     # the header: update time and prices (coloured), from the top part with any bright text
     top = im.crop((0, 0, im.width, int(im.height * 0.45)))
-    head = " ".join(" ".join(w[3] for w in ln) for ln in tsv(mask(top, "bright"), psm=11))
+    head = " ".join(" ".join(w[3] for w in ln) for ln in tsv(prep(top, "bright", width), psm=6))
     upd = re.search(r"(20\d\d-\d\d-\d\d)\s+(\d\d:\d\d)", " ".join(text_lines) + " " + head)
     btc = re.search(r"BTC[:;]?\s*[$S§]?\s*([\d,]+(?:\.\d+)?)", head)
     eth = re.search(r"ETH[:;]?\s*[$S§]?\s*([\d,]+(?:\.\d+)?)", head)
