@@ -189,7 +189,10 @@ def main(argv=None):
             if tree() != start_tree:
                 reason = "update"
                 break
-            nxt = t0 + a.every * 60
+            # rounds on the clock (:00:20, :10:20, ...): an hour's six snapshots are evenly spread, and the
+            # hour's publish comes right after it closes
+            step = a.every * 60
+            nxt = (time.time() // step + 1) * step + 20
             if nxt + 60 > t_end:
                 break
             time.sleep(max(0.0, nxt - time.time()))
