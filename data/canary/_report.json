@@ -1,8 +1,8 @@
 {
- "run_at": "2026-10-30T10:21:07Z",
+ "run_at": "2026-10-30T10:46:58Z",
  "funds": {
   "XRPC": {
-   "bytes": 1557966,
+   "bytes": 1563494,
    "tables": [
     {
      "n_rows": 4,
@@ -76,7 +76,7 @@
      ]
     },
     {
-     "n_rows": 1201,
+     "n_rows": 1207,
      "head": [
       [
        "Fund Name",
@@ -151,13 +151,13 @@
     }
    ],
    "from": "table",
-   "parsed": 241,
-   "stored": 241,
+   "parsed": 242,
+   "stored": 242,
    "first": "2025-11-12",
-   "last": "2026-10-28"
+   "last": "2026-10-29"
   },
   "LTCC": {
-   "bytes": 1557070,
+   "bytes": 1562591,
    "tables": [
     {
      "n_rows": 4,
@@ -231,7 +231,7 @@
      ]
     },
     {
-     "n_rows": 1201,
+     "n_rows": 1207,
      "head": [
       [
        "Fund Name",
@@ -306,13 +306,13 @@
     }
    ],
    "from": "table",
-   "parsed": 253,
-   "stored": 253,
+   "parsed": 254,
+   "stored": 254,
    "first": "2025-10-27",
-   "last": "2026-10-28"
+   "last": "2026-10-29"
   },
   "HBR": {
-   "bytes": 1564701,
+   "bytes": 1565898,
    "tables": [
     {
      "n_rows": 4,
@@ -467,7 +467,7 @@
    "last": "2026-10-29"
   },
   "SOLC": {
-   "bytes": 1576026,
+   "bytes": 1576162,
    "tables": [
     {
      "n_rows": 4,
@@ -622,7 +622,7 @@
    "last": "2026-10-29"
   },
   "SUIS": {
-   "bytes": 1567306,
+   "bytes": 1572833,
    "tables": [
     {
      "n_rows": 4,
@@ -694,7 +694,7 @@
      ]
     },
     {
-     "n_rows": 1201,
+     "n_rows": 1207,
      "head": [
       [
        "Fund Name",
@@ -769,13 +769,13 @@
     }
    ],
    "from": "table",
-   "parsed": 177,
-   "stored": 177,
+   "parsed": 178,
+   "stored": 178,
    "first": "2026-02-17",
-   "last": "2026-10-28"
+   "last": "2026-10-29"
   },
   "TRXS": {
-   "bytes": 1565722,
+   "bytes": 1571249,
    "tables": [
     {
      "n_rows": 4,
@@ -847,7 +847,7 @@
      ]
     },
     {
-     "n_rows": 1201,
+     "n_rows": 1207,
      "head": [
       [
        "Fund Name",
@@ -922,10 +922,10 @@
     }
    ],
    "from": "table",
-   "parsed": 37,
-   "stored": 37,
+   "parsed": 38,
+   "stored": 38,
    "first": "2026-09-08",
-   "last": "2026-10-28"
+   "last": "2026-10-29"
   }
  }
 }
