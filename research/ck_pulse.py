@@ -42,6 +42,7 @@ KEYS = [("accumulated btc liq", "acc_btc_liq"), ("overall liquidity in btc", "ov
         ("bitfinex premium", "bitfinex_premium"), ("usdc/usdt premium", "usdc_usdt_premium"), ("binance usdt interest rate", "binance_usdt_rate"),
         ("oi weighted funding apy", "oi_funding_apy"), ("pulse index", "pulse_index")]
 LABEL_MIN = 0.65
+STATUSES = ("Buy", "Hold", "Sell", "Caution", "Warning", "Danger")
 # plausible values, and whether CoinKarma prints two decimals (else none): a reading outside the range or with other
 # decimals is read again
 RANGE = {"overall_liq": (-15, 15, True), "btc_liq": (-15, 15, True), "eth_liq": (-15, 15, True), "acc_btc_liq": (-400, 400, True),
@@ -225,7 +226,7 @@ def read_once(im, width):
                     value = (value, len(tok.split(".")[1]) if "." in tok else 0)
                     break
         tail = " ".join(w[3] for w in ln[-2:]).lower()
-        status = next((st for st in ("Buy", "Hold", "Sell") if st.lower() in tail), None)
+        status = next((st for st in STATUSES if st.lower() in tail), None)
         if key not in vals:
             vals[key] = (value, status)
     # the header: update time and prices (coloured), from the top part with any bright text

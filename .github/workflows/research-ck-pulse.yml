@@ -10,7 +10,7 @@ permissions:
   contents: write
 concurrency:
   group: research-ck-pulse
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   read:
     runs-on: ubuntu-latest
@@ -28,9 +28,9 @@ jobs:
       - name: Read the channel
         run: python research/ck_pulse.py --limit "${LIMIT:-0}" --workers 4
         env:
-          LIMIT: "12"
+          LIMIT: "0"
         continue-on-error: true
-        timeout-minutes: 30
+        timeout-minutes: 140
       - name: Commit
         run: |
           git config user.name "etf-flows-bot"
