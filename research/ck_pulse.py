@@ -43,14 +43,14 @@ FIELDS = ["post", "posted_at", "update_at", "btc", "eth"] + [f"{k}{s}" for _, k 
 NUM = re.compile(r"[-−–]?\d[\d,]*(?:\.\d+)?%?")
 
 
-def get(url, tries=5):
+def get(url, tries=4):
     for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=60) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=30) as r:
                 return r.read()
         except urllib.error.HTTPError as e:
             if e.code in (429, 500, 502, 503, 504) and i < tries - 1:
-                time.sleep(int(e.headers.get("Retry-After") or 0) or 5 * (i + 1))
+                time.sleep(min(60, int(e.headers.get("Retry-After") or 0) or 5 * (i + 1)))
                 continue
             raise
         except (urllib.error.URLError, TimeoutError):
@@ -100,16 +100,19 @@ def mask(im, mode):
     mn, mx = a.min(axis=2), a.max(axis=2)
     keep = (mn > 130) & (mx - mn < 60) if mode == "white" else (mx > 120)
     out = Image.fromarray(np.where(keep, 0, 255).astype(np.uint8))
-    scale = max(1, round(1800 / max(1, im.width)))
-    return out.resize((im.width * scale, im.height * scale), Image.LANCZOS) if scale > 1 else out
+    f = 1400 / max(1, im.width)  # about 1400 px wide: big enough for the digits, small enough to be quick
+    return out.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS) if abs(f - 1) > 0.15 else out
 
 
 def tsv(img, psm=6):
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
         img.save(f.name)
         p = f.name
-    r = subprocess.run(["tesseract", p, "stdout", "--psm", str(psm), "-l", "eng", "tsv"], capture_output=True, text=True)
-    os.unlink(p)
+    try:  # one thread each (several run side by side), and never stuck
+        r = subprocess.run(["tesseract", p, "stdout", "--psm", str(psm), "-l", "eng", "tsv"], capture_output=True, text=True,
+                           timeout=120, env=dict(os.environ, OMP_THREAD_LIMIT="1"))
+    finally:
+        os.unlink(p)
     lines = {}
     for row in r.stdout.splitlines()[1:]:
         c = row.split("\t")
@@ -190,14 +193,20 @@ def read_table(path):
 
 def work(item):
     pid, posted, url = item
+    t0 = time.time()
     with tempfile.TemporaryDirectory() as d:
         p = os.path.join(d, "i.jpg")
         try:
             with open(p, "wb") as f:
                 f.write(get(url))
+            t1 = time.time()
+            size = Image.open(p).size
             r = read_table(p)
         except Exception as e:
+            print(f"post {pid}: {type(e).__name__}: {e} ({time.time() - t0:.0f}s)", flush=True)
             return pid, posted, {"error": f"{type(e).__name__}: {e}"}
+    print(f"post {pid}: {size[0]}x{size[1]} {'table' if r else 'chart'} download {t1 - t0:.1f}s, read {time.time() - t1:.1f}s"
+          + (f", {len(r['vals'])} rows, {r['update_at']}" if r else ""), flush=True)
     return pid, posted, r
 
 
