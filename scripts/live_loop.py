@@ -42,6 +42,7 @@ KICK = {
     "radar.yml": 30,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
     "okx-history.yml": 180,  # OKX's replayed books (out a day later): calibration, and hours the live loop missed
     "binspot.yml": 10,       # the Binance spot book collector: its jobs hand over to each other, this restarts it if none runs
+    "ck-pulse.yml": 50,      # CoinKarma's own values from their Telegram tables (three a day): only the new posts
 }
 BINSPOT = os.path.join(ROOT, "data", "ck", "live", "binspot")
 

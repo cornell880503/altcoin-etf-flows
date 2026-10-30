@@ -751,10 +751,12 @@ def apply_live(out, D, R, lo, ext, now=None):
             rows.append([c, LIVE_VENUES[f["venue"]] if f else "—", f["kind"] if f else "重疊不足", f["overlap"] if f else 0,
                          f"{f['r2']:.2f}" if f and f["r2"] is not None else "—"])
         fit_table = {"title": "即時估計的校準（每個幣選最貼近 Binance 的一家）", "head": ["幣", "即時資料", "方式", "重疊小時", "R²"], "rows": rows, "text": [1, 2]}
+    P = ck_pulse()
+    liq_tables = [fit_table] + ([pulse_table(P)] if P is not None else [])
     if not ext.get("k") and not spot:
         for it in out:
             if it["id"] == "liq":
-                it["tables"] = [fit_table]
+                it["tables"] = liq_tables
         return None
     E, X = ext["E"], ext["R"]
     ckc = ck_charts()
@@ -805,7 +807,7 @@ def apply_live(out, D, R, lo, ext, now=None):
             it["now"] = {"d": E.hour(last), "v": _r(ov, 2), "state": f"{st}，BTC LIQ {bv:+.1f}{live_txt}" if np.isfinite(bv) else st + live_txt,
                          "tone": "good" if ov > 2 else "bad" if ov < -2 else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
-            it["tables"] = [fit_table]
+            it["tables"] = liq_tables
         elif it["id"] == "liqacc":
             Bv = X["liq"]["BTC"]
             acc = np.full(n_e, np.nan)
@@ -1005,48 +1007,174 @@ def rsi(px, n=14):
 
 
 CK_CHARTS = os.path.join(ROOT, "data", "ck", "ck_charts.json")
-CK_LINE = {"k": "ck", "label": "CoinKarma 的 Overall LIQ（讀自他們貼文的圖）", "color": "var(--stat)"}
+PULSE_CSV = os.path.join(ROOT, "data", "ck", "pulse", "pulse.csv")
+CK_LINE = {"k": "ck", "label": "CoinKarma 公布的 Overall LIQ（Telegram，每 8 小時）", "color": "var(--stat)"}
+# CoinKarma's statuses as their tables show them: Buy at or above the first, Sell at or below the second, Caution
+# above Sell up to the third (Overall LIQ: Buy >= 2, Caution -2..-1.5, Sell <= -2)
+PULSE_IND = {"overall_liq": (2, -2, -1.5), "btc_liq": (3, -3, -2), "eth_liq": (3, -3, -2), "acc_btc_liq": (60, -60, -45),
+             "overall_liquidity_btc": (3000, -3000, -2000)}
+
+
+def pulse_status(k, v):
+    b, sl, c = PULSE_IND[k]
+    return "Buy" if v >= b else "Sell" if v <= sl else "Caution" if v <= c else "Hold"
+
+
+def pulse_clean(k, v, st):
+    """A value read off their table, checked against its status word (read far more reliably): a lost minus sign is
+    put back, a value the status cannot have is dropped (None); rounding at a threshold is fine."""
+    if v is None or not st or k not in PULSE_IND:
+        return v
+    near = lambda a, b: a == b or {a, b} in ({"Hold", "Caution"}, {"Buy", "Hold"}, {"Caution", "Sell"})  # noqa: E731
+    if near(pulse_status(k, v), st):
+        return v
+    if near(pulse_status(k, -v), st):
+        return -v
+    return None
+
+
+def ck_pulse():
+    """CoinKarma's own values, three times a day, from the tables they post on their Telegram trial channel
+    (scripts/ck_pulse.py, data/ck/pulse): {"hours": update hours (our index), "v": {key: values}, "st": {key: status
+    words}}. A table updated at hour U describes the market up to U, i.e. our candle U - 1. None without the file."""
+    rows = {}
+    try:
+        with open(PULSE_CSV, newline="") as fh:
+            for r in csv.DictReader(fh):
+                u = r.get("update_at") or ""
+                if len(u) < 13 or not u[11:13].isdigit() or int(u[11:13]) > 23:
+                    u = (r.get("posted_at") or "")[:13]
+                if len(u) >= 13:
+                    rows[hidx(u[:13])] = r
+    except OSError:
+        return None
+    if not rows:
+        return None
+    hs = sorted(rows)
+    out = {"hours": np.array(hs), "v": {}, "st": {}}
+    for k in list(PULSE_IND) + ["pulse_index"]:
+        st = [rows[h].get(k + "_st") or "" for h in hs]
+        vals = []
+        for h, w in zip(hs, st):
+            try:
+                x = float(rows[h].get(k))
+            except (TypeError, ValueError):
+                x = None
+            x = pulse_clean(k, x, w)
+            vals.append(np.nan if x is None else x)
+        out["v"][k], out["st"][k] = np.array(vals), st
+    return out
+
+
+def pulse_events(P, D, key, want, key2=None, gap=24):
+    """Our grid hours (the candle before each update) at which CoinKarma's status for key (and key2) turned to want:
+    the first table of each spell, none in the gap hours before."""
+    ev, last, prev = [], -10 ** 9, False
+    for j, U in enumerate(P["hours"]):
+        on = P["st"][key][j] == want and (key2 is None or P["st"][key2][j] == want)
+        if on and not prev and U - last >= gap:
+            i = int(U) - 1 - D.h0
+            if 0 <= i < D.n:
+                ev.append(i)
+            last = U
+        prev = on
+    return ev
+
+
+def pulse_table(P):
+    """Their latest table (Telegram), for the cards."""
+    j = len(P["hours"]) - 1
+    names = [("overall_liq", "Overall LIQ", 2), ("btc_liq", "BTC LIQ", 2), ("eth_liq", "ETH LIQ", 2), ("acc_btc_liq", "Accumulated BTC LIQ", 2),
+             ("overall_liquidity_btc", "Overall Liquidity（BTC）", 0), ("pulse_index", "Pulse Index", 0)]
+    rows = [[lab, "—" if not np.isfinite(P["v"][k][j]) else f"{P['v'][k][j]:.{d}f}", P["st"][k][j] or "—"] for k, lab, d in names]
+    return {"title": f"CoinKarma 最新公布（{short(ck_label(int(P['hours'][j]) - 1))} 台灣時間，Telegram）", "head": ["指標", "數值", "狀態"],
+            "rows": rows, "text": [0, 2]}
 
 
 def ck_charts():
-    """CoinKarma's own Overall LIQ and BTC LIQ, read off charts in their posts (research/ck_chart_decode.py):
-    {"overall": {hour: value}, "btc": {hour: value}, "posts": [url]}; later charts win where they overlap."""
+    """CoinKarma's own Overall LIQ and BTC LIQ per our hour, each table's value held for the 8 hours to the next
+    (their Telegram tables, 2025-02 on); without them, the hourly values we read off charts in their posts
+    (data/ck/ck_charts.json). {"overall": {hour: value}, "btc": {hour: value}, "src": ...}."""
+    P = ck_pulse()
+    if P is not None:
+        out = {"overall": {}, "btc": {}, "src": "telegram"}
+        hs = P["hours"]
+        for key, k in (("overall", "overall_liq"), ("btc", "btc_liq")):
+            for j, U in enumerate(hs):
+                v = P["v"][k][j]
+                if not np.isfinite(v):
+                    continue
+                end = min(int(hs[j + 1]) if j + 1 < len(hs) else int(U) + 8, int(U) + 8) - 1
+                for h in range(int(U) - 1, end):
+                    out[key][hstr(h)] = float(v)
+        return out if out["overall"] else None
     try:
         doc = json.load(open(CK_CHARTS))
     except (OSError, ValueError):
         return None
-    out = {"overall": {}, "btc": {}, "posts": []}
+    out = {"overall": {}, "btc": {}, "src": "charts"}
     for c in doc.get("charts", []):
         out["overall"].update(c.get("overall") or {})
         out["btc"].update(c.get("btc") or {})
-        out["posts"].append(c.get("post"))
     return out if out["overall"] else None
 
 
-def ck_fidelity(D, R, ckc):
-    """How closely our LIQ follows CoinKarma's charted one: correlations over the hours both have, and the hours
-    at or above 2 / below 0 in each, overall and in the week of 2026-10-22 (when the two parted: ours started a
-    wave that theirs never had)."""
-    def pair(key, ours):
-        xs, ys = [], []
-        for h, v in ckc[key].items():
-            i = hidx(h) - D.h0
-            if 0 <= i < D.n and np.isfinite(ours[i]):
-                xs.append(ours[i])
-                ys.append(v)
-        return np.array(xs), np.array(ys)
-    o_x, o_y = pair("overall", R["overall"])
-    b_x, b_y = pair("btc", R["liq"]["BTC"])
-    if len(o_x) < 200:
+def ck_fidelity(D, R, P=None):
+    """How closely our LIQ follows CoinKarma's published values (their Telegram tables) at their update hours: the
+    correlation over everything and the range over calendar quarters."""
+    P = P if P is not None else ck_pulse()
+    if P is None:
         return None
-    hs = sorted(ckc["overall"])
-    w0, w1 = hidx("2026-10-22T00") - D.h0, hidx("2026-10-28T23") - D.h0
-    wk_ck = [v for h, v in ckc["overall"].items() if w0 <= hidx(h) - D.h0 <= w1]
-    wk_ours = [R["overall"][i] for i in range(max(0, w0), min(D.n, w1 + 1)) if np.isfinite(R["overall"][i])]
-    return {"n": len(o_x), "from": hs[0], "to": hs[-1], "corr_overall": float(np.corrcoef(o_x, o_y)[0, 1]),
-            "corr_btc": float(np.corrcoef(b_x, b_y)[0, 1]) if len(b_x) > 200 else None,
-            "wk_ck_ge2": sum(v >= 2 for v in wk_ck), "wk_ck_lt0": sum(v < 0 for v in wk_ck), "wk_ck_max": max(wk_ck) if wk_ck else None,
-            "wk_ours_ge2": sum(v >= 2 for v in wk_ours), "wk_ours_lt0": sum(v < 0 for v in wk_ours), "wk_ours_min": min(wk_ours) if wk_ours else None}
+    idx = P["hours"] - 1 - D.h0
+    res = {"n": 0, "tables": len(P["hours"]), "from": hstr(int(P["hours"][0])), "to": hstr(int(P["hours"][-1]))}
+    for key, ours, k in (("overall", R["overall"], "overall_liq"), ("btc", R["liq"]["BTC"], "btc_liq")):
+        x = np.array([ours[i] if 0 <= i < D.n else np.nan for i in idx])
+        y = P["v"][k]
+        m = np.isfinite(x) & np.isfinite(y)
+        if m.sum() < 30:
+            continue
+        res[f"corr_{key}"] = float(np.corrcoef(x[m], y[m])[0, 1])
+        res["n"] = max(res["n"], int(m.sum()))
+        qs = {}
+        for j in np.flatnonzero(m):
+            d = dt.date.fromordinal(EPOCH + int(P["hours"][j]) // 24)
+            qs.setdefault((d.year, (d.month - 1) // 3), []).append(j)
+        cq = [float(np.corrcoef(x[js], y[js])[0, 1]) for js in qs.values() if len(js) > 30]
+        res[f"q_{key}"] = (min(cq), max(cq)) if cq else None
+    return res if res["n"] else None
+
+
+def spot_check(P=None):
+    """Our spot books against CoinKarma's published values at their update hours (our candle before each): BTC's and
+    ETH's log(bids / asks) within SPOT_BAND % against their BTC / ETH LIQ (a correlation: theirs is that over a
+    slowly moving scale), and the all-coin difference within SPOT_BAND % in BTC (their 23 coins) against their
+    Overall Liquidity in BTC, in the same units (correlation, and ours as a multiple of theirs). None before 6 tables."""
+    P = P if P is not None else ck_pulse()
+    if P is None:
+        return None
+    sp = load_spot()
+    v, mid = sp["v"], sp["mid"].get("BTC", {})
+    pairs = {"btc": [], "eth": [], "total": []}
+    for j, U in enumerate(P["hours"]):
+        h = int(U) - 1
+        for key, c, k in (("btc", "BTC", "btc_liq"), ("eth", "ETH", "eth_liq")):
+            q, y = v.get(c, {}).get(h), P["v"][k][j]
+            if q and np.isfinite(y):
+                pairs[key].append((math.log(q[0] / q[1]), y))
+        y = P["v"]["overall_liquidity_btc"][j]
+        coins = [c for c in COINS if c != "ZEC" and h in v.get(c, {})]
+        if np.isfinite(y) and mid.get(h) and len(coins) >= 20:
+            pairs["total"].append((sum(v[c][h][2] - v[c][h][3] for c in coins) / mid[h], y))
+    out = {}
+    for key, ps in pairs.items():
+        if len(ps) >= 6:
+            x, y = (np.array(t) for t in zip(*ps))
+            r = {"n": len(ps), "corr": float(np.corrcoef(x, y)[0, 1]) if x.std() > 0 and y.std() > 0 else None}
+            if key == "total" and float((y * y).sum()) > 0:
+                r["scale"] = float((x * y).sum() / (y * y).sum())  # ours ~ scale x theirs
+                r["mad"] = float(np.mean(np.abs(x - y)))
+            out[key] = r
+    return out or None
 
 
 def ck_overlay(ckc, hours):
@@ -1077,20 +1205,33 @@ def items(item, D=None, ctx=None):
                    "我們試了兩種標準化（扣不扣平均）、三個深度、四個視窗，選最接近 CoinKarma 公布的共振統計與範例波段的一組"
                    "（research/ck_liq_calibration.json）；只看波段的樣子，沒有看報酬。")
     ckc = ck_charts()
-    fid = ck_fidelity(D, R, ckc) if ckc else None
+    P = ck_pulse()
+    fid = ck_fidelity(D, R, P)
     if fid:
-        diff_common += (f"對照 CoinKarma 自己貼文裡的圖（{short(ck_label(hidx(fid['from'])))} – {short(ck_label(hidx(fid['to'])))}，"
-                        f"{fid['n']} 小時，圖上標「CoinKarma」的那條線）：我們的 Overall LIQ 跟他們的相關係數只有 {fid['corr_overall']:.2f}"
-                        + (f"、BTC LIQ {fid['corr_btc']:.2f}" if fid["corr_btc"] is not None else "")
-                        + f"，所以共振波段的時間點常不一樣。例如 10/22–10/28：他們的 Overall 最高 {fid['wk_ck_max']:.1f}、"
-                        f"沒有一小時到 2（{fid['wk_ck_lt0']} 小時跌破 0）；我們的有 {fid['wk_ours_ge2']} 小時 ≥ 2，最低 {fid['wk_ours_min']:+.1f}，"
-                        "開了一個他們沒有的波段，也就沒有他們 10/29 那個新波段。"
-                        "回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿，±0.25–30% 都試過）：Binance 現貨 ±10% 跟他們的 "
-                        "Overall LIQ 相關 0.89、BTC LIQ 0.87，每小時的起伏也像（扣掉當天平均後 0.87／0.85）；我們用的合約只有 0.45／0.31。"
-                        "±15% 在回放的訂單簿補齊之後跨日的高低更像（06:00 UTC 起 0.93），但每小時的起伏差很多（0.68／0.53），±20% 以上兩項都變差，"
-                        "所以用 ±10%（research/ck_chart/backtest.json）。"
-                        "他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集"
-                        "（±15% 也一起記，之後可以用不受回放影響的資料再比一次）。")
+        f0 = dt.date.fromordinal(EPOCH + hidx(fid["from"]) // 24)
+        qo = fid.get("q_overall")
+        diff_common += (f"對照 CoinKarma 在 Telegram 試用頻道每天 3 次公布的數值（{f0.year}/{f0.month} 起 {fid['tables']:,} 張表，"
+                        "我們用 OCR 讀下來，讀出的 BTC 價格全部和 Binance 對得上）：我們的 Overall LIQ 跟他們的相關係數只有 "
+                        f"{fid.get('corr_overall', float('nan')):.2f}" + (f"（各季 {qo[0]:+.2f} 到 {qo[1]:+.2f}）" if qo else "")
+                        + (f"、BTC LIQ {fid['corr_btc']:.2f}" if fid.get("corr_btc") is not None else "")
+                        + "，基本上對不上，所以下面的訊號統計改用他們自己公布的狀態。")
+    diff_common += ("回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿，±0.25–30% 都試過）：Binance 現貨 ±10% 跟他們的 "
+                    "Overall LIQ 相關 0.89、BTC LIQ 0.87，每小時的起伏也像（扣掉當天平均後 0.87／0.85）；我們用的合約只有 0.45／0.31。"
+                    "±15% 在回放的訂單簿補齊之後跨日的高低更像（06:00 UTC 起 0.93），但每小時的起伏差很多（0.68／0.53），±20% 以上兩項都變差，"
+                    "所以用 ±10%（research/ck_chart/backtest.json）。"
+                    "他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集"
+                    "（±15% 也一起記）。")
+    try:
+        chk = spot_check(P)
+    except Exception as e:
+        print(f"spot check skipped: {type(e).__name__}: {e}", flush=True)
+        chk = None
+    if chk:
+        parts = [f"{lab} 相關 {chk[k]['corr']:.2f}（{chk[k]['n']} 張）" for k, lab in (("btc", "BTC LIQ"), ("eth", "ETH LIQ")) if k in chk and chk[k]["corr"] is not None]
+        if "total" in chk and chk["total"]["corr"] is not None:
+            parts.append(f"全市場 ±{SPOT_BAND}% 掛單差（BTC）相關 {chk['total']['corr']:.2f}，我們約是他們的 {chk['total'].get('scale', float('nan')):.2f} 倍")
+        if parts:
+            diff_common += "我們的現貨收集對照他們公布的值：" + "；".join(parts) + "。"
     try:
         sp = load_spot()
         pg = spot_progress(sp["v"])
@@ -1112,14 +1253,26 @@ def items(item, D=None, ctx=None):
         red = (O < -2) & (B < -3)
     known = ~np.isnan(O) & ~np.isnan(B)
     g_ev, r_ev = first_hours(green, 24, known, lo), first_hours(red, 24, known, lo)
-    st = [x for x in (ev_stats_h(btc, g_ev, H_FWD, lo, "綠色箭頭（Overall > 2 且 BTC LIQ > 3）"),
-                      ev_stats_h(btc, r_ev, H_FWD, lo, "紅色箭頭（Overall < −2 且 BTC LIQ < −3）")) if x]
+    if P is not None:  # the signals as CoinKarma published them (their statuses), not ours
+        lo_ck = max(0, int(P["hours"][0]) - 1 - D.h0)
+        ck_since = f"{hstr(int(P['hours'][0]))[:10]} 起"
+        ck_how = (f"訊號統計用 CoinKarma 自己在 Telegram 公布的狀態（{ck_since}，每天 3 次）：每次轉成該狀態的第一張表（前 24 小時沒有），"
+                  f"看之後 {H_FWD} 小時 BTC 的表現，對照同期隨機一小時。我們自己的數值跟他們差很多（見差異），所以不用我們的訊號來統計。")
+        st = [x for x in (ev_stats_h(btc, pulse_events(P, D, "overall_liq", "Buy", "btc_liq"), H_FWD, lo_ck, "綠色箭頭（CoinKarma 公布：Overall 與 BTC LIQ 都是 Buy）"),
+                          ev_stats_h(btc, pulse_events(P, D, "overall_liq", "Buy"), H_FWD, lo_ck, "Overall LIQ 轉 Buy（單獨）"),
+                          ev_stats_h(btc, pulse_events(P, D, "overall_liq", "Caution"), H_FWD, lo_ck, "Overall LIQ 轉 Caution（−2 到 −1.5）"),
+                          ev_stats_h(btc, pulse_events(P, D, "overall_liq", "Sell", "btc_liq"), H_FWD, lo_ck, "紅色箭頭（兩個都是 Sell）")) if x]
+    else:
+        ck_how = None
+        st = [x for x in (ev_stats_h(btc, g_ev, H_FWD, lo, "綠色箭頭（Overall > 2 且 BTC LIQ > 3）"),
+                          ev_stats_h(btc, r_ev, H_FWD, lo, "紅色箭頭（Overall < −2 且 BTC LIQ < −3）")) if x]
     ov = O[last]
     state = "綠色箭頭" if green[last] else "紅色箭頭" if red[last] else "偏多" if ov > 2 else "偏空" if ov < -2 else "中性"
     out.append(item(id="liq", group="訂單簿流動性", name="Overall LIQ / LIQ", zh="LIQ 與 Overall LIQ（訂單簿買賣力道）", fidelity="proxy", res="h", chartNote=CHART_NOTE,
                     what="訂單簿上買單相對賣單的厚度，標準化成分數：正值代表買盤掛得比平常厚。Overall LIQ 是 24 個主流幣依市值加權。",
                     ck="LIQ > 3 偏多、< −3 偏空；Overall LIQ > 2 偏多、< −2 偏空。Overall > 2 且 BTC LIQ > 3 是綠色箭頭（分批做多），< −2 且 < −3 是紅色箭頭（較快了結）。適合震盪盤，單邊趨勢中會鈍化。",
-                    ours=how + f"Overall LIQ 用 Coin Metrics 的市值加權，幣要有 60 天資料才計入。訊號取每次的第一個小時（前 24 小時沒有），看之後 {H_FWD} 小時 BTC 的表現（{span}）。",
+                    ours=how + "Overall LIQ 用 Coin Metrics 的市值加權，幣要有 60 天資料才計入。"
+                    + (ck_how or f"訊號取每次的第一個小時（前 24 小時沒有），看之後 {H_FWD} 小時 BTC 的表現（{span}）。"),
                     diff=diff_common, unit="分", dec=2,
                     lines=[{"k": "v", "label": "Overall LIQ"}, {"k": "b", "label": "BTC LIQ"}] + ([CK_LINE] if ckc else []),
                     series={"h0": hrs[0], "n": len(hrs), "v": cut(O, 2), "b": cut(B, 2), **({"ck": ck_overlay(ckc, hrs)} if ckc else {})},
@@ -1128,7 +1281,9 @@ def items(item, D=None, ctx=None):
                           + [{"d": D.hour(i), "label": "紅色箭頭", "tone": "bad"} for i in r_ev if i >= r0],
                     now={"d": D.hour(last), "v": _r(ov, 2), "state": f"{state}，BTC LIQ {B[last]:+.1f}" if not np.isnan(B[last]) else state,
                          "tone": "good" if ov > 2 else "bad" if ov < -2 else "mid"},
-                    stats=st, statsKind="labeled", baseLabel="隨機一小時", src="Binance 合約公開資料（bookDepth、K 線）、Coin Metrics 市值"))
+                    stats=st, statsKind="labeled", baseLabel="同期隨機一小時" if ck_how else "隨機一小時",
+                    **({"tables": [pulse_table(P)]} if P is not None else {}),
+                    src="Binance 合約公開資料（bookDepth、K 線）、Coin Metrics 市值" + ("、CoinKarma 的 Telegram 試用頻道" if P is not None else "")))
     daily = (ctx or {}).get("daily")
     if daily is not None:
         daily["liq"] = to_daily(D, O)
@@ -1142,14 +1297,18 @@ def items(item, D=None, ctx=None):
             acc[i] = c1[i + 1] - c1[i - 23]
     with np.errstate(invalid="ignore"):
         a_up, a_dn = first_hours(acc >= 60, 24, ~np.isnan(acc), lo), first_hours(acc <= -60, 24, ~np.isnan(acc), lo)
-    st = [x for x in (ev_stats_h(btc, a_up, H_FWD, lo, "≥ +60"), ev_stats_h(btc, a_dn, H_FWD, lo, "≤ −60")) if x]
+    if P is not None:
+        st = [x for x in (ev_stats_h(btc, pulse_events(P, D, "acc_btc_liq", "Buy"), H_FWD, lo_ck, "CoinKarma 公布 ≥ +60（Buy）"),
+                          ev_stats_h(btc, pulse_events(P, D, "acc_btc_liq", "Sell"), H_FWD, lo_ck, "CoinKarma 公布 ≤ −60（Sell）")) if x]
+    else:
+        st = [x for x in (ev_stats_h(btc, a_up, H_FWD, lo, "≥ +60"), ev_stats_h(btc, a_dn, H_FWD, lo, "≤ −60")) if x]
     av = acc[last]
     if daily is not None:
         daily["liqacc"] = to_daily(D, acc)
     out.append(item(id="liqacc", group="訂單簿流動性", name="Accumulated LIQ", zh="累積 LIQ（BTC，24 小時加總）", fidelity="proxy", res="h", chartNote=CHART_NOTE,
                     what="BTC 的 LIQ 過去 24 小時加總，看買賣力道是否持續偏向一邊。",
                     ck="預設 (24, 60, −60)：加總過去 24 個 1 小時 LIQ，> 60 偏多、< −60 偏空（4 小時圖用 50 根、±100）。",
-                    ours="上面的 BTC LIQ，加總過去 24 小時（至少 20 小時有資料）。訊號取第一次越過 ±60 的小時（前 24 小時沒有）。",
+                    ours="上面的 BTC LIQ，加總過去 24 小時（至少 20 小時有資料）。" + (ck_how or "訊號取第一次越過 ±60 的小時（前 24 小時沒有）。"),
                     diff=diff_common, unit="分", dec=1,
                     lines=[{"k": "v", "label": "累積 LIQ（24 小時）"}],
                     series={"h0": hrs[0], "n": len(hrs), "v": cut(acc, 1)},
@@ -1158,7 +1317,7 @@ def items(item, D=None, ctx=None):
                           + [{"d": D.hour(i), "label": "≤ −60", "tone": "bad"} for i in a_dn if i >= r0],
                     now={"d": D.hour(last), "v": _r(av, 1), "state": "偏多" if av >= 60 else "偏空" if av <= -60 else "中性",
                          "tone": "good" if av >= 60 else "bad" if av <= -60 else "mid"},
-                    stats=st, statsKind="labeled", baseLabel="隨機一小時", src="Binance 合約公開資料（bookDepth）"))
+                    stats=st, statsKind="labeled", baseLabel="同期隨機一小時" if ck_how else "隨機一小時", src="Binance 合約公開資料（bookDepth）"))
     # 3) order-book difference, BTC, in BTC; 4) the same over all coins, in US$ (CoinKarma: within 10%; ours: 5%)
     with np.errstate(invalid="ignore", divide="ignore"):
         dif = (D.bid[5]["BTC"] - D.ask[5]["BTC"]) / btc
@@ -1175,7 +1334,11 @@ def items(item, D=None, ctx=None):
             ("liqtotal", tot, "5% 全市場掛單差（美元）", "百萬美元", 300, "10% Overall Liquidity：全市場訂單簿 ±10% 內買單減賣單，> 3 億美元偏多、< −3 億偏空（或 ±3000 BTC）。", "全部")):
         with np.errstate(invalid="ignore"):
             up_e, dn_e = first_hours(arr >= thr, 24, ~np.isnan(arr), lo), first_hours(arr <= -thr, 24, ~np.isnan(arr), lo)
-        st = [x for x in (ev_stats_h(btc, up_e, H_FWD, lo, f"≥ +{thr:,}"), ev_stats_h(btc, dn_e, H_FWD, lo, f"≤ −{thr:,}")) if x]
+        if key == "liqtotal" and P is not None:  # CoinKarma's own Overall Liquidity (in BTC, +-3000)
+            st = [x for x in (ev_stats_h(btc, pulse_events(P, D, "overall_liquidity_btc", "Buy"), H_FWD, lo_ck, "CoinKarma 公布 ≥ +3000 BTC（Buy）"),
+                              ev_stats_h(btc, pulse_events(P, D, "overall_liquidity_btc", "Sell"), H_FWD, lo_ck, "CoinKarma 公布 ≤ −3000 BTC（Sell）")) if x]
+        else:
+            st = [x for x in (ev_stats_h(btc, up_e, H_FWD, lo, f"≥ +{thr:,}"), ev_stats_h(btc, dn_e, H_FWD, lo, f"≤ −{thr:,}")) if x]
         fin_ = np.flatnonzero(np.isfinite(arr))
         lk = int(fin_[-1]) if len(fin_) else last
         v = arr[lk]
@@ -1186,14 +1349,16 @@ def items(item, D=None, ctx=None):
                         what=("BTC 訂單簿上、價格 ±5% 內的買單減賣單（換算成顆數）。" if key == "liqdif" else
                               "24 個主流幣的訂單簿、價格 ±5% 內的買單減賣單，加總成美元。"),
                         ck=ckt, ours=("Binance 永續合約 ±5% 深度（每小時平均）；" + ("除以 BTC 價格換成顆數。" if key == "liqdif" else "有 60 天資料的幣才加總，至少 10 個幣。")
-                                      + f"門檻沿用 CoinKarma 的數字；過去 {p_hi:.0f}% 的小時在上門檻之上、{p_lo:.0f}% 在下門檻之下。"),
+                                      + f"門檻沿用 CoinKarma 的數字；過去 {p_hi:.0f}% 的小時在上門檻之上、{p_lo:.0f}% 在下門檻之下。"
+                                      + (ck_how if key == "liqtotal" and ck_how else "")),
                         diff="CoinKarma 是 ±10% 的現貨訂單簿，Binance 公開資料只到 ±5%，所以數字會比他們小，門檻只能參考。",
                         unit=unit, dec=0, lines=[{"k": "v", "label": zh, "bar": True}],
                         series={"h0": hrs[0], "n": len(hrs), "v": cut(arr, 0)},
                         zones=[{"from": thr, "to": None, "tone": "good", "label": f"≥ {thr:,}"}, {"from": None, "to": -thr, "tone": "bad", "label": f"≤ −{thr:,}"}],
                         now={"d": D.hour(lk), "v": _r(v, 0), "state": "偏多" if v >= thr else "偏空" if v <= -thr else "中性",
                              "tone": "good" if v >= thr else "bad" if v <= -thr else "mid"},
-                        stats=st, statsKind="labeled", baseLabel="隨機一小時", src="Binance 合約公開資料（bookDepth）"))
+                        stats=st, statsKind="labeled", baseLabel="同期隨機一小時" if key == "liqtotal" and ck_how else "隨機一小時",
+                        src="Binance 合約公開資料（bookDepth）"))
     # CVD: BTC perpetual taker buys minus taker sells (US$), cumulated over the chart window
     tq, qv = D.tqvol["BTC"], D.qvol["BTC"]
     delta = 2 * tq - qv  # taker buy - taker sell

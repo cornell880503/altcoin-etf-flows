@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CoinKarma's own indicator values (research/ck_pulse/pulse.csv, read from their Telegram tables three times a day)
+"""CoinKarma's own indicator values (data/ck/pulse/pulse.csv, read from their Telegram tables three times a day)
 against what BTC and the altcoins did next.
 
 1. Checks of the reading: BTC's printed price against Binance's close at the update time; each status against its
@@ -10,7 +10,7 @@ against what BTC and the altcoins did next.
    permutation p (random tables, the same number).
 3. Lead or lag: each value against BTC's return over the 24 hours before and after (Spearman, one table a day).
 4. How close our own LIQ (Binance perpetual proxy) comes to theirs at the same hours.
-Output: research/ck_pulse/backtest.json and a printout.
+Output: research/ck_pulse_backtest.json and a printout.
 """
 import csv
 import json
@@ -24,8 +24,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import ck_liq as L  # noqa: E402
 
-PULSE = os.path.join(ROOT, "research", "ck_pulse", "pulse.csv")
-OUT = os.path.join(ROOT, "research", "ck_pulse", "backtest.json")
+PULSE = os.path.join(ROOT, "data", "ck", "pulse", "pulse.csv")
+OUT = os.path.join(ROOT, "research", "ck_pulse_backtest.json")
 # key: (label, buy test, sell test) with CoinKarma's thresholds as printed (Bottom Ref = Buy, Top Ref = Sell/Caution)
 IND = {
     "overall_liq": ("Overall LIQ", lambda v: v >= 2, lambda v: v <= -2),

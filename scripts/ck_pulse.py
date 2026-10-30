@@ -3,15 +3,16 @@
 three times a day (00, 08, 16 UTC) it posts a Market Pulse chart and a table image with each indicator's current
 value, CoinKarma's thresholds and status (Buy / Hold / Sell), BTC's and ETH's price and the update time. The values
 are only in the images, so this reads the channel's web preview (t.me/s/...), downloads the images and reads the
-tables with tesseract. Run on a GitHub runner (needs tesseract-ocr; the workspace cannot reach Telegram).
+tables with tesseract. Run on a GitHub runner (needs tesseract-ocr): .github/workflows/ck-pulse.yml, started every
+hour by the live loop (scripts/live_loop.py); it reads only the posts it has not read yet.
 
-Output (research/ck_pulse/):
+Output (data/ck/pulse/):
   pulse.csv     a row per table: post, posted_at, update_at, btc, eth, and per indicator its value and status
   ocr.jsonl.gz  the OCR lines per post (to audit the reading)
   report.json   counts, the posts skipped and why
 Incremental: posts already in pulse.csv (or skipped before) are not read again.
 
-    python research/ck_pulse.py [--limit N] [--workers 4]
+    python scripts/ck_pulse.py [--limit N] [--workers 4]
 """
 import argparse
 import concurrent.futures as cf
@@ -33,7 +34,7 @@ import numpy as np
 from PIL import Image, ImageOps
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "research", "ck_pulse")
+OUT = os.path.join(ROOT, "data", "ck", "pulse")
 CHANNEL = "coinkarma_market_pulse_trial"
 UA = "Mozilla/5.0 (compatible; altcoin-etf-flows research; +https://github.com/cornell880503/altcoin-etf-flows)"
 # the table's row labels -> keys; an OCR'd label goes to the closest one (difflib, at least LABEL_MIN alike)
@@ -271,9 +272,16 @@ def main():
         have = {int(r["post"]): r for r in csv.DictReader(open(csv_p))}
     rep = json.load(open(rep_p)) if os.path.exists(rep_p) else {}
     skipped = {int(k): v for k, v in rep.get("skipped", {}).items()}
+    retry = {int(k): v for k, v in rep.get("retry", {}).items()}  # posts that failed (e.g. a download): tried up to 3 times
+    for pid in [p for p, v in skipped.items() if v not in ("chart", "no table rows") and p not in retry]:
+        retry[pid] = 1
+        del skipped[pid]
     done = set(have) | set(skipped)
     t0 = time.time()
-    ps = posts(stop_at=0 if a.limit else (max(done) if done else 0), max_pages=(a.limit // 20 + 2) if a.limit else 400)
+    stop = max(done) if done else 0
+    if retry:
+        stop = min(stop, min(retry) - 1)
+    ps = posts(stop_at=0 if a.limit else stop, max_pages=(a.limit // 20 + 2) if a.limit else 400)
     items = [(pid, posted, imgs[0]) for pid, posted, imgs in ps if imgs and pid not in done]
     if a.limit:
         items = items[-a.limit:]
@@ -284,10 +292,17 @@ def main():
             if r is None:
                 skipped[pid] = "chart"
                 continue
-            if "error" in r or not r.get("vals"):
-                skipped[pid] = r.get("error", "no table rows") if r else "?"
-                audit.append({"post": pid, "error": skipped[pid], "lines": (r or {}).get("lines")})
+            if "error" in r:
+                retry[pid] = retry.get(pid, 0) + 1
+                if retry[pid] >= 3:
+                    skipped[pid] = r["error"]
+                    del retry[pid]
                 continue
+            if not r.get("vals"):
+                skipped[pid] = "no table rows"
+                audit.append({"post": pid, "error": skipped[pid], "lines": r.get("lines")})
+                continue
+            retry.pop(pid, None)
             row = {"post": pid, "posted_at": posted, "update_at": r["update_at"], "btc": r["btc"], "eth": r["eth"],
                    "other": json.dumps(r["other"], ensure_ascii=False) if r["other"] else ""}
             for _, k in KEYS:
@@ -313,7 +328,7 @@ def main():
         reasons[v.split(":")[0]] = reasons.get(v.split(":")[0], 0) + 1
     rep = {"at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "tables": len(have), "skipped_by_reason": reasons,
            "first": min(have) if have else None, "last": max(have) if have else None, "secs": round(time.time() - t0),
-           "skipped": {str(k): v for k, v in sorted(skipped.items())}}
+           "retry": {str(k): v for k, v in sorted(retry.items())}, "skipped": {str(k): v for k, v in sorted(skipped.items())}}
     with open(rep_p, "w") as f:
         json.dump(rep, f, indent=1)
     print(json.dumps({k: v for k, v in rep.items() if k != "skipped"}), flush=True)
