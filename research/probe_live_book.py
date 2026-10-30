@@ -183,8 +183,40 @@ def binance_checks():
     print("binance/bybit", {k: v["status"] for k, v in res.items()}, flush=True)
 
 
+def extra_checks():
+    """Live sources for the hourly versions of the other indicators, and OKX's historical order books
+    (to calibrate the live LIQ without waiting for overlap)."""
+    res = {}
+    urls = {
+        "binance_spot_klines": "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=1000",
+        "binance_usdc_klines": "https://data-api.binance.vision/api/v3/klines?symbol=USDCUSDT&interval=1h&limit=5",
+        "okx_funding_now": "https://www.okx.com/api/v5/public/funding-rate?instId=BTC-USDT-SWAP",
+        "okx_futures_list": "https://www.okx.com/api/v5/public/instruments?instType=FUTURES&instFamily=BTC-USD",
+        "okx_index": "https://www.okx.com/api/v5/market/index-tickers?instId=BTC-USD",
+        "okx_taker_volume": "https://www.okx.com/api/v5/rubik/stat/taker-volume?ccy=BTC&instType=CONTRACTS&period=1H",
+        "okx_ls_ratio": "https://www.okx.com/api/v5/rubik/stat/contracts/long-short-account-ratio?ccy=BTC&period=1H",
+        "bitfinex_last": "https://api-pub.bitfinex.com/v2/stats1/pos.size:1m:tBTCUSD:long/last",
+    }
+    for mod in (1, 2, 3, 4, 5, 6):
+        urls[f"okx_history_m{mod}"] = ("https://www.okx.com/api/v5/public/market-data-history?module=%d&instType=SWAP&instFamilyList=BTC-USDT"
+                                       "&dateAggrType=daily&begin=%d&end=%d" % (mod, int(time.time() * 1000) - 5 * 86400000, int(time.time() * 1000) - 2 * 86400000))
+    for name, url in urls.items():
+        st, body, secs = get(url)
+        txt = body.decode("utf-8", "replace") if isinstance(body, bytes) else str(body)
+        res[name] = {"status": st, "secs": round(secs, 2), "bytes": len(body or b""), "head": txt[:900]}
+        time.sleep(0.3)
+    st, body, secs = get("https://api.hyperliquid.xyz/info", data={"type": "metaAndAssetCtxs"})
+    res["hl_ctxs"] = {"status": st, "bytes": len(body or b""), "head": (body or b"")[:400].decode("utf-8", "replace")}
+    REPORT["extra"] = res
+    print("extra", {k: v["status"] for k, v in res.items()}, flush=True)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
+    try:
+        extra_checks()
+    except Exception as e:
+        REPORT["extra_error"] = str(e)[:300]
     try:
         binance_checks()
     except Exception as e:
