@@ -1,10 +1,10 @@
 {
  "binspot": {
-  "at": "2026-10-30T09:01:39Z",
+  "at": "2026-10-30T10:01:28Z",
   "dead": [],
   "errors": [],
   "levels_btc": [
-   10734
+   10457
   ],
   "live": [
    "AAVE",
@@ -32,7 +32,7 @@
    "XRP",
    "ZEC"
   ],
-  "msgs": 165652,
+  "msgs": 83401,
   "resyncs": 0,
   "waiting": [
    "TONUSDT"
@@ -48,17 +48,17 @@
   "2026-10-30T10"
  ],
  "kick": {
-  "at": "2026-10-30T09:01:39Z",
+  "at": "2026-10-30T10:01:28Z",
   "book-data.yml": "started",
   "fetch.yml": "recent",
-  "indicators.yml": "recent",
-  "okx-history.yml": "started",
-  "radar.yml": "recent"
+  "indicators.yml": "started",
+  "okx-history.yml": "recent",
+  "radar.yml": "started"
  },
  "published_at": "2026-10-30T10:01:26Z",
  "published_hour": "2026-10-30T09",
  "published_rev": "8a3d78df9c3386cd",
  "rounds": 1,
- "run_at": "2026-10-30T10:00:53Z",
+ "run_at": "2026-10-30T10:10:52Z",
  "secs": 33
 }
