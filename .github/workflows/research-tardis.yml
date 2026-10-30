@@ -18,7 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        date: ["2025-11-01", "2025-12-01", "2026-01-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01", "2026-07-01"]
+        # the days CoinKarma's charts show (research/ck_chart/ck_days.txt, research/ck_backtest.py)
+        date: ["2025-11-01", "2025-12-01", "2026-01-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-10-01"]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -29,7 +30,7 @@ jobs:
       - run: python -m pip install --quiet numpy
       - name: Replay the day
         run: |
-          c="BTC ETH XRP BNB SOL DOGE TRX ADA LINK HYPE AVAX SUI BCH LTC DOT UNI AAVE NEAR TON ATOM APT ARB OP ZEC"
+          c="BTC ETH XRP BNB SOL DOGE TRX ADA LINK HYPE AVAX SUI BCH LTC DOT UNI AAVE NEAR TON GRAM ATOM APT ARB OP ZEC"
           items=$(for x in $c; do printf "binance:%sUSDT," "$x"; done)coinbase:BTC-USD
           python research/tardis_spot_day.py --date "${{ matrix.date }}" --items "$items"
         continue-on-error: true
