@@ -1,14 +1,15 @@
 {
- "at": "2026-10-30T16:07:11Z",
+ "at": "2026-10-30T17:06:57Z",
  "tables": 1888,
  "skipped_by_reason": {
-  "chart": 1902,
-  "HTTPError": 1
+  "chart": 1902
  },
  "first": 6,
  "last": 3811,
- "secs": 306,
- "retry": {},
+ "secs": 284,
+ "retry": {
+  "964": 2
+ },
  "skipped": {
   "5": "chart",
   "15": "chart",
@@ -485,7 +486,6 @@
   "958": "chart",
   "960": "chart",
   "962": "chart",
-  "964": "HTTPError: HTTP Error 500: Internal Server Error",
   "966": "chart",
   "968": "chart",
   "970": "chart",
