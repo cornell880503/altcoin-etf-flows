@@ -935,8 +935,9 @@ def items(item, D=None, ctx=None):
                         + f"，所以共振波段的時間點常不一樣。例如 10/22–10/28：他們的 Overall 最高 {fid['wk_ck_max']:.1f}、"
                         f"沒有一小時到 2（{fid['wk_ck_lt0']} 小時跌破 0）；我們的有 {fid['wk_ours_ge2']} 小時 ≥ 2，最低 {fid['wk_ours_min']:+.1f}，"
                         "開了一個他們沒有的波段，也就沒有他們 10/29 那個新波段。"
-                        "換成 OKX 現貨訂單簿（OKX 有 2026 年起的歷史）那一週的形狀對了，但整段的相關係數也只有 0.52"
-                        "（research/ck_chart/compare.json）；他們的資料來源推測是 Binance 現貨或多家合併、範圍更寬的訂單簿，沒有免費歷史可以重建。")
+                        "回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿）：Binance 現貨 ±10% 跟他們的 Overall LIQ 相關 0.88、"
+                        "BTC LIQ 0.86（±5% 的日內形狀更像，0.93／0.88），我們用的合約只有 0.45／0.31（research/ck_chart/backtest.json）。"
+                        "所以他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集。")
     out = []
     # 1) Overall LIQ and BTC LIQ; CoinKarma's arrows: Overall > 2 and BTC LIQ > 3 (green), < -2 and < -3 (red)
     B = L["BTC"]
