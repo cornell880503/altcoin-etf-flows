@@ -16,6 +16,7 @@ $RUNNER_TEMP/live_minutes and live_reason for the workflow's hand-over step.
 """
 import argparse
 import datetime as dt
+import glob
 import hashlib
 import json
 import os
@@ -29,11 +30,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_book_live as FB  # noqa: E402
 import fetch_live_extras as FX  # noqa: E402
 
-try:
-    import binance_spot_ws as BWS  # needs websocket-client
-except Exception:  # the loop runs without it
-    BWS = None
-
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 META = os.path.join(ROOT, "data", "ck", "live", "_meta.json")
 WATCH = ["scripts", "site", ".github/workflows/liq-live.yml"]
@@ -45,7 +41,9 @@ KICK = {
     "book-data.yml": 30,     # Binance's daily order-book and candle files (out about 21-23 hours after the day)
     "radar.yml": 30,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
     "okx-history.yml": 180,  # OKX's replayed books (out a day later): calibration, and hours the live loop missed
+    "binspot.yml": 10,       # the Binance spot book collector: its jobs hand over to each other, this restarts it if none runs
 }
+BINSPOT = os.path.join(ROOT, "data", "ck", "live", "binspot")
 
 
 def sh(cmd, check=False):
@@ -133,6 +131,22 @@ def kick():
     return out
 
 
+def binspot_status():
+    """The Binance spot collector (binspot.yml): its newest hour on main, and its last saved books (every three hours
+    and at each hand-over) with its status then."""
+    out = {}
+    files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(BINSPOT, "**", "*.csv.gz"), recursive=True))
+    if files:
+        out["newest_hour"] = max(f[:13] for f in files)
+    try:
+        c = gh("commits/binspot-state") or {}
+        meta = json.loads(c["commit"]["message"])
+        out.update({k: meta.get(k) for k in ("at", "run", "final", "to")}, **(meta.get("status") or {}))
+    except Exception as e:
+        out["error"] = f"{type(e).__name__}: {str(e)[:80]}"
+    return out
+
+
 def data_rev():
     """A fingerprint of the Binance files book-data adds (the tree hashes under data/ck/book and data/ck/px1h,
     without their run reports; it works in the runner's shallow clone). That workflow does not publish the
@@ -159,13 +173,6 @@ def main(argv=None):
     reason, rounds = "time", 0
     sh('git config user.name "etf-flows-bot"')
     sh('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"')
-    col = None
-    if BWS:  # Binance spot books from the websocket, beside the rounds (data/ck/live/binspot)
-        try:
-            col = BWS.Collector().start()
-        except Exception:
-            traceback.print_exc()
-            col = None
     try:
         while True:
             t0 = time.time()
@@ -195,11 +202,7 @@ def main(argv=None):
                 if new_hour:
                     m = meta()
                     m["kick"] = {"at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), **kick()}
-                    if col:
-                        try:
-                            m["binspot"] = {"at": m["kick"]["at"], **col.status()}
-                        except Exception:
-                            traceback.print_exc()
+                    m["binspot"] = binspot_status()
                     with open(META, "w") as f:  # committed with the next push
                         json.dump(m, f, indent=1, sort_keys=True)
             elif rounds % 2 == 0:
@@ -217,19 +220,11 @@ def main(argv=None):
             if nxt + 60 > t_end:
                 break
             time.sleep(max(0.0, nxt - time.time()))
-        if col:  # the hour so far, written before the last push
-            col.stop()
-            col = None
         push(f"live book: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
     except Exception:
         reason = "error"
         traceback.print_exc()
     finally:
-        if col:
-            try:
-                col.stop()
-            except Exception:
-                traceback.print_exc()
         mins = (time.time() - t_start) / 60
         for name, val in (("live_minutes", f"{mins:.0f}"), ("live_reason", reason)):
             with open(os.path.join(TMP, name), "w") as f:
