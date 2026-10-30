@@ -1,0 +1,42 @@
+name: research-ck-pulse
+# CoinKarma's own indicator values, read from the table images of their public Telegram trial channel
+# (research/ck_pulse.py; three tables a day since the channel began). Writes research/ck_pulse/.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/ck_pulse.py", ".github/workflows/research-ck-pulse.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: research-ck-pulse
+  cancel-in-progress: false
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: |
+          sudo apt-get install -y -q tesseract-ocr >/dev/null
+          python -m pip install --quiet numpy pillow
+      - name: Read the channel
+        run: python research/ck_pulse.py --limit "${LIMIT:-0}" --workers 4
+        env:
+          LIMIT: "40"
+        continue-on-error: true
+        timeout-minutes: 140
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/ck_pulse || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "research ck pulse: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5 6 7 8 9 10; do git pull --rebase -X theirs -q origin main && git push -q origin HEAD:main && break; git rebase --abort 2>/dev/null || true; sleep $((RANDOM % 20 + 5)); done
+          fi
