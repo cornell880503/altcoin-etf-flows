@@ -1,0 +1,333 @@
+{
+ "run_at": "2026-10-30T08:29:51Z",
+ "live": {
+  "binance spot data-api BTCUSDT 5000": {
+   "status": 200,
+   "secs": 0.86,
+   "levels": [
+    5000,
+    5000
+   ],
+   "reach_pct": [
+    1.12,
+    1.5
+   ],
+   "bid1_m": 13.96,
+   "ask1_m": 8.62,
+   "bid2_m": 16.07,
+   "ask2_m": 10.98,
+   "bid5_m": 16.07,
+   "ask5_m": 10.98,
+   "bid10_m": 16.07,
+   "ask10_m": 10.98
+  },
+  "binance spot data-api ETHUSDT 5000": {
+   "status": 200,
+   "secs": 0.85,
+   "levels": [
+    5000,
+    5000
+   ],
+   "reach_pct": [
+    4.73,
+    5.1
+   ],
+   "bid1_m": 5.77,
+   "ask1_m": 4.65,
+   "bid2_m": 7.66,
+   "ask2_m": 5.59,
+   "bid5_m": 19.2,
+   "ask5_m": 18.67,
+   "bid10_m": 19.2,
+   "ask10_m": 18.83
+  },
+  "binance spot data-api SOLUSDT 5000": {
+   "status": 200,
+   "secs": 0.85,
+   "levels": [
+    4993,
+    5000
+   ],
+   "reach_pct": [
+    80.58,
+    51.48
+   ],
+   "bid1_m": 3.56,
+   "ask1_m": 0.75,
+   "bid2_m": 4.2,
+   "ask2_m": 1.58,
+   "bid5_m": 6.82,
+   "ask5_m": 4.77,
+   "bid10_m": 13.82,
+   "ask10_m": 9.5
+  },
+  "binance spot data-api DOGEUSDT 5000": {
+   "status": 200,
+   "secs": 0.87,
+   "levels": [
+    2761,
+    5000
+   ],
+   "reach_pct": [
+    73.62,
+    66.15
+   ],
+   "bid1_m": 1.38,
+   "ask1_m": 1.26,
+   "bid2_m": 1.54,
+   "ask2_m": 1.32,
+   "bid5_m": 1.97,
+   "ask5_m": 1.53,
+   "bid10_m": 5.44,
+   "ask10_m": 2.8
+  },
+  "binance spot api.binance.com BTCUSDT": {
+   "status": 451,
+   "secs": 0.1,
+   "body": "{\n  \"code\": 0,\n  \"msg\": \"Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact custom"
+  },
+  "binance.us BTCUSDT": {
+   "status": 200,
+   "secs": 0.59,
+   "levels": [
+    550,
+    1014
+   ],
+   "reach_pct": [
+    80.15,
+    428.69
+   ],
+   "bid1_m": 0.63,
+   "ask1_m": 0.48,
+   "bid2_m": 0.64,
+   "ask2_m": 0.49,
+   "bid5_m": 0.84,
+   "ask5_m": 0.63,
+   "bid10_m": 1.12,
+   "ask10_m": 0.91
+  },
+  "bitstamp BTCUSD group=1": {
+   "status": 200,
+   "secs": 0.11,
+   "levels": [
+    3062,
+    3886
+   ],
+   "reach_pct": [
+    100.0,
+    126467.46
+   ],
+   "bid1_m": 7.51,
+   "ask1_m": 4.38,
+   "bid2_m": 7.55,
+   "ask2_m": 4.46,
+   "bid5_m": 9.64,
+   "ask5_m": 4.53,
+   "bid10_m": 10.72,
+   "ask10_m": 5.38
+  },
+  "bitfinex tBTCUSD P2 len250": {
+   "status": 200,
+   "secs": 0.28,
+   "levels": [
+    250,
+    250
+   ],
+   "reach_pct": [
+    32.74,
+    67.84
+   ],
+   "bid1_m": 11.17,
+   "ask1_m": 9.78,
+   "bid2_m": 12.24,
+   "ask2_m": 10.63,
+   "bid5_m": 14.93,
+   "ask5_m": 20.39,
+   "bid10_m": 23.77,
+   "ask10_m": 30.68
+  },
+  "bitfinex tBTCUSD P3 len250": {
+   "status": 200,
+   "secs": 0.24,
+   "levels": [
+    250,
+    101
+   ],
+   "reach_pct": [
+    99.92,
+    1401173.89
+   ],
+   "bid1_m": 0.1,
+   "ask1_m": 10.31,
+   "bid2_m": 11.51,
+   "ask2_m": 11.24,
+   "bid5_m": 14.17,
+   "ask5_m": 24.67,
+   "bid10_m": 23.16,
+   "ask10_m": 31.13
+  },
+  "kraken XBTUSD 500": {
+   "status": 200,
+   "secs": 0.17,
+   "levels": [
+    500,
+    500
+   ],
+   "reach_pct": [
+    2.28,
+    3.96
+   ],
+   "bid1_m": 15.15,
+   "ask1_m": 16.09,
+   "bid2_m": 17.01,
+   "ask2_m": 16.86,
+   "bid5_m": 24.34,
+   "ask5_m": 19.27,
+   "bid10_m": 24.34,
+   "ask10_m": 19.27
+  },
+  "kucoin BTC-USDT level2_100": {
+   "status": 200,
+   "secs": 0.2,
+   "levels": [
+    100,
+    100
+   ],
+   "reach_pct": [
+    0.02,
+    0.02
+   ],
+   "bid1_m": 0.55,
+   "ask1_m": 0.29,
+   "bid2_m": 0.55,
+   "ask2_m": 0.29,
+   "bid5_m": 0.55,
+   "ask5_m": 0.29,
+   "bid10_m": 0.55,
+   "ask10_m": 0.29
+  },
+  "bybit spot BTCUSDT 200": {
+   "status": 403,
+   "secs": 0.03,
+   "body": "{\n    error:The Amazon CloudFront distribution is configured to block access from your country\n}"
+  },
+  "okx spot BTC-USDT books-full 5000": {
+   "status": 200,
+   "secs": 0.39,
+   "levels": [
+    5000,
+    5000
+   ],
+   "reach_pct": [
+    1.09,
+    1.45
+   ],
+   "bid1_m": 12.72,
+   "ask1_m": 6.94,
+   "bid2_m": 13.01,
+   "ask2_m": 8.49,
+   "bid5_m": 13.01,
+   "ask5_m": 8.49,
+   "bid10_m": 13.01,
+   "ask10_m": 8.49
+  },
+  "coinbase BTC-USD level2": {
+   "status": 200,
+   "secs": 0.31,
+   "levels": [
+    18091,
+    21416
+   ],
+   "reach_pct": [
+    100.0,
+    178399.02
+   ],
+   "bid1_m": 4.1,
+   "ask1_m": 3.8,
+   "bid2_m": 5.58,
+   "ask2_m": 5.71,
+   "bid5_m": 39.43,
+   "ask5_m": 9.22,
+   "bid10_m": 70.57,
+   "ask10_m": 28.94
+  },
+  "upbit KRW-BTC": {
+   "status": 200,
+   "secs": 0.52,
+   "levels": [
+    30,
+    30
+   ],
+   "reach_pct": [
+    0.07,
+    0.08
+   ],
+   "bid1_m": 179.99,
+   "ask1_m": 280.21,
+   "bid2_m": 179.99,
+   "ask2_m": 280.21,
+   "bid5_m": 179.99,
+   "ask5_m": 280.21,
+   "bid10_m": 179.99,
+   "ask10_m": 280.21
+  }
+ },
+ "history": {
+  "tardis binance spot BTCUSDT 2026-10-01 (free first day)": {
+   "status": 206,
+   "secs": 0.53,
+   "size": "bytes 0-2000/146790051",
+   "body": "ok"
+  },
+  "tardis binance spot BTCUSDT 2026-10-02": {
+   "status": 401,
+   "secs": 12.65,
+   "size": "361",
+   "body": "{\n  \"code\": 10,\n  \"message\": \"For unauthorized requests, only historical CSV market datasets for the first day of each month are available (dataset for '2026-10-02' has been requested).\",\n  \"providedP"
+  },
+  "tardis binance spot book_snapshot_25 2026-10-01": {
+   "status": 206,
+   "secs": 0.39,
+   "size": "bytes 0-2000/39575067",
+   "body": "ok"
+  },
+  "tardis coinbase BTC-USD 2026-10-01": {
+   "status": 206,
+   "secs": 0.75,
+   "size": "bytes 0-2000/485032789",
+   "body": "ok"
+  },
+  "bybit spot ob200 2026-10-27": {
+   "status": 206,
+   "secs": 0.36,
+   "size": "bytes 0-2000/56837973",
+   "body": "ok"
+  },
+  "coinglass api (no key)": {
+   "status": 200,
+   "secs": 0.31,
+   "size": null,
+   "body": "ok"
+  }
+ },
+ "ws": {
+  "binance data-stream": {
+   "ok": true,
+   "secs": 1.05,
+   "updates_in_5_msgs": 23,
+   "keys": [
+    "e",
+    "E",
+    "s",
+    "U",
+    "u",
+    "b",
+    "a"
+   ]
+  },
+  "binance stream": {
+   "ok": false,
+   "error": "WebSocketBadStatusException: Handshake status 451 None -+-+- {'server': 'awselb/2.0', 'date': 'Fri, 30 Oct 2026 08:29:59 GMT', 'content-length': '224', 'connection': 'keep-alive', 'content-"
+  }
+ }
+}
