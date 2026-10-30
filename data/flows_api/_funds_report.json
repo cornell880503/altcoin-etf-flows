@@ -9,7 +9,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1793341680"
+    "X-RateLimit-Reset": "1793342340"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -32,7 +32,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1793341680"
+    "X-RateLimit-Reset": "1793342340"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -55,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1793341680"
+    "X-RateLimit-Reset": "1793342340"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -70,26 +70,36 @@
    "window_days": 30
   },
   "SOL": {
-   "changed": false,
+   "changed": true,
    "days": 22,
    "gap": false,
    "ok": true,
    "partial": [
-    "2026-10-06",
-    "2026-10-07",
-    "2026-10-08",
     "2026-10-29"
    ],
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1793341680"
+    "X-RateLimit-Reset": "1793342340"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 193,
-    "differ": 0,
-    "examples": []
+    "compared": 196,
+    "differ": 2,
+    "examples": [
+     [
+      "2026-10-06",
+      "invesco",
+      0.0,
+      0.1
+     ],
+     [
+      "2026-10-08",
+      "invesco",
+      0.0,
+      0.2
+     ]
+    ]
    },
    "window": [
     "2026-09-30",
@@ -98,7 +108,7 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": false,
+   "changed": true,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -106,13 +116,26 @@
    "rate_limit": {
     "X-RateLimit-Limit": "120",
     "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1793341680"
+    "X-RateLimit-Reset": "1793342340"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 110,
-    "differ": 0,
-    "examples": []
+    "differ": 2,
+    "examples": [
+     [
+      "2026-10-06",
+      "franklin",
+      -2.7,
+      -4.1
+     ],
+     [
+      "2026-10-08",
+      "franklin",
+      5.8,
+      8.2
+     ]
+    ]
    },
    "window": [
     "2026-09-30",
@@ -121,5 +144,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-10-30T06:27:33Z"
+ "run_at": "2026-10-30T06:38:51Z"
 }
