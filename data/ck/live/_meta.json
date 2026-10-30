@@ -1,4 +1,43 @@
 {
+ "binspot": {
+  "at": "2026-10-30T09:01:39Z",
+  "dead": [],
+  "errors": [],
+  "levels_btc": [
+   10734
+  ],
+  "live": [
+   "AAVE",
+   "ADA",
+   "APT",
+   "ARB",
+   "ATOM",
+   "AVAX",
+   "BCH",
+   "BNB",
+   "BTC",
+   "DOGE",
+   "DOT",
+   "ETH",
+   "GRAM",
+   "HYPE",
+   "LINK",
+   "LTC",
+   "NEAR",
+   "OP",
+   "SOL",
+   "SUI",
+   "TRX",
+   "UNI",
+   "XRP",
+   "ZEC"
+  ],
+  "msgs": 165652,
+  "resyncs": 0,
+  "waiting": [
+   "TONUSDT"
+  ]
+ },
  "books": {
   "cb": 22,
   "hl": 24,
@@ -9,17 +48,17 @@
   "2026-10-30T09"
  ],
  "kick": {
-  "at": "2026-10-30T08:01:37Z",
+  "at": "2026-10-30T09:01:39Z",
   "book-data.yml": "started",
   "fetch.yml": "recent",
-  "indicators.yml": "started",
-  "okx-history.yml": "recent",
+  "indicators.yml": "recent",
+  "okx-history.yml": "started",
   "radar.yml": "recent"
  },
  "published_at": "2026-10-30T09:01:37Z",
  "published_hour": "2026-10-30T08",
  "published_rev": "acc733514f6b3188",
  "rounds": 1,
- "run_at": "2026-10-30T09:00:52Z",
+ "run_at": "2026-10-30T09:10:52Z",
  "secs": 33
 }
