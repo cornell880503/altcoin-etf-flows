@@ -1,7 +1,29 @@
 {
  "assets": {
   "BTC": {
-   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
+   "CF-Cache-Status": "DYNAMIC",
+   "Content-Type": "text/html; charset=utf-8",
+   "Server": "cloudflare",
+   "X-Nextjs-Cache": "STALE",
+   "bytes": 650509,
+   "dated_arrays": [
+    "days"
+   ],
+   "historical_mentions": 0,
+   "partial": [
+    "2026-10-28",
+    "2026-10-29"
+   ],
+   "sessions": 30,
+   "status": 200,
+   "total_mismatch": [],
+   "unknown_tickers": [],
+   "url": "https://cryptoetf.today/en/bitcoin-etf-flows",
+   "used": "cols+daily",
+   "window": [
+    "2026-09-18",
+    "2026-10-29"
+   ]
   },
   "ETH": {
    "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
