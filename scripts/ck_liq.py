@@ -478,7 +478,8 @@ def load_live():
 # keeps no history of them, so scripts/binance_spot_ws.py (binspot.yml) collects them. Once they cover the
 # standardization window (720 hours from the first one) and Binance's perpetual files have reached that hour, the
 # LIQ family takes its values from them from that hour on (spot_extend); the hours before stay on the perpetuals.
-SPOT_BAND = 10        # % of the price
+SPOT_BAND = 10        # % of the price: of 0.25-30 %, the best on both the day-to-day level and the hourly moves (15 % matches the level
+                      # once a replayed book has filled in, but not the hourly moves; research/ck_chart/backtest.json)
 SPOT_MIN_N = 90       # samples (one every 10 seconds) an hour needs: a quarter of an hour
 SPOT_SWITCH_H = 720   # = PARAMS["window"]
 # a book whose snapshot does not cover the band (BTC, ETH) learns its farther levels as they change: in Tardis's replay of
@@ -1084,9 +1085,12 @@ def items(item, D=None, ctx=None):
                         + f"，所以共振波段的時間點常不一樣。例如 10/22–10/28：他們的 Overall 最高 {fid['wk_ck_max']:.1f}、"
                         f"沒有一小時到 2（{fid['wk_ck_lt0']} 小時跌破 0）；我們的有 {fid['wk_ours_ge2']} 小時 ≥ 2，最低 {fid['wk_ours_min']:+.1f}，"
                         "開了一個他們沒有的波段，也就沒有他們 10/29 那個新波段。"
-                        "回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿）：Binance 現貨 ±10% 跟他們的 Overall LIQ 相關 0.88、"
-                        "BTC LIQ 0.86（±5% 的日內形狀更像，0.93／0.88），我們用的合約只有 0.45／0.31（research/ck_chart/backtest.json）。"
-                        "所以他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集。")
+                        "回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿，±0.25–30% 都試過）：Binance 現貨 ±10% 跟他們的 "
+                        "Overall LIQ 相關 0.89、BTC LIQ 0.87，每小時的起伏也像（扣掉當天平均後 0.87／0.85）；我們用的合約只有 0.45／0.31。"
+                        "±15% 在回放的訂單簿補齊之後跨日的高低更像（06:00 UTC 起 0.93），但每小時的起伏差很多（0.68／0.53），±20% 以上兩項都變差，"
+                        "所以用 ±10%（research/ck_chart/backtest.json）。"
+                        "他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集"
+                        "（±15% 也一起記，之後可以用不受回放影響的資料再比一次）。")
     try:
         sp = load_spot()
         pg = spot_progress(sp["v"])
