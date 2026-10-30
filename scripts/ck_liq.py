@@ -416,8 +416,18 @@ def calibrate(D, grid=None, lo=None):
 LIVE = os.path.join(ROOT, "data", "ck", "live", "hours")
 LIVE_VENUES = {"okx": "OKX 永續", "cb": "Coinbase 現貨", "hl": "Hyperliquid"}
 FIT_MIN, FIT_FULL = 6, 48  # hours both have: an offset-only map from 6, a linear map from 48
+RES_N, RES_HL = 6, 24  # the map's error over the last 6 hours both have is carried on, halving every 24 hours
 LIVE_PENDING = ("即時估計：每小時另外抓 OKX、Coinbase、Hyperliquid 的訂單簿；Binance 的檔案隔天才公布，兩者重疊滿 6 小時、"
                 "完成校準後，這裡會接上到最近一小時的估計值。")
+# Out of sample (Binance cut at five hours from 2026-10-23 23:00 to 10-27 11:00, OKX's replayed books mapped over
+# the next 1.5-5 days): Overall LIQ off by 0.19-0.54 on average (correlation 0.64-0.90; the worst with the
+# shortest fit and the longest stretch), a coin's LIQ by about 0.6; carrying the last Binance value on was off
+# by 0.49-0.98 and cannot follow the hourly moves (the estimate's hourly changes correlate 0.64-0.74).
+# The 5% order-book difference the same way (cuts 2026-10-24 23:00 to 10-27 11:00): BTC off by $25-49M on average
+# (correlation 0.54-0.88; carrying the last value on: $57-120M), the all-coin total by $37-75M (0.74-0.89).
+DIF_ACCURACY = "樣本外檢驗：即時估計的 BTC 5% 掛單差平均差約 300–600 顆（相關係數 0.5–0.9），全市場合計約差 0.4–0.75 億美元（0.7–0.9）。"
+LIVE_ACCURACY = ("樣本外檢驗（2026 年 10 月的 5 個切點，往後 1.5–5 天）：即時估計的 Overall LIQ 平均差 0.2–0.5（相關係數 0.6–0.9），"
+                 "單一幣的 LIQ 約差 0.6；門檻附近的訊號要等 Binance 正式值確認。")
 
 
 OKX_HIST = os.path.join(ROOT, "data", "ck", "live", "okxhist")
@@ -426,8 +436,8 @@ OKX_HIST = os.path.join(ROOT, "data", "ck", "live", "okxhist")
 def load_live():
     """Live books (scripts/fetch_book_live.py) and OKX's replayed daily books (scripts/okx_book_history.py,
     which win where both have an hour: 120 samples an hour against 6): {(venue, coin): {hour: log(bidR /
-    askR)}}, {coin: {hour: close}}."""
-    feats, px = {}, {}
+    askR)}}, {coin: {hour: close}}, {(venue, coin): {hour: bidR - askR in US$}}."""
+    feats, px, difs = {}, {}, {}
     for p in sorted(glob.glob(os.path.join(LIVE, "*.csv.gz"))) + sorted(glob.glob(os.path.join(OKX_HIST, "*.csv.gz"))):
         with gzip.open(p, "rt", newline="") as f:
             rd = csv.reader(f)
@@ -450,15 +460,51 @@ def load_live():
                     continue
                 if b > 0 and a > 0:
                     feats.setdefault((v, c), {})[h] = math.log(b / a)
-    return feats, px
+                    difs.setdefault((v, c), {})[h] = b - a
+    return feats, px, difs
+
+
+def map_venue(c, feats, x, h0, Tabs, L):
+    """The live venue whose series best tracks x (Binance's, on the grid from h0) on the hours both have up
+    to Tabs, mapped onto x for the hours Tabs+1..L: a + b * live (an offset only until FIT_FULL hours) plus
+    the map's mean error over the last RES_N hours both have, fading with a half-life of RES_HL hours (the
+    venues' gap to Binance lasts a while: out of sample this cut the Overall LIQ error by about a fifth).
+    Returns (fit, {hour: value}) or None."""
+    best = None
+    for v in LIVE_VENUES:
+        f = feats.get((v, c))
+        if not f:
+            continue
+        pairs = sorted((h, x[h - h0], fv) for h, fv in f.items() if h0 <= h <= Tabs and np.isfinite(x[h - h0]))
+        m = len(pairs)
+        if m < FIT_MIN:
+            continue
+        xs, fs = np.array([q[1] for q in pairs]), np.array([q[2] for q in pairs])
+        if m >= FIT_FULL and fs.std() > 1e-12 * max(1.0, float(np.abs(fs).max())):
+            b, a = (float(t) for t in np.polyfit(fs, xs, 1))
+            kind = "線性"
+        else:
+            b, a = 1.0, float(np.mean(xs - fs))
+            kind = "只校正偏移"
+        ss = float(((xs - xs.mean()) ** 2).sum())
+        r2 = 1 - float(((xs - (a + b * fs)) ** 2).sum()) / ss if ss > 0 else None
+        e_last = float(np.mean((xs - (a + b * fs))[-RES_N:]))
+        live_n = sum(1 for h in f if Tabs < h <= L)
+        rank = (kind == "線性", -9.0 if r2 is None else r2, m)
+        if live_n and (best is None or rank > best[0]):
+            best = (rank, v, kind, a, b, r2, m, e_last, pairs[-1][0])
+    if best is None:
+        return None
+    _, v, kind, a, b, r2, m, e_last, h_last = best
+    est = {h: a + b * fv + e_last * 0.5 ** ((h - h_last) / RES_HL) for h, fv in feats[(v, c)].items() if Tabs < h <= L}
+    return {"venue": v, "kind": kind, "a": a, "b": b, "r2": r2, "overlap": m, "e_last": e_last}, est
 
 
 def live_extend(D, R, now=None):
-    """Extend LIQ past Binance's last published hour T with the live books: per coin, the venue whose
-    imbalance best tracks Binance's on the hours both have is mapped onto Binance's (x = a + b * live;
-    an offset only until FIT_FULL hours), divided by the coin's trailing standard deviation at T.
-    Returns None when there is nothing to add."""
-    feats, px = load_live()
+    """Extend LIQ past Binance's last published hour T with the live books (map_venue), divided by the coin's
+    trailing standard deviation at T; and the same for the 5% order-book difference (bids - asks, US$) of the
+    DIF cards. Returns None when there is nothing to add."""
+    feats, px, difs = load_live()
     if not feats:
         return None
     now = now or dt.datetime.now(dt.timezone.utc)
@@ -467,42 +513,25 @@ def live_extend(D, R, now=None):
     L = min(done, max(max(f) for f in feats.values()))
     fits = {}
     k = max(0, L - Tabs)
-    liq_live = {}
+    liq_live, dif_live = {}, {}
     for c in COINS:
-        x, sd = R["raw"][c], R["sd"][c]
+        sd = R["sd"][c]
         fin = np.flatnonzero(np.isfinite(sd))
         sdv = float(sd[fin[-1]]) if len(fin) else None
-        best = None
-        for v in LIVE_VENUES:
-            f = feats.get((v, c))
-            if not f:
-                continue
-            pairs = [(x[h - D.h0], fv) for h, fv in f.items() if D.h0 <= h <= Tabs and np.isfinite(x[h - D.h0])]
-            m = len(pairs)
-            if m < FIT_MIN:
-                continue
-            xs, fs = np.array([q[0] for q in pairs]), np.array([q[1] for q in pairs])
-            if m >= FIT_FULL and fs.std() > 1e-9:
-                b, a = (float(t) for t in np.polyfit(fs, xs, 1))
-                kind = "線性"
-            else:
-                b, a = 1.0, float(np.mean(xs - fs))
-                kind = "只校正偏移"
-            ss = float(((xs - xs.mean()) ** 2).sum())
-            r2 = 1 - float(((xs - (a + b * fs)) ** 2).sum()) / ss if ss > 0 else None
-            live_n = sum(1 for h in f if Tabs < h <= L)
-            rank = (kind == "線性", -9.0 if r2 is None else r2, m)
-            if live_n and (best is None or rank > best[0]):
-                best = (rank, v, kind, a, b, r2, m)
-        if best is None or not sdv:
-            continue
-        _, v, kind, a, b, r2, m = best
-        arr = np.full(k, np.nan)
-        for h, fv in feats[(v, c)].items():
-            if Tabs < h <= L:
-                arr[h - Tabs - 1] = (a + b * fv) / sdv
-        liq_live[c] = arr
-        fits[c] = {"venue": v, "kind": kind, "a": a, "b": b, "r2": r2, "overlap": m}
+        mp = map_venue(c, feats, R["raw"][c], D.h0, Tabs, L)
+        if mp and sdv:
+            arr = np.full(k, np.nan)
+            for h, val in mp[1].items():
+                arr[h - Tabs - 1] = val / sdv
+            liq_live[c] = arr
+            fits[c] = mp[0]
+        with np.errstate(invalid="ignore"):
+            md = map_venue(c, difs, D.bid[5][c] - D.ask[5][c], D.h0, Tabs, L)
+        if md:
+            arr = np.full(k, np.nan)
+            for h, val in md[1].items():
+                arr[h - Tabs - 1] = val
+            dif_live[c] = arr
     if k == 0 or "BTC" not in liq_live:
         return {"fits": fits, "k": 0} if fits else None
     # Overall LIQ: the last market caps; at least half of the counted market cap must have a live value
@@ -533,10 +562,13 @@ def live_extend(D, R, now=None):
         E.close[c] = cl
         fin = np.flatnonzero(np.isfinite(D.mcap[c]))
         E.mcap[c] = np.concatenate([D.mcap[c], np.full(k, D.mcap[c][fin[-1]] if len(fin) else np.nan)])
-    X = {"liq": {c: np.concatenate([R["liq"][c], liq_live.get(c, np.full(k, np.nan))]) for c in COINS},
-         "elig": {c: np.concatenate([R["elig"][c], np.full(k, elig_T[c] and c in w) & np.isfinite(liq_live.get(c, np.full(k, np.nan)))])
+    nan_k = np.full(k, np.nan)
+    X = {"liq": {c: np.concatenate([R["liq"][c], liq_live.get(c, nan_k)]) for c in COINS},
+         "elig": {c: np.concatenate([R["elig"][c], np.full(k, elig_T[c] and c in w) & np.isfinite(liq_live.get(c, nan_k))])
                   for c in COINS},
          "overall": np.concatenate([R["overall"], o_live])}
+    with np.errstate(invalid="ignore"):
+        X["dif"] = {c: np.concatenate([D.bid[5][c] - D.ask[5][c], dif_live.get(c, nan_k)]) for c in COINS}
     return {"E": E, "R": X, "fits": fits, "k": k, "cover": float(np.nanmin(den / total)) if total else 0.0}
 
 
@@ -592,7 +624,8 @@ def apply_live(out, D, R, lo, ext, now=None):
     live_from = T + 1
     O, B = X["overall"], X["liq"]["BTC"]
     note = (f"最後 {n_e - 1 - T} 小時（{short(E.label(live_from))} 起，台灣時間）是即時估計：Binance 的訂單簿檔案隔天才公布，"
-            "這段改用 OKX、Coinbase、Hyperliquid 每小時抓的訂單簿，換算成 Binance 的尺度（校準見下表）；Binance 檔案到了就換回正式值。")
+            "這段改用 OKX、Coinbase、Hyperliquid 每 10 分鐘抓的訂單簿，換算成 Binance 的尺度（校準見下表）；Binance 檔案到了就換回正式值。"
+            + LIVE_ACCURACY)
     for it in out:
         if it["id"] == "liq":
             with np.errstate(invalid="ignore"):
@@ -635,6 +668,28 @@ def apply_live(out, D, R, lo, ext, now=None):
             it["now"] = {"d": E.hour(la), "v": _r(av, 1), "state": ("偏多" if av >= 60 else "偏空" if av <= -60 else "中性") + ("（即時估計）" if la > T else ""),
                          "tone": "good" if av >= 60 else "bad" if av <= -60 else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
+        elif it["id"] in ("liqdif", "liqtotal") and "dif" in X:
+            if it["id"] == "liqdif":
+                with np.errstate(invalid="ignore", divide="ignore"):
+                    arr = X["dif"]["BTC"] / E.close["BTC"]
+                thr = 2000
+            else:
+                tot, cnt = np.zeros(n_e), np.zeros(n_e)
+                for c in COINS:
+                    ok = X["elig"][c] & np.isfinite(X["dif"][c])
+                    tot += np.where(ok, X["dif"][c], 0.0)
+                    cnt += ok
+                arr = np.where(cnt >= 10, tot / 1e6, np.nan)
+                thr = 300
+            fin_ = np.flatnonzero(np.isfinite(arr))
+            if len(fin_):
+                lk = int(fin_[-1])
+                v = float(arr[lk])
+                it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(x, 0) for x in arr[r0:n_e]], "liveFrom": E.hour(live_from)}
+                it["now"] = {"d": E.hour(lk), "v": _r(v, 0),
+                             "state": ("偏多" if v >= thr else "偏空" if v <= -thr else "中性") + ("（即時估計）" if lk > T else ""),
+                             "tone": "good" if v >= thr else "bad" if v <= -thr else "mid"}
+                it["chartNote"] = CHART_NOTE + " " + note.replace("（校準見下表）", "（校準方式同 LIQ 卡）").replace(LIVE_ACCURACY, DIF_ACCURACY)
         elif it["id"] == "screener":
             sc = screener_item(lambda **kw: kw, E, X, lo, "")
             it["now"] = dict(sc["now"], state=sc["now"]["state"] + ("（即時估計）" if hidx(sc["now"]["d"]) - D.h0 > T else ""))

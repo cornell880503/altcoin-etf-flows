@@ -5,19 +5,24 @@ one ends, and live-watchdog.yml restarts the chain if it ever breaks).
 
 Every `--every` minutes: a snapshot of the live order books (fetch_book_live.py). Each newly completed
 UTC hour: the other live values (fetch_live_extras.py), then the site is rebuilt and published, so the
-page is at most about an hour behind. Data commits go to main, the site to the "site" branch. The loop
-ends after `--minutes`, or early when the live scripts, the template or the workflow change on main (so a
-new version takes over within one round). It leaves the minutes run and the reason in
+page is at most about an hour behind; then the data workflows in KICK are started (GitHub's own schedule
+fires on this repo about one run in five, often hours late: book-data's two-hourly cron ran once on
+2026-10-29). The site is also rebuilt in any round in which their data arrived on main (anything under
+data/ outside data/ck/live). Data commits go to main, the site to the "site" branch. The loop ends after
+`--minutes`, or early when the live scripts, the template or the workflow change on main (so a new
+version takes over within one round). It leaves the minutes run and the reason in
 $RUNNER_TEMP/live_minutes and live_reason for the workflow's hand-over step.
 """
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import subprocess
 import sys
 import time
 import traceback
+import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_book_live as FB  # noqa: E402
@@ -27,6 +32,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 META = os.path.join(ROOT, "data", "ck", "live", "_meta.json")
 WATCH = ["scripts", "site", ".github/workflows/liq-live.yml"]
 TMP = os.environ.get("RUNNER_TEMP", "/tmp")
+# workflows the chain starts: {file: minimum minutes since its last run}. Each does little when nothing is new.
+KICK = {
+    "fetch.yml": 50,         # ETF flows (issuers report after the US close and through the next morning), prices, the page
+    "indicators.yml": 50,    # the daily sources of the indicator library (stablecoins, CFTC, rates, App Store, ...)
+    "book-data.yml": 50,     # Binance's daily order-book and candle files (out about 21-23 hours after the day)
+    "radar.yml": 50,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
+    "okx-history.yml": 1200,  # OKX's replayed books for the days the live loop missed (out a day later)
+}
 
 
 def sh(cmd, check=False):
@@ -78,6 +91,49 @@ def publish():
     return False
 
 
+def gh(path, body=None):
+    token, repo = os.environ.get("GH_TOKEN"), os.environ.get("GITHUB_REPOSITORY")
+    if not token or not repo:
+        return None
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/{path}", data=None if body is None else json.dumps(body).encode(),
+                                 headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+                                          "X-GitHub-Api-Version": "2022-11-28"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        raw = r.read()
+    return json.loads(raw) if raw else {}
+
+
+def kick():
+    """Start each workflow in KICK unless a run of it is queued or running or one started recently."""
+    now, out = dt.datetime.now(dt.timezone.utc), {}
+    for wf, gap in KICK.items():
+        try:
+            runs = (gh(f"actions/workflows/{wf}/runs?per_page=3") or {}).get("workflow_runs")
+            if runs is None:
+                out[wf] = "no token"
+                continue
+            if any(r["status"] != "completed" for r in runs):
+                out[wf] = "busy"
+                continue
+            last = max((dt.datetime.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc) for r in runs), default=None)
+            if last and (now - last).total_seconds() < gap * 60:
+                out[wf] = "recent"
+                continue
+            gh(f"actions/workflows/{wf}/dispatches", {"ref": "main"})
+            out[wf] = "started"
+        except Exception as e:
+            out[wf] = f"{type(e).__name__}: {str(e)[:80]}"
+    print("kick:", out, flush=True)
+
+
+def data_rev():
+    """A fingerprint of the data the page shows other than the live loop's own (the tree hashes under data/
+    without data/ck/live; works in the runner's shallow clone, where commit history would not)."""
+    top = [ln for ln in sh("git ls-tree HEAD data/").stdout.splitlines() if not ln.endswith("\tdata/ck")]
+    ck = [ln for ln in sh("git ls-tree HEAD data/ck/").stdout.splitlines() if not ln.endswith("\tdata/ck/live")]
+    return hashlib.sha1("\n".join(top + ck).encode()).hexdigest()[:16]
+
+
 def meta():
     try:
         return json.load(open(META))
@@ -105,19 +161,25 @@ def main(argv=None):
             except Exception:
                 traceback.print_exc()
             done = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).strftime("%Y-%m-%dT%H")
-            if meta().get("published_hour") != done:
+            new_hour = meta().get("published_hour") != done
+            if new_hour:
                 try:
                     FX.main()
                 except Exception:
                     traceback.print_exc()
+            if new_hour or data_rev() != meta().get("published_rev"):
                 push(f"live: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
+                rev = data_rev()
                 if publish():
                     m = meta()
-                    m["published_hour"] = done
+                    m["published_hour"], m["published_rev"] = done, rev
+                    m["published_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                     with open(META, "w") as f:
                         json.dump(m, f, indent=1, sort_keys=True)
                     push(f"live: published {done}")
-                    print(f"published {done} ({time.time() - t0:.0f}s)", flush=True)
+                    print(f"published {done}{'' if new_hour else ' (new data)'} ({time.time() - t0:.0f}s)", flush=True)
+                if new_hour:
+                    kick()
             elif rounds % 2 == 0:
                 push(f"live book: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
             sh("git pull -q --rebase -X theirs origin main")

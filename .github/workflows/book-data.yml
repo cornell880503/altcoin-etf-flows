@@ -2,9 +2,10 @@ name: book-data
 # Data for the LIQ copies: hourly candles (scripts/fetch_px_binance.py; data/ck/px1h) and hourly
 # order-book depth (scripts/fetch_book_binance.py; data/ck/book) of Binance USD-M perpetuals.
 # The first run backfills from 2023-01-01 (about 34,000 daily depth files); a run that reaches its time
-# budget stops and the next one goes on. Binance publishes a day's files some time the next day, so the
-# schedule looks every two hours (a run with nothing new only gets 404s); the hourly live LIQ
-# (liq-live) is calibrated on the hours both have, so the sooner they arrive the better.
+# budget stops and the next one goes on. Binance publishes a day's files some time the next day (the
+# order book about 21-23 hours after the day ends), so the live chain (scripts/live_loop.py, KICK) starts
+# this every hour, and the schedule below is a fallback (a run with nothing new only gets 404s); the
+# hourly live LIQ (liq-live) is calibrated on the hours both have, so the sooner they arrive the better.
 on:
   workflow_dispatch:
   push:

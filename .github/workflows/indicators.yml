@@ -1,11 +1,15 @@
 name: indicators
 # The indicator library (open copies of CoinKarma's indicators; scripts/fetch_ck.py, scripts/ck_indicators.py).
-# Scheduled a few times a day; the runs right after midnight UTC also take the daily snapshots
-# (App Store rank, Deribit option chain). GitHub may start a scheduled run late or skip it, so there
-# are several. A push of the scripts runs a long backfill. The site is rebuilt only when
-# data/ck/indicators.json changed.
+# Started every hour by the live chain (scripts/live_loop.py, KICK), because GitHub fires this repo's
+# schedules seldom and late; the schedules below are a fallback. The first run after midnight UTC also
+# takes the daily snapshots (App Store rank, Deribit option chain). A push of the scripts runs a long
+# backfill. The site is rebuilt only when data/ck/indicators.json changed.
 on:
   workflow_dispatch:
+    inputs:
+      budget:
+        description: "Minutes for the long backfills (the hourly runs use 8; a first backfill takes about 110)"
+        default: "8"
   push:
     branches: [main]
     paths: ["scripts/fetch_ck.py", "scripts/ck_indicators.py", ".github/workflows/indicators.yml"]
@@ -34,9 +38,9 @@ jobs:
           python-version: "3.12"
       - name: Fetch the raw series (long budget on a push, the first backfill takes about an hour)
         run: |
-          budget=8
-          if [ "${{ github.event_name }}" != schedule ]; then budget=110; fi
-          python scripts/fetch_ck.py --budget "$budget"
+          budget="${{ inputs.budget }}"
+          if [ "${{ github.event_name }}" = push ]; then budget=110; fi
+          python scripts/fetch_ck.py --budget "${budget:-8}"
         continue-on-error: true
         timeout-minutes: 130
       - name: Compute the indicators
