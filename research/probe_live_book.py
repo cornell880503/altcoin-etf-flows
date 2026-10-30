@@ -211,8 +211,60 @@ def extra_checks():
     print("extra", {k: v["status"] for k, v in res.items()}, flush=True)
 
 
+def okx_l2_sample():
+    """Format of OKX's daily 5000-level order-book files: the first records, how many, how far apart."""
+    import io
+    import tarfile
+    out = {}
+    end = int(time.time() * 1000) - 2 * 86400000
+    for fam in ("OP-USDT", "BTC-USDT"):
+        url = ("https://www.okx.com/api/v5/public/market-data-history?module=5&instType=SWAP&instFamilyList=%s"
+               "&dateAggrType=daily&begin=%d&end=%d" % (fam, end - 86400000, end))
+        st, body, _ = get(url)
+        try:
+            det = json.loads(body)["data"][0]["details"][0]["groupDetails"][0]
+        except Exception as e:
+            out[fam] = {"list_error": str(e)[:200], "body": body[:300].decode("utf-8", "replace")}
+            continue
+        t0 = time.time()
+        try:
+            with urllib.request.urlopen(urllib.request.Request(det["url"], headers={"User-Agent": UA}), timeout=300) as r:
+                raw = r.read()
+        except Exception as e:
+            out[fam] = {"download_error": str(e)[:200], "file": det.get("filename")}
+            continue
+        info = {"file": det.get("filename"), "mb": round(len(raw) / 1e6, 1), "download_s": round(time.time() - t0, 1), "members": []}
+        with tarfile.open(fileobj=io.BytesIO(raw), mode="r:gz") as tf:
+            for m in tf.getmembers()[:3]:
+                info["members"].append({"name": m.name, "size": m.size})
+                f = tf.extractfile(m)
+                if not f:
+                    continue
+                lines, first, ts = 0, [], []
+                for line in f:
+                    lines += 1
+                    if len(first) < 2:
+                        first.append(line[:600].decode("utf-8", "replace"))
+                    if lines <= 200:
+                        try:
+                            d = json.loads(line)
+                            ts.append((d.get("ts") or (d.get("data") or [{}])[0].get("ts"), d.get("action"),
+                                       len(d.get("bids") or (d.get("data") or [{}])[0].get("bids") or []),
+                                       len(d.get("asks") or (d.get("data") or [{}])[0].get("asks") or [])))
+                        except Exception:
+                            pass
+                info["members"][-1].update({"lines": lines, "first": first, "ts_first": ts[:12], "parse_s": round(time.time() - t0, 1)})
+        out[fam] = info
+        print("okx l2", fam, info["mb"], "MB", flush=True)
+    REPORT["okx_l2"] = out
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
+    try:
+        okx_l2_sample()
+    except Exception as e:
+        REPORT["okx_l2_error"] = f"{type(e).__name__}: {str(e)[:300]}"
     try:
         extra_checks()
     except Exception as e:
