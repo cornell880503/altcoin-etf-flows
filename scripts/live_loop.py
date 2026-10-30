@@ -29,6 +29,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_book_live as FB  # noqa: E402
 import fetch_live_extras as FX  # noqa: E402
 
+try:
+    import binance_spot_ws as BWS  # needs websocket-client
+except Exception:  # the loop runs without it
+    BWS = None
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 META = os.path.join(ROOT, "data", "ck", "live", "_meta.json")
 WATCH = ["scripts", "site", ".github/workflows/liq-live.yml"]
@@ -154,6 +159,13 @@ def main(argv=None):
     reason, rounds = "time", 0
     sh('git config user.name "etf-flows-bot"')
     sh('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"')
+    col = None
+    if BWS:  # Binance spot books from the websocket, beside the rounds (data/ck/live/binspot)
+        try:
+            col = BWS.Collector().start()
+        except Exception:
+            traceback.print_exc()
+            col = None
     try:
         while True:
             t0 = time.time()
@@ -183,6 +195,11 @@ def main(argv=None):
                 if new_hour:
                     m = meta()
                     m["kick"] = {"at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), **kick()}
+                    if col:
+                        try:
+                            m["binspot"] = {"at": m["kick"]["at"], **col.status()}
+                        except Exception:
+                            traceback.print_exc()
                     with open(META, "w") as f:  # committed with the next push
                         json.dump(m, f, indent=1, sort_keys=True)
             elif rounds % 2 == 0:
@@ -200,11 +217,19 @@ def main(argv=None):
             if nxt + 60 > t_end:
                 break
             time.sleep(max(0.0, nxt - time.time()))
+        if col:  # the hour so far, written before the last push
+            col.stop()
+            col = None
         push(f"live book: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
     except Exception:
         reason = "error"
         traceback.print_exc()
     finally:
+        if col:
+            try:
+                col.stop()
+            except Exception:
+                traceback.print_exc()
         mins = (time.time() - t_start) / 60
         for name, val in (("live_minutes", f"{mins:.0f}"), ("live_reason", reason)):
             with open(os.path.join(TMP, name), "w") as f:
