@@ -1,0 +1,231 @@
+{
+ "run_at": "2026-10-30T07:34:14Z",
+ "probes": {
+  "okx": {
+   "sep m4 instIdList": {
+    "status": 200,
+    "len": 972,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.3,
+    "code": "0",
+    "msg": "",
+    "files": [
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-09-12.tar.gz",
+      "31.07"
+     ],
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-09-11.tar.gz",
+      "128.75"
+     ],
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-09-10.tar.gz",
+      "105.95"
+     ]
+    ]
+   },
+   "sep m4 instFamilyList": {
+    "status": 400,
+    "secs": 0.19,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "sep m5 instIdList": {
+    "status": 200,
+    "len": 979,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.27,
+    "code": "0",
+    "msg": "",
+    "files": [
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-09-12.tar.gz",
+      "18.28"
+     ],
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-09-11.tar.gz",
+      "49.06"
+     ],
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-09-10.tar.gz",
+      "43.11"
+     ]
+    ]
+   },
+   "sep m5 instFamilyList": {
+    "status": 400,
+    "secs": 0.21,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "oct m4 instIdList": {
+    "status": 200,
+    "len": 970,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.19,
+    "code": "0",
+    "msg": "",
+    "files": [
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-10-28.tar.gz",
+      "97.7"
+     ],
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-10-27.tar.gz",
+      "93.05"
+     ],
+     [
+      "BTC-USDT-L2orderbook-400lv-2026-10-26.tar.gz",
+      "137.14"
+     ]
+    ]
+   },
+   "oct m4 instFamilyList": {
+    "status": 400,
+    "secs": 0.19,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "first_url": "https://static.okx.com/cdn/okx/match/orderbook/pro/L2/5000lv/daily/20261028/BTC-USDT-L2orderbook-5000lv-2026-10-28.tar.gz",
+   "oct m5 instIdList": {
+    "status": 200,
+    "len": 979,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.29,
+    "code": "0",
+    "msg": "",
+    "files": [
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-10-28.tar.gz",
+      "45.32"
+     ],
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-10-27.tar.gz",
+      "43.53"
+     ],
+     [
+      "BTC-USDT-L2orderbook-5000lv-2026-10-26.tar.gz",
+      "57.14"
+     ]
+    ]
+   },
+   "oct m5 instFamilyList": {
+    "status": 400,
+    "secs": 0.18,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "year m4 instIdList": {
+    "status": 200,
+    "len": 734,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.3,
+    "code": "0",
+    "msg": "",
+    "files": [
+     [
+      "BTC-USDT-L2orderbook-400lv-2025-10-02.tar.gz",
+      "167.83"
+     ],
+     [
+      "BTC-USDT-L2orderbook-400lv-2025-10-01.tar.gz",
+      "181.46"
+     ]
+    ]
+   },
+   "year m4 instFamilyList": {
+    "status": 400,
+    "secs": 0.19,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "year m5 instIdList": {
+    "status": 200,
+    "len": 107,
+    "range": null,
+    "type": "application/json;charset=UTF-8",
+    "secs": 0.29,
+    "code": "0",
+    "msg": "",
+    "files": []
+   },
+   "year m5 instFamilyList": {
+    "status": 400,
+    "secs": 0.23,
+    "code": "50016",
+    "msg": "Parameter ANY doesn't match parameter module",
+    "files": []
+   },
+   "file_head": {
+    "status": 206,
+    "len": 200001,
+    "range": "bytes 0-200000/47517345",
+    "type": "application/gzip",
+    "secs": 1.05,
+    "head": "{\"instId\":\"BTC-USDT\",\"action\":\"snapshot\",\"ts\":\"1793145600000\",\"asks\":[[\"80907.5\",\"1.01574108\",\"10\"],[\"80907.8\",\"0.424276\",\"1\"],[\"80907.9\",\"0.41411563\",\"1\"],[\"80908\",\"0.0156\",\"1\"],[\"80908.2\",\"0.21091659\",\"1\"],[\"80908.5\",\"0.06\",\"1\"],[\"80908.7\",\"0.0000102\",\"1\"],[\"80908.8\",\"0.00013\",\"1\"],[\"80909.2\",\"0.11517363\",\"2\"],[\"80909.5\",\"0.0000102\",\"1\"],[\"80910\",\"0.00013\",\"1\"],[\"80910.1\",\"0.001236\",\"1\"],[\"80910.3\",\"0.0000102\",\"1\"],[\"80910.4\",\"0.00013\",\"1\"],[\"80911\",\"0.17913277\",\"1\"],[\"80911.9\",\"0.46411642\",\"2\"],[\"80912\",\"0.00013\",\"1\"],[\"80912.8\",\"0.88904804\",\"2\"],[\"80912.9\",\"0.1749825\",\"1\"],[\"80913.1\",\"0.00",
+    "member": "BTC-USDT-L2orderbook-5000lv-2026-10-28.data"
+   }
+  },
+  "gate": {
+   "https://download.gatedata.org/spot/orderbooks/202610/BTC_USDT-2026102700.csv.gz": {
+    "status": 206,
+    "len": 4001,
+    "range": "bytes 0-4000/6782551",
+    "type": "text/csv",
+    "secs": 0.55,
+    "head": "1793059200,2,set,0.01,13717.4576400000000000,40634691041,0\n1793059200,2,set,0.02,3356.6640000000000000,40634691041,0\n1793059200,2,set,0.03,1307.7750000000000000,40634691041,0\n1793059200,2,set,0.04,870.0000000000000000,40634691041,0\n1793059200,2,set,0.05,2326.7320000000000000,40634691041,0\n1793059200,2,set,0.06,428.3333000000000000,40634691041,0\n1793059200,2,set,0.07,393.0000000000000000,40634691041,0\n1793059200,2,set,0.08,418.0000000000000000,40634691041,0\n1793059200,2,set,0.09,319.9066000000000000,40634691041,0\n1793059200,2,set,0.1,41585.7735990000000000,40634691041,0\n1793059200,2,set,0.11,660.7400000000000000,40634691041,0\n1793059200,2,set,0.12,385.0000000000000000,40634691041,0\n1793059200,2,set,0.13,541.0000000000000000,40634691041,0\n1793059200,2,set,0.14,233.2139000000000000,4063469104"
+   },
+   "https://download.gatedata.org/spot/orderbooks/202610/BTC_USDT-20261027.csv.gz": {
+    "status": 404,
+    "secs": 0.55,
+    "head": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><Key>spot/orderbooks/202610/BTC_USDT-20261027.csv.gz</Key><RequestId>SPR3C5D3QC2"
+   },
+   "https://download.gatedata.org/spot/orderbooks/202609/BTC_USDT-2026091000.csv.gz": {
+    "status": 206,
+    "len": 4001,
+    "range": "bytes 0-4000/5205995",
+    "type": "text/csv",
+    "secs": 0.73,
+    "head": "1788998400,2,set,0.01,13717.4576400000000000,39688599179,0\n1788998400,2,set,0.02,3356.6640000000000000,39688599179,0\n1788998400,2,set,0.03,1307.7750000000000000,39688599179,0\n1788998400,2,set,0.04,870.0000000000000000,39688599179,0\n1788998400,2,set,0.05,2326.7320000000000000,39688599179,0\n1788998400,2,set,0.06,428.3333000000000000,39688599179,0\n1788998400,2,set,0.07,393.0000000000000000,39688599179,0\n1788998400,2,set,0.08,418.0000000000000000,39688599179,0\n1788998400,2,set,0.09,319.9066000000000000,39688599179,0\n1788998400,2,set,0.1,40401.4365490000000000,39688599179,0\n1788998400,2,set,0.11,860.7400000000000000,39688599179,0\n1788998400,2,set,0.12,585.0000000000000000,39688599179,0\n1788998400,2,set,0.13,740.0000000000000000,39688599179,0\n1788998400,2,set,0.14,233.2139000000000000,3968859917"
+   },
+   "https://download.gatedata.org/spot/deals/202610/BTC_USDT-202610.csv.gz": {
+    "status": 404,
+    "secs": 0.52,
+    "head": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><Key>spot/deals/202610/BTC_USDT-202610.csv.gz</Key><RequestId>CV8ZW7P4JE2RDWHX</"
+   }
+  },
+  "bybit": {
+   "https://quote-saver.bycsi.com/orderbook/spot/BTCUSDT/2026-10-27_BTCUSDT_ob200.data.zip": {
+    "status": 206,
+    "len": 3001,
+    "range": "bytes 0-3000/56837973",
+    "type": "application/octet-stream",
+    "secs": 0.72,
+    "head": "504b030414000800080000005c5d0000000000000000000000001d000900323032362d31302d32375f425443555344545f6f623230302e646174615554050001003be16accbdcd8e3cbb8e27b637e097f8af0f0ae28744ea2e6dbf81c7ab8b59f4cc3460c3867b3cdd5e18837977232a43244529ab2a54d7"
+   },
+   "https://quote-saver.bycsi.com/orderbook/spot/BTCUSDT/2026-09-10_BTCUSDT_ob200.data.zip": {
+    "status": 206,
+    "len": 3001,
+    "range": "bytes 0-3000/50862288",
+    "type": "application/octet-stream",
+    "secs": 0.58,
+    "head": "504b030414000800080001002b5d0000000000000000000000001d000900323032362d30392d31305f425443555344545f6f623230302e6461746155540500018244a36aecbdc98e2c3db226b617a09738eb428236d048d652d21ba8b5fad18beabe17902041f7aaabb4101afdee8267386d223d3383a70a"
+   },
+   "https://quote-saver.bycsi.com/orderbook/linear/BTCUSDT/2026-10-27_BTCUSDT_ob500.data.zip": {
+    "status": 404,
+    "secs": 0.5,
+    "head": "<html>\n<head><title>404 Not Found</title></head>\n<body>\n<h1>404 Not Found</h1>\n<ul>\n<li>Code: NoSuchKey</li>\n<li>Message: The specified key does not exist.</li>\n<li>Key: orderbook/linear/BTCUSDT/2026-"
+   }
+  }
+ }
+}
