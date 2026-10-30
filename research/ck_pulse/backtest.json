@@ -1,0 +1,2092 @@
+{
+ "tables": 1887,
+ "from": "2025-02-05T06",
+ "to": "2026-10-30T08",
+ "checks": {
+  "btc_price": {
+   "compared": 1883,
+   "within_1pct": 1.0,
+   "median_dev_pct": 0.046,
+   "worst": [
+    [
+     "2026-04-06T00",
+     "69476.0",
+     68998.0
+    ],
+    [
+     "2026-06-04T00",
+     "64411.0",
+     64118.0
+    ],
+    [
+     "2026-06-18T16",
+     "62579.0",
+     62338.0
+    ],
+    [
+     "2026-09-11T16",
+     "77948.0",
+     77683.0
+    ],
+    [
+     "2026-06-05T16",
+     "60200.0",
+     60401.0
+    ]
+   ]
+  },
+  "status_vs_value": {
+   "overall_liq": {
+    "agree": 1822,
+    "disagree": 4,
+    "examples": [
+     [
+      "2025-03-30T16",
+      2.0,
+      "Hold"
+     ],
+     [
+      "2025-07-04T00",
+      -1.5,
+      "Hold"
+     ],
+     [
+      "2025-07-26T08",
+      -1.5,
+      "Hold"
+     ]
+    ]
+   },
+   "btc_liq": {
+    "agree": 1883,
+    "disagree": 4,
+    "examples": [
+     [
+      "2025-05-12T00",
+      2.39,
+      "Caution"
+     ],
+     [
+      "2025-08-07T16",
+      2.19,
+      "Caution"
+     ],
+     [
+      "2025-08-08T00",
+      2.19,
+      "Caution"
+     ]
+    ]
+   },
+   "eth_liq": {
+    "agree": 1856,
+    "disagree": 1,
+    "examples": [
+     [
+      "2025-07-18T00",
+      -2.0,
+      "Hold"
+     ]
+    ]
+   },
+   "acc_btc_liq": {
+    "agree": 1559,
+    "disagree": 25,
+    "examples": [
+     [
+      "2025-05-13T00",
+      -41.09,
+      "Caution"
+     ],
+     [
+      "2025-05-13T16",
+      -40.39,
+      "Caution"
+     ],
+     [
+      "2025-05-14T00",
+      -42.78,
+      "Caution"
+     ]
+    ]
+   },
+   "overall_liquidity_btc": {
+    "agree": 1876,
+    "disagree": 1,
+    "examples": [
+     [
+      "2025-12-27T16",
+      4111.0,
+      "Hold"
+     ]
+    ]
+   },
+   "lsur_z": {
+    "agree": 1814,
+    "disagree": 72,
+    "examples": [
+     [
+      "2025-02-20T08",
+      1.51,
+      "Caution"
+     ],
+     [
+      "2025-02-20T16",
+      1.81,
+      "Caution"
+     ],
+     [
+      "2025-02-21T08",
+      1.85,
+      "Caution"
+     ]
+    ]
+   },
+   "ari": {
+    "agree": 1856,
+    "disagree": 21,
+    "examples": [
+     [
+      "2025-02-06T12",
+      -0.26,
+      "Hold"
+     ],
+     [
+      "2025-02-10T08",
+      -0.2,
+      "Hold"
+     ],
+     [
+      "2025-02-10T16",
+      -0.2,
+      "Hold"
+     ]
+    ]
+   },
+   "bitfinex_premium": {
+    "agree": 1830,
+    "disagree": 42,
+    "examples": [
+     [
+      "2025-04-18T00",
+      -0.15,
+      "Caution"
+     ],
+     [
+      "2025-04-18T16",
+      -0.12,
+      "Caution"
+     ],
+     [
+      "2025-04-19T00",
+      -0.11,
+      "Caution"
+     ]
+    ]
+   },
+   "usdc_usdt_premium": {
+    "agree": 1184,
+    "disagree": 505,
+    "examples": [
+     [
+      "2025-02-07T16",
+      0.05,
+      "Hold"
+     ],
+     [
+      "2025-02-09T00",
+      -0.01,
+      "Caution"
+     ],
+     [
+      "2025-02-09T08",
+      -0.02,
+      "Caution"
+     ]
+    ]
+   },
+   "binance_usdt_rate": {
+    "agree": 1871,
+    "disagree": 0,
+    "examples": []
+   },
+   "oi_funding_apy": {
+    "agree": 1873,
+    "disagree": 3,
+    "examples": [
+     [
+      "2025-10-11T08",
+      9.54,
+      "Buy"
+     ],
+     [
+      "2026-02-06T16",
+      5.04,
+      "Buy"
+     ],
+     [
+      "2026-02-10T16",
+      5.52,
+      "Buy"
+     ]
+    ]
+   },
+   "pulse_index": {
+    "agree": 1873,
+    "disagree": 14,
+    "examples": [
+     [
+      "2025-04-14T08",
+      7.0,
+      "Hold"
+     ],
+     [
+      "2025-04-22T00",
+      7.0,
+      "Hold"
+     ],
+     [
+      "2025-11-01T16",
+      7.0,
+      "Hold"
+     ]
+    ]
+   }
+  },
+  "cleaning": {
+   "overall_liq": {
+    "ok": 1825,
+    "unchecked": 61,
+    "sign": 1
+   },
+   "btc_liq": {
+    "ok": 1887
+   },
+   "eth_liq": {
+    "ok": 1856,
+    "unchecked": 30,
+    "sign": 1
+   },
+   "acc_btc_liq": {
+    "ok": 1582,
+    "unchecked": 303,
+    "sign": 2
+   },
+   "overall_liquidity_btc": {
+    "ok": 1877,
+    "unchecked": 9,
+    "dropped": 1
+   },
+   "lsur_z": {
+    "ok": 1870,
+    "sign": 16,
+    "unchecked": 1
+   },
+   "ari": {
+    "ok": 1877,
+    "unchecked": 10
+   },
+   "bitfinex_premium": {
+    "ok": 1872,
+    "unchecked": 15
+   },
+   "usdc_usdt_premium": {
+    "ok": 1686,
+    "sign": 3,
+    "unchecked": 198
+   },
+   "binance_usdt_rate": {
+    "ok": 1871,
+    "unchecked": 16
+   },
+   "oi_funding_apy": {
+    "ok": 1876,
+    "unchecked": 11
+   },
+   "pulse_index": {
+    "ok": 1887
+   }
+  },
+  "vs_digitized_chart": {
+   "n": 141,
+   "corr": 0.942,
+   "mean_abs_diff": 0.227
+  }
+ },
+ "signals": [
+  {
+   "label": "Overall LIQ: Buy",
+   "n": 96,
+   "btc_24h": {
+    "n": 95,
+    "mean_pct": 0.25,
+    "median_pct": 0.27,
+    "up": 0.589,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.109,
+    "p_up": 0.066
+   },
+   "btc_72h": {
+    "n": 95,
+    "mean_pct": 0.43,
+    "median_pct": 0.8,
+    "up": 0.589,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.111,
+    "p_up": 0.053
+   },
+   "btc_168h": {
+    "n": 95,
+    "mean_pct": -0.62,
+    "median_pct": -0.4,
+    "up": 0.463,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.159,
+    "p_up": 0.25
+   },
+   "alts_72h": {
+    "n": 95,
+    "mean_pct": 0.54,
+    "median_pct": 0.29,
+    "up": 0.537,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.13,
+    "p_up": 0.205
+   }
+  },
+  {
+   "label": "Overall LIQ: Caution",
+   "n": 53,
+   "btc_24h": {
+    "n": 53,
+    "mean_pct": -0.11,
+    "median_pct": 0.03,
+    "up": 0.528,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.37,
+    "p_up": 0.461
+   },
+   "btc_72h": {
+    "n": 53,
+    "mean_pct": -0.11,
+    "median_pct": -0.04,
+    "up": 0.491,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.441,
+    "p_up": 0.453
+   },
+   "btc_168h": {
+    "n": 53,
+    "mean_pct": -1.09,
+    "median_pct": -0.13,
+    "up": 0.472,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.081,
+    "p_up": 0.368
+   },
+   "alts_72h": {
+    "n": 53,
+    "mean_pct": 0.21,
+    "median_pct": 0.51,
+    "up": 0.547,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.35,
+    "p_up": 0.249
+   }
+  },
+  {
+   "label": "Overall LIQ: Sell",
+   "n": 29,
+   "btc_24h": {
+    "n": 29,
+    "mean_pct": -0.54,
+    "median_pct": -0.18,
+    "up": 0.448,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.094,
+    "p_up": 0.321
+   },
+   "btc_72h": {
+    "n": 29,
+    "mean_pct": -0.57,
+    "median_pct": -0.58,
+    "up": 0.379,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.222,
+    "p_up": 0.124
+   },
+   "btc_168h": {
+    "n": 29,
+    "mean_pct": -1.4,
+    "median_pct": -0.4,
+    "up": 0.448,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.101,
+    "p_up": 0.344
+   },
+   "alts_72h": {
+    "n": 29,
+    "mean_pct": -0.93,
+    "median_pct": -1.07,
+    "up": 0.379,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.184,
+    "p_up": 0.165
+   }
+  },
+  {
+   "label": "BTC LIQ: Buy",
+   "n": 57,
+   "btc_24h": {
+    "n": 56,
+    "mean_pct": 0.37,
+    "median_pct": 0.46,
+    "up": 0.607,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.085,
+    "p_up": 0.093
+   },
+   "btc_72h": {
+    "n": 56,
+    "mean_pct": 1.25,
+    "median_pct": 1.26,
+    "up": 0.625,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.006,
+    "p_up": 0.034
+   },
+   "btc_168h": {
+    "n": 56,
+    "mean_pct": 0.17,
+    "median_pct": 0.85,
+    "up": 0.589,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.367,
+    "p_up": 0.114
+   },
+   "alts_72h": {
+    "n": 56,
+    "mean_pct": 1.16,
+    "median_pct": 0.4,
+    "up": 0.554,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.035,
+    "p_up": 0.203
+   }
+  },
+  {
+   "label": "BTC LIQ: Caution",
+   "n": 35,
+   "btc_24h": {
+    "n": 35,
+    "mean_pct": -0.76,
+    "median_pct": -0.18,
+    "up": 0.457,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.019,
+    "p_up": 0.312
+   },
+   "btc_72h": {
+    "n": 35,
+    "mean_pct": -0.68,
+    "median_pct": -0.67,
+    "up": 0.4,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.149,
+    "p_up": 0.139
+   },
+   "btc_168h": {
+    "n": 35,
+    "mean_pct": -2.23,
+    "median_pct": -2.7,
+    "up": 0.429,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.009,
+    "p_up": 0.249
+   },
+   "alts_72h": {
+    "n": 35,
+    "mean_pct": -0.81,
+    "median_pct": -1.11,
+    "up": 0.486,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.191,
+    "p_up": 0.546
+   }
+  },
+  {
+   "label": "BTC LIQ: Sell",
+   "n": 7,
+   "btc_24h": {
+    "n": 7,
+    "mean_pct": -0.54,
+    "median_pct": -0.75,
+    "up": 0.429,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.232,
+    "p_up": 0.464
+   },
+   "btc_72h": {
+    "n": 7,
+    "mean_pct": -1.65,
+    "median_pct": -1.51,
+    "up": 0.143,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.116,
+    "p_up": 0.057
+   },
+   "btc_168h": {
+    "n": 7,
+    "mean_pct": -4.97,
+    "median_pct": -6.86,
+    "up": 0.143,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.011,
+    "p_up": 0.057
+   },
+   "alts_72h": {
+    "n": 7,
+    "mean_pct": -1.58,
+    "median_pct": -1.07,
+    "up": 0.286,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.215,
+    "p_up": 0.235
+   }
+  },
+  {
+   "label": "ETH LIQ: Buy",
+   "n": 81,
+   "btc_24h": {
+    "n": 80,
+    "mean_pct": -0.03,
+    "median_pct": 0.05,
+    "up": 0.512,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.459,
+    "p_up": 0.543
+   },
+   "btc_72h": {
+    "n": 80,
+    "mean_pct": -0.25,
+    "median_pct": 0.56,
+    "up": 0.55,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.289,
+    "p_up": 0.246
+   },
+   "btc_168h": {
+    "n": 80,
+    "mean_pct": -0.77,
+    "median_pct": 0.13,
+    "up": 0.512,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.123,
+    "p_up": 0.478
+   },
+   "alts_72h": {
+    "n": 80,
+    "mean_pct": -0.19,
+    "median_pct": 0.74,
+    "up": 0.525,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.408,
+    "p_up": 0.309
+   }
+  },
+  {
+   "label": "ETH LIQ: Caution",
+   "n": 58,
+   "btc_24h": {
+    "n": 58,
+    "mean_pct": -0.22,
+    "median_pct": -0.31,
+    "up": 0.379,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.217,
+    "p_up": 0.025
+   },
+   "btc_72h": {
+    "n": 58,
+    "mean_pct": -0.79,
+    "median_pct": -0.67,
+    "up": 0.31,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.06,
+    "p_up": 0.002
+   },
+   "btc_168h": {
+    "n": 58,
+    "mean_pct": -0.94,
+    "median_pct": -0.58,
+    "up": 0.414,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.114,
+    "p_up": 0.108
+   },
+   "alts_72h": {
+    "n": 58,
+    "mean_pct": -0.65,
+    "median_pct": -1.83,
+    "up": 0.397,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.191,
+    "p_up": 0.094
+   }
+  },
+  {
+   "label": "ETH LIQ: Sell",
+   "n": 28,
+   "btc_24h": {
+    "n": 28,
+    "mean_pct": -0.5,
+    "median_pct": -0.38,
+    "up": 0.357,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.119,
+    "p_up": 0.066
+   },
+   "btc_72h": {
+    "n": 28,
+    "mean_pct": -1.11,
+    "median_pct": -0.77,
+    "up": 0.321,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.064,
+    "p_up": 0.045
+   },
+   "btc_168h": {
+    "n": 27,
+    "mean_pct": -2.34,
+    "median_pct": -3.16,
+    "up": 0.333,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.021,
+    "p_up": 0.051
+   },
+   "alts_72h": {
+    "n": 28,
+    "mean_pct": -0.89,
+    "median_pct": -1.26,
+    "up": 0.357,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.191,
+    "p_up": 0.115
+   }
+  },
+  {
+   "label": "Accumulated BTC LIQ: Buy",
+   "n": 36,
+   "btc_24h": {
+    "n": 35,
+    "mean_pct": 0.23,
+    "median_pct": 0.66,
+    "up": 0.571,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.258,
+    "p_up": 0.279
+   },
+   "btc_72h": {
+    "n": 35,
+    "mean_pct": 0.21,
+    "median_pct": 0.16,
+    "up": 0.543,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.355,
+    "p_up": 0.385
+   },
+   "btc_168h": {
+    "n": 35,
+    "mean_pct": -1.38,
+    "median_pct": -0.13,
+    "up": 0.486,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.081,
+    "p_up": 0.5
+   },
+   "alts_72h": {
+    "n": 35,
+    "mean_pct": -0.08,
+    "median_pct": -0.1,
+    "up": 0.457,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.498,
+    "p_up": 0.402
+   }
+  },
+  {
+   "label": "Accumulated BTC LIQ: Caution",
+   "n": 19,
+   "btc_24h": {
+    "n": 19,
+    "mean_pct": 0.15,
+    "median_pct": 0.24,
+    "up": 0.632,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.372,
+    "p_up": 0.202
+   },
+   "btc_72h": {
+    "n": 19,
+    "mean_pct": -0.69,
+    "median_pct": -0.15,
+    "up": 0.474,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.219,
+    "p_up": 0.475
+   },
+   "btc_168h": {
+    "n": 19,
+    "mean_pct": -1.38,
+    "median_pct": -0.64,
+    "up": 0.421,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.151,
+    "p_up": 0.316
+   },
+   "alts_72h": {
+    "n": 19,
+    "mean_pct": -0.37,
+    "median_pct": 0.5,
+    "up": 0.579,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.388,
+    "p_up": 0.273
+   }
+  },
+  {
+   "label": "Accumulated BTC LIQ: Sell",
+   "n": 7,
+   "btc_24h": {
+    "n": 7,
+    "mean_pct": -0.67,
+    "median_pct": -0.48,
+    "up": 0.143,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.198,
+    "p_up": 0.05
+   },
+   "btc_72h": {
+    "n": 7,
+    "mean_pct": -0.35,
+    "median_pct": -1.01,
+    "up": 0.429,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.399,
+    "p_up": 0.478
+   },
+   "btc_168h": {
+    "n": 7,
+    "mean_pct": -2.77,
+    "median_pct": -0.63,
+    "up": 0.286,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.095,
+    "p_up": 0.226
+   },
+   "alts_72h": {
+    "n": 7,
+    "mean_pct": -0.64,
+    "median_pct": -0.0,
+    "up": 0.429,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.389,
+    "p_up": 0.509
+   }
+  },
+  {
+   "label": "Overall Liquidity in BTC: Buy",
+   "n": 46,
+   "btc_24h": {
+    "n": 46,
+    "mean_pct": 0.62,
+    "median_pct": 0.94,
+    "up": 0.652,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.025,
+    "p_up": 0.036
+   },
+   "btc_72h": {
+    "n": 46,
+    "mean_pct": 1.12,
+    "median_pct": 2.2,
+    "up": 0.674,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.022,
+    "p_up": 0.01
+   },
+   "btc_168h": {
+    "n": 46,
+    "mean_pct": -0.68,
+    "median_pct": 0.29,
+    "up": 0.565,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.213,
+    "p_up": 0.24
+   },
+   "alts_72h": {
+    "n": 46,
+    "mean_pct": 0.78,
+    "median_pct": 1.6,
+    "up": 0.63,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.143,
+    "p_up": 0.038
+   }
+  },
+  {
+   "label": "Overall Liquidity in BTC: Caution",
+   "n": 43,
+   "btc_24h": {
+    "n": 43,
+    "mean_pct": -0.42,
+    "median_pct": -0.24,
+    "up": 0.465,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.099,
+    "p_up": 0.325
+   },
+   "btc_72h": {
+    "n": 43,
+    "mean_pct": -0.64,
+    "median_pct": -0.37,
+    "up": 0.419,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.136,
+    "p_up": 0.175
+   },
+   "btc_168h": {
+    "n": 43,
+    "mean_pct": -1.28,
+    "median_pct": -0.49,
+    "up": 0.419,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.07,
+    "p_up": 0.176
+   },
+   "alts_72h": {
+    "n": 43,
+    "mean_pct": -0.73,
+    "median_pct": -1.19,
+    "up": 0.419,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.189,
+    "p_up": 0.224
+   }
+  },
+  {
+   "label": "Overall Liquidity in BTC: Sell",
+   "n": 15,
+   "btc_24h": {
+    "n": 15,
+    "mean_pct": -0.2,
+    "median_pct": -0.31,
+    "up": 0.4,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.359,
+    "p_up": 0.26
+   },
+   "btc_72h": {
+    "n": 15,
+    "mean_pct": -1.59,
+    "median_pct": -0.67,
+    "up": 0.267,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.046,
+    "p_up": 0.061
+   },
+   "btc_168h": {
+    "n": 15,
+    "mean_pct": -2.68,
+    "median_pct": -2.7,
+    "up": 0.2,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.034,
+    "p_up": 0.018
+   },
+   "alts_72h": {
+    "n": 15,
+    "mean_pct": -2.07,
+    "median_pct": -1.68,
+    "up": 0.4,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.058,
+    "p_up": 0.327
+   }
+  },
+  {
+   "label": "LSUR Z-Index: Buy",
+   "n": 56,
+   "btc_24h": {
+    "n": 56,
+    "mean_pct": -0.34,
+    "median_pct": -0.02,
+    "up": 0.5,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.126,
+    "p_up": 0.496
+   },
+   "btc_72h": {
+    "n": 56,
+    "mean_pct": -0.29,
+    "median_pct": -0.35,
+    "up": 0.482,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.302,
+    "p_up": 0.419
+   },
+   "btc_168h": {
+    "n": 56,
+    "mean_pct": -0.0,
+    "median_pct": -0.13,
+    "up": 0.464,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.466,
+    "p_up": 0.315
+   },
+   "alts_72h": {
+    "n": 56,
+    "mean_pct": -0.34,
+    "median_pct": -0.67,
+    "up": 0.446,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.348,
+    "p_up": 0.27
+   }
+  },
+  {
+   "label": "LSUR Z-Index: Caution",
+   "n": 62,
+   "btc_24h": {
+    "n": 62,
+    "mean_pct": -0.04,
+    "median_pct": -0.06,
+    "up": 0.5,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.453,
+    "p_up": 0.469
+   },
+   "btc_72h": {
+    "n": 62,
+    "mean_pct": -0.06,
+    "median_pct": 0.05,
+    "up": 0.516,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.465,
+    "p_up": 0.475
+   },
+   "btc_168h": {
+    "n": 62,
+    "mean_pct": -1.14,
+    "median_pct": -0.45,
+    "up": 0.452,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.062,
+    "p_up": 0.251
+   },
+   "alts_72h": {
+    "n": 62,
+    "mean_pct": -0.09,
+    "median_pct": -0.67,
+    "up": 0.452,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.47,
+    "p_up": 0.282
+   }
+  },
+  {
+   "label": "LSUR Z-Index: Sell",
+   "n": 25,
+   "btc_24h": {
+    "n": 25,
+    "mean_pct": -0.27,
+    "median_pct": -0.11,
+    "up": 0.48,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.273,
+    "p_up": 0.442
+   },
+   "btc_72h": {
+    "n": 25,
+    "mean_pct": -0.51,
+    "median_pct": -0.62,
+    "up": 0.44,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.263,
+    "p_up": 0.35
+   },
+   "btc_168h": {
+    "n": 24,
+    "mean_pct": -0.93,
+    "median_pct": -0.6,
+    "up": 0.375,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.213,
+    "p_up": 0.147
+   },
+   "alts_72h": {
+    "n": 25,
+    "mean_pct": -0.63,
+    "median_pct": -0.22,
+    "up": 0.44,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.302,
+    "p_up": 0.363
+   }
+  },
+  {
+   "label": "ALT Resilient Index: Buy",
+   "n": 18,
+   "btc_24h": {
+    "n": 18,
+    "mean_pct": -0.3,
+    "median_pct": -0.05,
+    "up": 0.5,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.282,
+    "p_up": 0.545
+   },
+   "btc_72h": {
+    "n": 18,
+    "mean_pct": 0.84,
+    "median_pct": 2.13,
+    "up": 0.556,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.153,
+    "p_up": 0.429
+   },
+   "btc_168h": {
+    "n": 18,
+    "mean_pct": -2.21,
+    "median_pct": -2.93,
+    "up": 0.389,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.05,
+    "p_up": 0.246
+   },
+   "alts_72h": {
+    "n": 18,
+    "mean_pct": 0.32,
+    "median_pct": -0.68,
+    "up": 0.444,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.379,
+    "p_up": 0.445
+   }
+  },
+  {
+   "label": "ALT Resilient Index: Caution",
+   "n": 126,
+   "btc_24h": {
+    "n": 124,
+    "mean_pct": 0.16,
+    "median_pct": 0.01,
+    "up": 0.5,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.18,
+    "p_up": 0.418
+   },
+   "btc_72h": {
+    "n": 123,
+    "mean_pct": -0.06,
+    "median_pct": -0.26,
+    "up": 0.463,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.481,
+    "p_up": 0.202
+   },
+   "btc_168h": {
+    "n": 122,
+    "mean_pct": -0.41,
+    "median_pct": -0.09,
+    "up": 0.492,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.244,
+    "p_up": 0.444
+   },
+   "alts_72h": {
+    "n": 124,
+    "mean_pct": 0.34,
+    "median_pct": -0.06,
+    "up": 0.476,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.199,
+    "p_up": 0.391
+   }
+  },
+  {
+   "label": "ALT Resilient Index: Sell",
+   "n": 123,
+   "btc_24h": {
+    "n": 123,
+    "mean_pct": -0.06,
+    "median_pct": 0.08,
+    "up": 0.52,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.399,
+    "p_up": 0.459
+   },
+   "btc_72h": {
+    "n": 123,
+    "mean_pct": -0.23,
+    "median_pct": -0.46,
+    "up": 0.423,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.284,
+    "p_up": 0.043
+   },
+   "btc_168h": {
+    "n": 123,
+    "mean_pct": -0.44,
+    "median_pct": -0.2,
+    "up": 0.48,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.215,
+    "p_up": 0.343
+   },
+   "alts_72h": {
+    "n": 123,
+    "mean_pct": -0.21,
+    "median_pct": -0.22,
+    "up": 0.472,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.367,
+    "p_up": 0.366
+   }
+  },
+  {
+   "label": "Bitfinex Premium: Buy",
+   "n": 28,
+   "btc_24h": {
+    "n": 28,
+    "mean_pct": -0.25,
+    "median_pct": 0.35,
+    "up": 0.571,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.286,
+    "p_up": 0.34
+   },
+   "btc_72h": {
+    "n": 28,
+    "mean_pct": -1.41,
+    "median_pct": -0.42,
+    "up": 0.464,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.022,
+    "p_up": 0.413
+   },
+   "btc_168h": {
+    "n": 28,
+    "mean_pct": -2.2,
+    "median_pct": -1.15,
+    "up": 0.357,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.021,
+    "p_up": 0.093
+   },
+   "alts_72h": {
+    "n": 28,
+    "mean_pct": -1.36,
+    "median_pct": -0.97,
+    "up": 0.464,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.086,
+    "p_up": 0.47
+   }
+  },
+  {
+   "label": "Bitfinex Premium: Caution",
+   "n": 18,
+   "btc_24h": {
+    "n": 18,
+    "mean_pct": 0.31,
+    "median_pct": 0.24,
+    "up": 0.667,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.257,
+    "p_up": 0.136
+   },
+   "btc_72h": {
+    "n": 18,
+    "mean_pct": 0.55,
+    "median_pct": 0.41,
+    "up": 0.722,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.238,
+    "p_up": 0.053
+   },
+   "btc_168h": {
+    "n": 18,
+    "mean_pct": -0.1,
+    "median_pct": 0.26,
+    "up": 0.556,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.475,
+    "p_up": 0.402
+   },
+   "alts_72h": {
+    "n": 18,
+    "mean_pct": 0.49,
+    "median_pct": 0.77,
+    "up": 0.556,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.317,
+    "p_up": 0.378
+   }
+  },
+  {
+   "label": "Bitfinex Premium: Sell",
+   "n": 12,
+   "btc_24h": {
+    "n": 12,
+    "mean_pct": -0.19,
+    "median_pct": 0.09,
+    "up": 0.583,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.383,
+    "p_up": 0.431
+   },
+   "btc_72h": {
+    "n": 12,
+    "mean_pct": 1.12,
+    "median_pct": 1.05,
+    "up": 0.667,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.127,
+    "p_up": 0.197
+   },
+   "btc_168h": {
+    "n": 12,
+    "mean_pct": 0.77,
+    "median_pct": 0.59,
+    "up": 0.667,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.297,
+    "p_up": 0.181
+   },
+   "alts_72h": {
+    "n": 12,
+    "mean_pct": 0.84,
+    "median_pct": 0.99,
+    "up": 0.583,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.276,
+    "p_up": 0.364
+   }
+  },
+  {
+   "label": "USDC/USDT Premium: Buy",
+   "n": 38,
+   "btc_24h": {
+    "n": 38,
+    "mean_pct": 0.08,
+    "median_pct": 0.04,
+    "up": 0.526,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.397,
+    "p_up": 0.495
+   },
+   "btc_72h": {
+    "n": 38,
+    "mean_pct": -0.44,
+    "median_pct": 0.19,
+    "up": 0.526,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.238,
+    "p_up": 0.443
+   },
+   "btc_168h": {
+    "n": 38,
+    "mean_pct": -0.22,
+    "median_pct": -0.11,
+    "up": 0.5,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.433,
+    "p_up": 0.544
+   },
+   "alts_72h": {
+    "n": 38,
+    "mean_pct": -0.43,
+    "median_pct": -0.65,
+    "up": 0.421,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.322,
+    "p_up": 0.245
+   }
+  },
+  {
+   "label": "USDC/USDT Premium: Caution",
+   "n": 81,
+   "btc_24h": {
+    "n": 81,
+    "mean_pct": -0.01,
+    "median_pct": 0.12,
+    "up": 0.531,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.47,
+    "p_up": 0.433
+   },
+   "btc_72h": {
+    "n": 81,
+    "mean_pct": -0.59,
+    "median_pct": -0.64,
+    "up": 0.42,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.081,
+    "p_up": 0.077
+   },
+   "btc_168h": {
+    "n": 81,
+    "mean_pct": -0.53,
+    "median_pct": -0.2,
+    "up": 0.481,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.222,
+    "p_up": 0.386
+   },
+   "alts_72h": {
+    "n": 81,
+    "mean_pct": -0.07,
+    "median_pct": -0.58,
+    "up": 0.457,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.493,
+    "p_up": 0.305
+   }
+  },
+  {
+   "label": "USDC/USDT Premium: Sell",
+   "n": 35,
+   "btc_24h": {
+    "n": 35,
+    "mean_pct": -0.57,
+    "median_pct": -0.46,
+    "up": 0.371,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.063,
+    "p_up": 0.07
+   },
+   "btc_72h": {
+    "n": 35,
+    "mean_pct": -0.58,
+    "median_pct": -0.71,
+    "up": 0.4,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.188,
+    "p_up": 0.152
+   },
+   "btc_168h": {
+    "n": 35,
+    "mean_pct": -0.21,
+    "median_pct": 0.22,
+    "up": 0.543,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.432,
+    "p_up": 0.375
+   },
+   "alts_72h": {
+    "n": 35,
+    "mean_pct": -0.42,
+    "median_pct": -0.49,
+    "up": 0.457,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.339,
+    "p_up": 0.409
+   }
+  },
+  {
+   "label": "Binance USDT Interest Rate: Buy",
+   "n": 9,
+   "btc_24h": {
+    "n": 9,
+    "mean_pct": 0.13,
+    "median_pct": -0.13,
+    "up": 0.444,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.419,
+    "p_up": 0.465
+   },
+   "btc_72h": {
+    "n": 9,
+    "mean_pct": -1.15,
+    "median_pct": -0.35,
+    "up": 0.333,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.177,
+    "p_up": 0.243
+   },
+   "btc_168h": {
+    "n": 9,
+    "mean_pct": -3.83,
+    "median_pct": -2.87,
+    "up": 0.0,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.024,
+    "p_up": 0.002
+   },
+   "alts_72h": {
+    "n": 9,
+    "mean_pct": -2.91,
+    "median_pct": -1.51,
+    "up": 0.444,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.048,
+    "p_up": 0.533
+   }
+  },
+  {
+   "label": "OI Weighted Funding APY: Buy",
+   "n": 190,
+   "btc_24h": {
+    "n": 189,
+    "mean_pct": -0.05,
+    "median_pct": -0.07,
+    "up": 0.476,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.403,
+    "p_up": 0.166
+   },
+   "btc_72h": {
+    "n": 189,
+    "mean_pct": 0.14,
+    "median_pct": 0.07,
+    "up": 0.529,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.246,
+    "p_up": 0.265
+   },
+   "btc_168h": {
+    "n": 188,
+    "mean_pct": 0.23,
+    "median_pct": -0.08,
+    "up": 0.5,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.239,
+    "p_up": 0.51
+   },
+   "alts_72h": {
+    "n": 189,
+    "mean_pct": -0.07,
+    "median_pct": 0.03,
+    "up": 0.503,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.484,
+    "p_up": 0.397
+   }
+  },
+  {
+   "label": "OI Weighted Funding APY: Sell",
+   "n": 1,
+   "btc_24h": {
+    "n": 1
+   },
+   "btc_72h": {
+    "n": 1
+   },
+   "btc_168h": {
+    "n": 1
+   },
+   "alts_72h": {
+    "n": 1
+   }
+  },
+  {
+   "label": "Pulse Index: Buy",
+   "n": 76,
+   "btc_24h": {
+    "n": 75,
+    "mean_pct": 0.14,
+    "median_pct": 0.27,
+    "up": 0.573,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.27,
+    "p_up": 0.171
+   },
+   "btc_72h": {
+    "n": 75,
+    "mean_pct": 0.97,
+    "median_pct": 0.8,
+    "up": 0.613,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.006,
+    "p_up": 0.033
+   },
+   "btc_168h": {
+    "n": 75,
+    "mean_pct": 0.15,
+    "median_pct": 0.28,
+    "up": 0.56,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.37,
+    "p_up": 0.189
+   },
+   "alts_72h": {
+    "n": 75,
+    "mean_pct": 1.03,
+    "median_pct": 1.01,
+    "up": 0.587,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.032,
+    "p_up": 0.059
+   }
+  },
+  {
+   "label": "Pulse Index: Caution",
+   "n": 25,
+   "btc_24h": {
+    "n": 25,
+    "mean_pct": -0.1,
+    "median_pct": -0.17,
+    "up": 0.48,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.411,
+    "p_up": 0.436
+   },
+   "btc_72h": {
+    "n": 25,
+    "mean_pct": -1.32,
+    "median_pct": -0.67,
+    "up": 0.4,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.042,
+    "p_up": 0.193
+   },
+   "btc_168h": {
+    "n": 25,
+    "mean_pct": -2.91,
+    "median_pct": -3.16,
+    "up": 0.32,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.005,
+    "p_up": 0.059
+   },
+   "alts_72h": {
+    "n": 25,
+    "mean_pct": -1.27,
+    "median_pct": -1.34,
+    "up": 0.36,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.123,
+    "p_up": 0.132
+   }
+  },
+  {
+   "label": "Pulse Index: Sell",
+   "n": 5,
+   "btc_24h": {
+    "n": 5,
+    "mean_pct": 0.14,
+    "median_pct": -0.1,
+    "up": 0.4,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.433,
+    "p_up": 0.477
+   },
+   "btc_72h": {
+    "n": 5,
+    "mean_pct": -0.15,
+    "median_pct": -0.58,
+    "up": 0.2,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.469,
+    "p_up": 0.166
+   },
+   "btc_168h": {
+    "n": 5,
+    "mean_pct": -2.6,
+    "median_pct": -1.63,
+    "up": 0.2,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.145,
+    "p_up": 0.185
+   },
+   "alts_72h": {
+    "n": 5,
+    "mean_pct": -0.04,
+    "median_pct": 1.14,
+    "up": 0.6,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.51,
+    "p_up": 0.474
+   }
+  },
+  {
+   "label": "Green arrow (Overall LIQ and BTC LIQ both Buy)",
+   "n": 57,
+   "btc_24h": {
+    "n": 56,
+    "mean_pct": 0.33,
+    "median_pct": 0.46,
+    "up": 0.589,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.112,
+    "p_up": 0.162
+   },
+   "btc_72h": {
+    "n": 56,
+    "mean_pct": 1.24,
+    "median_pct": 1.25,
+    "up": 0.625,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.002,
+    "p_up": 0.037
+   },
+   "btc_168h": {
+    "n": 56,
+    "mean_pct": 0.17,
+    "median_pct": 0.85,
+    "up": 0.589,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.369,
+    "p_up": 0.122
+   },
+   "alts_72h": {
+    "n": 56,
+    "mean_pct": 1.12,
+    "median_pct": 0.24,
+    "up": 0.536,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.044,
+    "p_up": 0.288
+   }
+  },
+  {
+   "label": "Red arrow (Overall LIQ and BTC LIQ both Sell)",
+   "n": 5,
+   "btc_24h": {
+    "n": 5,
+    "mean_pct": -0.12,
+    "median_pct": 0.39,
+    "up": 0.6,
+    "all_mean_pct": -0.01,
+    "all_up": 0.512,
+    "p_mean": 0.444,
+    "p_up": 0.534
+   },
+   "btc_72h": {
+    "n": 5,
+    "mean_pct": -1.04,
+    "median_pct": -0.86,
+    "up": 0.2,
+    "all_mean_pct": -0.03,
+    "all_up": 0.503,
+    "p_mean": 0.257,
+    "p_up": 0.188
+   },
+   "btc_168h": {
+    "n": 5,
+    "mean_pct": -5.0,
+    "median_pct": -6.86,
+    "up": 0.2,
+    "all_mean_pct": -0.06,
+    "all_up": 0.502,
+    "p_mean": 0.02,
+    "p_up": 0.177
+   },
+   "alts_72h": {
+    "n": 5,
+    "mean_pct": -1.45,
+    "median_pct": -1.07,
+    "up": 0.2,
+    "all_mean_pct": -0.05,
+    "all_up": 0.491,
+    "p_mean": 0.267,
+    "p_up": 0.202
+   }
+  }
+ ],
+ "lead_lag": {
+  "overall_liq": {
+   "next_24h": [
+    0.094,
+    601
+   ],
+   "next_72h": [
+    0.153,
+    600
+   ],
+   "past_24h": [
+    -0.413,
+    602
+   ],
+   "alts_next_72h": [
+    0.125,
+    601
+   ]
+  },
+  "btc_liq": {
+   "next_24h": [
+    0.084,
+    624
+   ],
+   "next_72h": [
+    0.121,
+    623
+   ],
+   "past_24h": [
+    -0.372,
+    625
+   ],
+   "alts_next_72h": [
+    0.099,
+    624
+   ]
+  },
+  "eth_liq": {
+   "next_24h": [
+    0.079,
+    624
+   ],
+   "next_72h": [
+    0.133,
+    623
+   ],
+   "past_24h": [
+    -0.326,
+    625
+   ],
+   "alts_next_72h": [
+    0.119,
+    624
+   ]
+  },
+  "acc_btc_liq": {
+   "next_24h": [
+    0.061,
+    612
+   ],
+   "next_72h": [
+    0.091,
+    611
+   ],
+   "past_24h": [
+    -0.211,
+    613
+   ],
+   "alts_next_72h": [
+    0.062,
+    612
+   ]
+  },
+  "overall_liquidity_btc": {
+   "next_24h": [
+    0.131,
+    624
+   ],
+   "next_72h": [
+    0.159,
+    623
+   ],
+   "past_24h": [
+    -0.383,
+    625
+   ],
+   "alts_next_72h": [
+    0.141,
+    624
+   ]
+  },
+  "lsur_z": {
+   "next_24h": [
+    0.033,
+    624
+   ],
+   "next_72h": [
+    0.051,
+    623
+   ],
+   "past_24h": [
+    -0.369,
+    625
+   ],
+   "alts_next_72h": [
+    0.02,
+    624
+   ]
+  },
+  "ari": {
+   "next_24h": [
+    0.008,
+    623
+   ],
+   "next_72h": [
+    0.049,
+    622
+   ],
+   "past_24h": [
+    -0.963,
+    624
+   ],
+   "alts_next_72h": [
+    0.016,
+    623
+   ]
+  },
+  "bitfinex_premium": {
+   "next_24h": [
+    -0.012,
+    618
+   ],
+   "next_72h": [
+    -0.012,
+    617
+   ],
+   "past_24h": [
+    -0.224,
+    619
+   ],
+   "alts_next_72h": [
+    -0.024,
+    618
+   ]
+  },
+  "usdc_usdt_premium": {
+   "next_24h": [
+    0.006,
+    613
+   ],
+   "next_72h": [
+    -0.022,
+    612
+   ],
+   "past_24h": [
+    -0.152,
+    614
+   ],
+   "alts_next_72h": [
+    -0.027,
+    613
+   ]
+  },
+  "binance_usdt_rate": {
+   "next_24h": [
+    -0.015,
+    622
+   ],
+   "next_72h": [
+    -0.047,
+    621
+   ],
+   "past_24h": [
+    0.02,
+    623
+   ],
+   "alts_next_72h": [
+    -0.015,
+    622
+   ]
+  },
+  "oi_funding_apy": {
+   "next_24h": [
+    0.015,
+    623
+   ],
+   "next_72h": [
+    -0.078,
+    622
+   ],
+   "past_24h": [
+    0.178,
+    624
+   ],
+   "alts_next_72h": [
+    -0.02,
+    623
+   ]
+  },
+  "pulse_index": {
+   "next_24h": [
+    -0.092,
+    624
+   ],
+   "next_72h": [
+    -0.126,
+    623
+   ],
+   "past_24h": [
+    0.436,
+    625
+   ],
+   "alts_next_72h": [
+    -0.096,
+    624
+   ]
+  }
+ },
+ "our_proxy_vs_theirs": {
+  "overall_liq": {
+   "n": 1819,
+   "corr": -0.088,
+   "by_quarter": {
+    "2025Q1": 0.51,
+    "2025Q2": -0.13,
+    "2025Q3": 0.35,
+    "2025Q4": 0.12,
+    "2026Q1": 0.46,
+    "2026Q2": 0.57,
+    "2026Q3": -0.21,
+    "2026Q4": 0.52
+   }
+  },
+  "btc_liq": {
+   "n": 1871,
+   "corr": 0.04,
+   "by_quarter": {
+    "2025Q1": 0.44,
+    "2025Q2": -0.01,
+    "2025Q3": 0.45,
+    "2025Q4": 0.26,
+    "2026Q1": 0.48,
+    "2026Q2": 0.62,
+    "2026Q3": -0.36,
+    "2026Q4": 0.12
+   }
+  },
+  "eth_liq": {
+   "n": 1880,
+   "corr": 0.06,
+   "by_quarter": {
+    "2025Q1": 0.43,
+    "2025Q2": 0.12,
+    "2025Q3": 0.12,
+    "2025Q4": -0.34,
+    "2026Q1": 0.33,
+    "2026Q2": 0.12,
+    "2026Q3": 0.44,
+    "2026Q4": 0.54
+   }
+  }
+ }
+}
