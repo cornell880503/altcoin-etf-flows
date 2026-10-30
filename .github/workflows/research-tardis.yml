@@ -1,11 +1,11 @@
 name: research-tardis
-# One-off research run: a day of full spot order books from Tardis.dev's free first-of-month sample
+# Research runs: days of full spot order books from Tardis.dev's free first-of-month sample
 # (research/tardis_spot_day.py), to lay against CoinKarma's charted LIQ. Writes research/spot/.
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["research/tardis_spot_day.py"]
+    paths: ["research/tardis_spot_day.py", ".github/workflows/research-tardis.yml"]
 permissions:
   contents: write
 concurrency:
@@ -18,11 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        items:
-          - "binance:BTCUSDT,coinbase:BTC-USD"
-          - "binance:ETHUSDT,binance:XRPUSDT,binance:BNBUSDT,binance:SOLUSDT,binance:DOGEUSDT,coinbase:ETH-USD"
-          - "binance:TRXUSDT,binance:ADAUSDT,binance:LINKUSDT,binance:HYPEUSDT,binance:AVAXUSDT,binance:SUIUSDT,binance:BCHUSDT,binance:LTCUSDT,binance:DOTUSDT"
-          - "binance:UNIUSDT,binance:AAVEUSDT,binance:NEARUSDT,binance:TONUSDT,binance:ATOMUSDT,binance:APTUSDT,binance:ARBUSDT,binance:OPUSDT,binance:ZECUSDT"
+        date: ["2025-11-01", "2025-12-01", "2026-01-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01", "2026-07-01"]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -32,7 +28,10 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install --quiet numpy
       - name: Replay the day
-        run: python research/tardis_spot_day.py --date 2026-10-01 --items "${{ matrix.items }}"
+        run: |
+          c="BTC ETH XRP BNB SOL DOGE TRX ADA LINK HYPE AVAX SUI BCH LTC DOT UNI AAVE NEAR TON ATOM APT ARB OP ZEC"
+          items=$(for x in $c; do printf "binance:%sUSDT," "$x"; done)coinbase:BTC-USD
+          python research/tardis_spot_day.py --date "${{ matrix.date }}" --items "$items"
         continue-on-error: true
         timeout-minutes: 80
       - name: Commit
