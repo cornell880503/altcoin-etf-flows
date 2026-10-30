@@ -1,0 +1,156 @@
+{
+ "period_utc": [
+  "2026-09-12T02",
+  "2026-10-28T23"
+ ],
+ "hours": 1114,
+ "source": [
+  "https://x.com/coinkarma_/status/2115805844147442015"
+ ],
+ "overall_corr": {
+  "ours_binance_perp": 0.549,
+  "okx_spot_24": 0.525,
+  "perp_btc_plus_spot_alts": 0.591,
+  "spot_alts_only": 0.626
+ },
+ "btc_liq_corr": {
+  "ours_binance_perp_5": 0.263,
+  "okx_spot": 0.386,
+  "gate_spot_1": 0.168,
+  "gate_spot_2": 0.162,
+  "gate_spot_5": 0.074,
+  "gate_spot_10": -0.052
+ },
+ "oct21_28_corr": {
+  "btc_ours": -0.04,
+  "btc_okx_spot": 0.497,
+  "overall_ours": 0.363,
+  "overall_okx_spot": 0.684
+ },
+ "week_oct22_28": {
+  "coinkarma": {
+   "mean": 1.18,
+   "min": -0.41,
+   "max": 1.91,
+   "hours_ge2": 0,
+   "hours_lt0": 7
+  },
+  "ours": {
+   "mean": 1.94,
+   "min": 0.42,
+   "max": 3.12,
+   "hours_ge2": 67,
+   "hours_lt0": 0
+  },
+  "okx_spot": {
+   "mean": 0.67,
+   "min": -0.79,
+   "max": 1.85,
+   "hours_ge2": 0,
+   "hours_lt0": 33
+  }
+ },
+ "level": {
+  "coinkarma_mean": 1.15,
+  "ours_mean": 1.09,
+  "okx_spot_mean": 0.15
+ },
+ "per_coin_vs_ck_overall": {
+  "BTC": {
+   "okx_spot": 0.452,
+   "perp": 0.514
+  },
+  "ETH": {
+   "okx_spot": 0.453,
+   "perp": 0.457
+  },
+  "SOL": {
+   "okx_spot": 0.479,
+   "perp": 0.343
+  },
+  "XRP": {
+   "okx_spot": 0.409,
+   "perp": 0.351
+  },
+  "BNB": {
+   "okx_spot": 0.501,
+   "perp": 0.38
+  },
+  "DOGE": {
+   "okx_spot": 0.606,
+   "perp": 0.352
+  },
+  "ADA": {
+   "okx_spot": 0.189,
+   "perp": 0.354
+  },
+  "TRX": {
+   "okx_spot": 0.162,
+   "perp": 0.034
+  },
+  "LINK": {
+   "okx_spot": 0.42,
+   "perp": 0.299
+  },
+  "AVAX": {
+   "okx_spot": 0.318,
+   "perp": 0.335
+  },
+  "DOT": {
+   "okx_spot": 0.099,
+   "perp": 0.248
+  },
+  "LTC": {
+   "okx_spot": 0.129,
+   "perp": 0.195
+  },
+  "BCH": {
+   "okx_spot": 0.079,
+   "perp": 0.236
+  },
+  "SUI": {
+   "okx_spot": 0.198,
+   "perp": 0.295
+  },
+  "HYPE": {
+   "okx_spot": 0.439,
+   "perp": 0.391
+  },
+  "UNI": {
+   "okx_spot": 0.291,
+   "perp": 0.183
+  },
+  "AAVE": {
+   "okx_spot": 0.019,
+   "perp": 0.167
+  },
+  "NEAR": {
+   "okx_spot": 0.101,
+   "perp": 0.306
+  },
+  "GRAM": {
+   "okx_spot": 0.318,
+   "perp": 0.452
+  },
+  "ATOM": {
+   "okx_spot": 0.32,
+   "perp": 0.306
+  },
+  "APT": {
+   "okx_spot": 0.192,
+   "perp": 0.328
+  },
+  "ARB": {
+   "okx_spot": -0.005,
+   "perp": 0.245
+  },
+  "OP": {
+   "okx_spot": 0.218,
+   "perp": 0.297
+  },
+  "ZEC": {
+   "okx_spot": 0.105,
+   "perp": 0.219
+  }
+ }
+}

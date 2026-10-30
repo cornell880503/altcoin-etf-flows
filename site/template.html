@@ -2889,7 +2889,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
       return;
     }
     var lines = it.lines.filter(function (l) { return !l.hidden && !l.right; });
-    var series = lines.map(function (l, k) { return { name: l.label, y: S[l.k], color: CK_COLORS[k % CK_COLORS.length], width: k ? 1.4 : 2, area: !!l.bar, dot: k === 0 }; });
+    var series = lines.map(function (l, k) { return { name: l.label, y: S[l.k], color: l.color || CK_COLORS[k % CK_COLORS.length], width: k ? 1.4 : 2, area: !!l.bar, dot: k === 0 }; });
     var zones = it.zones || [];
     var inv = lines.length && lines[0].invert;
     lineChart(host, { x: S.d, height: 190, left: 56, series: series, includeZero: !inv && series.some(function (s2) { return s2.y.some(function (v) { return v != null && v < 0; }); }),
@@ -2945,7 +2945,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     card.appendChild(nw);
     var S = it.res === 'h' ? ckHourly(it) : it.res === 'table' ? { d: [] } : ckSlice(it.series || { d: [] }, it.range);
     var lg = node('div', 'legend');
-    it.lines.filter(function (l) { return !l.hidden && !l.right; }).forEach(function (l, k) { var sp = node('span'); var key = node('span', 'key'); key.style.background = CK_COLORS[k % CK_COLORS.length]; sp.appendChild(key); sp.appendChild(document.createTextNode(l.label)); lg.appendChild(sp); });
+    it.lines.filter(function (l) { return !l.hidden && !l.right; }).forEach(function (l, k) { var sp = node('span'); var key = node('span', 'key'); key.style.background = l.color || CK_COLORS[k % CK_COLORS.length]; sp.appendChild(key); sp.appendChild(document.createTextNode(l.label)); lg.appendChild(sp); });
     if ((it.marks || []).length) { var sp2 = node('span'); var tr = node('span', 'sq'); tr.style.background = 'var(--accent)'; sp2.appendChild(tr); sp2.appendChild(document.createTextNode('訊號（上圖三角形）')); lg.appendChild(sp2); }
     if ((it.marks || []).some(function (m2) { return m2.tone === 'ref'; })) { var sp3 = node('span'); var tr3 = node('span', 'sq'); tr3.style.background = 'var(--stat)'; sp3.appendChild(tr3); sp3.appendChild(document.createTextNode('CoinKarma 公布的訊號')); lg.appendChild(sp3); }
     card.appendChild(lg);

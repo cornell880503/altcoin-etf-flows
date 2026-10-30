@@ -26,6 +26,7 @@ import csv
 import datetime as dt
 import glob
 import gzip
+import json
 import math
 import os
 import statistics
@@ -52,8 +53,10 @@ CK_STATS = {"per_month": 3.5, "median_days": 1.4, "short_share": 0.40, "long_sha
 CK_WAVES = [
     {"start": "2026-09-12 03:00", "end": "2026-09-15 03:00", "coins": 7, "note": "CoinKarma 貼文"},
     {"start": "2026-09-15 10:00", "end": "2026-09-18 22:00", "coins": 17, "first": ["ARB", "ETH", "BCH", "SUI"], "note": "CoinKarma 文件的範例"},
+    {"start": "2026-10-08", "hours": 3 * 24 + 15, "coins": 18, "avg": 10.4, "up": 18, "note": "CoinKarma 貼文"},
     {"start": "2026-10-13", "hours": 6, "coins": 15, "avg": 4.7, "note": "CoinKarma 貼文"},
     {"start": "2026-10-14", "hours": 7 * 24 + 3, "coins": 19, "avg": 5.1, "up": 16, "note": "CoinKarma 貼文"},
+    {"start": "2026-10-29 10:00", "hours": 13, "coins": 12, "avg": 3.8, "up": 12, "note": "CoinKarma 貼文（13 小時後仍在進行）"},
 ]
 EPOCH = dt.date(2020, 1, 1).toordinal()
 
@@ -375,7 +378,10 @@ def match_ck(D, W):
             cands = [w for w in W if d0 <= w["start"] < d0 + 24]
             s = cands[0]["start"] if cands else d0
             e = s + ck["hours"]
-        if s >= D.n or e < 0:
+        if s >= D.n:  # Binance's files for that day are not out yet
+            out.append({**ck, "ours": None, "pending": True})
+            continue
+        if e < 0:
             out.append({**ck, "ours": None})
             continue
         best, ov = None, 0
@@ -616,6 +622,11 @@ def apply_live(out, D, R, lo, ext, now=None):
                 it["tables"] = [fit_table]
         return None
     E, X = ext["E"], ext["R"]
+    ckc = ck_charts()
+    if ckc:  # an indicators.json computed before the overlay existed
+        for it in out:
+            if it["id"] in ("liq", "resonance") and not any(ln.get("k") == "ck" for ln in it.get("lines", [])):
+                it["lines"] = it.get("lines", []) + [CK_LINE]
     T = D.n - 1
     n_e = E.n
     r0 = max(lo, n_e - RECENT_H)
@@ -638,7 +649,7 @@ def apply_live(out, D, R, lo, ext, now=None):
             ov, bv = O[last], B[last]
             st = "綠色箭頭" if green[last] else "紅色箭頭" if red[last] else "偏多" if ov > 2 else "偏空" if ov < -2 else "中性"
             it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "b": [_r(v, 2) for v in B[r0:n_e]],
-                            "liveFrom": E.hour(live_from)}
+                            "liveFrom": E.hour(live_from), **({"ck": ck_overlay(ckc, hrs)} if ckc else {})}
             it["marks"] = ([{"d": E.hour(i), "label": "綠色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "good"} for i in g_ev if i >= r0]
                            + [{"d": E.hour(i), "label": "紅色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "bad"} for i in r_ev if i >= r0])
             live_txt = "（即時估計）" if last > T else ""
@@ -706,7 +717,8 @@ def apply_live(out, D, R, lo, ext, now=None):
         elif it["id"] == "resonance":
             W = waves(E, X)
             spans, recent, last, o_now, state, cur = wave_view(E, W, O, r0, live_from)
-            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "liveFrom": E.hour(live_from)}
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "liveFrom": E.hour(live_from),
+                            **({"ck": ck_overlay(ckc, hrs)} if ckc else {})}
             it["spans"] = spans
             live_txt = "（即時估計）" if last > T else ""
             it["now"] = {"d": E.hour(last), "v": _r(o_now, 2), "state": state + live_txt, "tone": "good" if cur else "mid"}
@@ -842,6 +854,55 @@ def rsi(px, n=14):
     return out
 
 
+CK_CHARTS = os.path.join(ROOT, "data", "ck", "ck_charts.json")
+CK_LINE = {"k": "ck", "label": "CoinKarma 的 Overall LIQ（讀自他們貼文的圖）", "color": "var(--stat)"}
+
+
+def ck_charts():
+    """CoinKarma's own Overall LIQ and BTC LIQ, read off charts in their posts (research/ck_chart_decode.py):
+    {"overall": {hour: value}, "btc": {hour: value}, "posts": [url]}; later charts win where they overlap."""
+    try:
+        doc = json.load(open(CK_CHARTS))
+    except (OSError, ValueError):
+        return None
+    out = {"overall": {}, "btc": {}, "posts": []}
+    for c in doc.get("charts", []):
+        out["overall"].update(c.get("overall") or {})
+        out["btc"].update(c.get("btc") or {})
+        out["posts"].append(c.get("post"))
+    return out if out["overall"] else None
+
+
+def ck_fidelity(D, R, ckc):
+    """How closely our LIQ follows CoinKarma's charted one: correlations over the hours both have, and the hours
+    at or above 2 / below 0 in each, overall and in the week of 2026-10-22 (when the two parted: ours started a
+    wave that theirs never had)."""
+    def pair(key, ours):
+        xs, ys = [], []
+        for h, v in ckc[key].items():
+            i = hidx(h) - D.h0
+            if 0 <= i < D.n and np.isfinite(ours[i]):
+                xs.append(ours[i])
+                ys.append(v)
+        return np.array(xs), np.array(ys)
+    o_x, o_y = pair("overall", R["overall"])
+    b_x, b_y = pair("btc", R["liq"]["BTC"])
+    if len(o_x) < 200:
+        return None
+    hs = sorted(ckc["overall"])
+    w0, w1 = hidx("2026-10-22T00") - D.h0, hidx("2026-10-28T23") - D.h0
+    wk_ck = [v for h, v in ckc["overall"].items() if w0 <= hidx(h) - D.h0 <= w1]
+    wk_ours = [R["overall"][i] for i in range(max(0, w0), min(D.n, w1 + 1)) if np.isfinite(R["overall"][i])]
+    return {"n": len(o_x), "from": hs[0], "to": hs[-1], "corr_overall": float(np.corrcoef(o_x, o_y)[0, 1]),
+            "corr_btc": float(np.corrcoef(b_x, b_y)[0, 1]) if len(b_x) > 200 else None,
+            "wk_ck_ge2": sum(v >= 2 for v in wk_ck), "wk_ck_lt0": sum(v < 0 for v in wk_ck), "wk_ck_max": max(wk_ck) if wk_ck else None,
+            "wk_ours_ge2": sum(v >= 2 for v in wk_ours), "wk_ours_lt0": sum(v < 0 for v in wk_ours), "wk_ours_min": min(wk_ours) if wk_ours else None}
+
+
+def ck_overlay(ckc, hours):
+    return [ckc["overall"].get(h) for h in hours] if ckc else None
+
+
 def items(item, D=None, ctx=None):
     """The LIQ family as indicator-library items (scripts/ck_indicators.py's item()), and BTC's hourly
     closes over the charts' window (shared by the hourly charts)."""
@@ -865,6 +926,17 @@ def items(item, D=None, ctx=None):
     diff_common = ("CoinKarma 用現貨訂單簿，標準化方式沒有公開；Binance 沒有現貨深度的歷史，只能用合約的 ±1–5% 深度（2023 年起）。"
                    "我們試了兩種標準化（扣不扣平均）、三個深度、四個視窗，選最接近 CoinKarma 公布的共振統計與範例波段的一組"
                    "（research/ck_liq_calibration.json）；只看波段的樣子，沒有看報酬。")
+    ckc = ck_charts()
+    fid = ck_fidelity(D, R, ckc) if ckc else None
+    if fid:
+        diff_common += (f"對照 CoinKarma 自己貼文裡的圖（{short(ck_label(hidx(fid['from'])))} – {short(ck_label(hidx(fid['to'])))}，"
+                        f"{fid['n']} 小時，圖上標「CoinKarma」的那條線）：我們的 Overall LIQ 跟他們的相關係數只有 {fid['corr_overall']:.2f}"
+                        + (f"、BTC LIQ {fid['corr_btc']:.2f}" if fid["corr_btc"] is not None else "")
+                        + f"，所以共振波段的時間點常不一樣。例如 10/22–10/28：他們的 Overall 最高 {fid['wk_ck_max']:.1f}、"
+                        f"沒有一小時到 2（{fid['wk_ck_lt0']} 小時跌破 0）；我們的有 {fid['wk_ours_ge2']} 小時 ≥ 2，最低 {fid['wk_ours_min']:+.1f}，"
+                        "開了一個他們沒有的波段，也就沒有他們 10/29 那個新波段。"
+                        "換成 OKX 現貨訂單簿（OKX 有 2026 年起的歷史）那一週的形狀對了，但整段的相關係數也只有 0.52"
+                        "（research/ck_chart/compare.json）；他們的資料來源推測是 Binance 現貨或多家合併、範圍更寬的訂單簿，沒有免費歷史可以重建。")
     out = []
     # 1) Overall LIQ and BTC LIQ; CoinKarma's arrows: Overall > 2 and BTC LIQ > 3 (green), < -2 and < -3 (red)
     B = L["BTC"]
@@ -882,8 +954,8 @@ def items(item, D=None, ctx=None):
                     ck="LIQ > 3 偏多、< −3 偏空；Overall LIQ > 2 偏多、< −2 偏空。Overall > 2 且 BTC LIQ > 3 是綠色箭頭（分批做多），< −2 且 < −3 是紅色箭頭（較快了結）。適合震盪盤，單邊趨勢中會鈍化。",
                     ours=how + f"Overall LIQ 用 Coin Metrics 的市值加權，幣要有 60 天資料才計入。訊號取每次的第一個小時（前 24 小時沒有），看之後 {H_FWD} 小時 BTC 的表現（{span}）。",
                     diff=diff_common, unit="分", dec=2,
-                    lines=[{"k": "v", "label": "Overall LIQ"}, {"k": "b", "label": "BTC LIQ"}],
-                    series={"h0": hrs[0], "n": len(hrs), "v": cut(O, 2), "b": cut(B, 2)},
+                    lines=[{"k": "v", "label": "Overall LIQ"}, {"k": "b", "label": "BTC LIQ"}] + ([CK_LINE] if ckc else []),
+                    series={"h0": hrs[0], "n": len(hrs), "v": cut(O, 2), "b": cut(B, 2), **({"ck": ck_overlay(ckc, hrs)} if ckc else {})},
                     zones=[{"from": 2, "to": None, "tone": "good", "label": "> 2"}, {"from": None, "to": -2, "tone": "bad", "label": "< −2"}],
                     marks=[{"d": D.hour(i), "label": "綠色箭頭", "tone": "good"} for i in g_ev if i >= r0]
                           + [{"d": D.hour(i), "label": "紅色箭頭", "tone": "bad"} for i in r_ev if i >= r0],
@@ -1279,6 +1351,8 @@ def resonance_item(item, D, R, W, lo, r0, hrs, diff_common):
         if o:
             ours = f"{short(o['start'])} → {short(o['end']) if o['end'] else '進行中'}（{dur(o['hours'])}）；{o['coins']} 幣" \
                 + (f"，平均 {o['avg']:+.1f}%" if o.get("avg") is not None else "") + f"；先 {'、'.join(o['first'][:4])}"
+        elif m.get("pending"):
+            ours = "Binance 那天的訂單簿檔案還沒公布"
         else:
             ours = "同一時間沒有波段"
         ex_rows.append([ck_desc, ours])
@@ -1293,8 +1367,8 @@ def resonance_item(item, D, R, W, lo, r0, hrs, diff_common):
                 ck="Overall ≥ 2 時新的幣可以加入；0–2 之間波段延續、不再加入；跌破 0 波段結束，所有幣同時結束。新幣要有 60 天資料。2022/10–2026/09 約每月 3.5 波、長度中位數約 1.4 天、每波中位數 11 個幣。",
                 ours=f"照 CoinKarma 的規則在我們的 LIQ 上跑（{D.hour(lo)[:10]} 起），報酬用 Binance 永續合約 1 小時收盤：每個幣從它共振那小時的收盤，到波段結束那小時的收盤。時間是台灣時間、K 線收盤。",
                 diff=diff_common, unit="分", dec=2,
-                lines=[{"k": "v", "label": "Overall LIQ（陰影＝波段）"}],
-                series={"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n]]},
+                lines=[{"k": "v", "label": "Overall LIQ（陰影＝波段）"}] + ([CK_LINE] if ck_charts() else []),
+                series={"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n]], **({"ck": ck_overlay(ck_charts(), hrs)} if ck_charts() else {})},
                 zones=[{"from": 2, "to": None, "tone": "good", "label": "≥ 2"}, {"from": None, "to": 0, "tone": "bad", "label": "< 0"}],
                 spans=spans,
                 now={"d": D.hour(last), "v": _r(o_now, 2), "state": state, "tone": "good" if cur else "mid"},
@@ -1392,9 +1466,8 @@ if __name__ == "__main__":
     cal = calibrate(D)
     for r in cal[:12]:
         st = r["stats"] or {}
-        print(f"{r['norm']} depth {r['depth']}% window {r['window']:5d}h {r['mode']}: score {r['score']:.2f} examples {r['examples']}/4 "
+        print(f"{r['norm']} depth {r['depth']}% window {r['window']:5d}h {r['mode']}: score {r['score']:.2f} examples {r['examples']}/{len(CK_WAVES)} "
               + " ".join(f"{k}={v:.2f}" if isinstance(v, float) else f"{k}={v}" for k, v in st.items()))
-    import json
     with open(os.path.join(ROOT, "research", "ck_liq_calibration.json"), "w") as f:
         json.dump({"built": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "data": [D.hour(0), D.hour(D.n - 1)],
                    "coinkarma": CK_STATS, "chosen": PARAMS,
