@@ -35,10 +35,10 @@ WATCH = ["scripts", "site", ".github/workflows/liq-live.yml"]
 TMP = os.environ.get("RUNNER_TEMP", "/tmp")
 # workflows the chain starts: {file: minimum minutes since its last run}. Each does little when nothing is new.
 KICK = {
-    "fetch.yml": 50,         # ETF flows (issuers report after the US close and through the next morning), prices, the page
-    "indicators.yml": 50,    # the daily sources of the indicator library (stablecoins, CFTC, rates, App Store, ...)
-    "book-data.yml": 50,     # Binance's daily order-book and candle files (out about 21-23 hours after the day)
-    "radar.yml": 50,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
+    "fetch.yml": 30,         # ETF flows (issuers report after the US close and through the next morning), prices, the page
+    "indicators.yml": 30,    # the daily sources of the indicator library (stablecoins, CFTC, rates, App Store, ...)
+    "book-data.yml": 30,     # Binance's daily order-book and candle files (out about 21-23 hours after the day)
+    "radar.yml": 30,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
     "okx-history.yml": 180,  # OKX's replayed books (out a day later): calibration, and hours the live loop missed
 }
 
@@ -125,6 +125,7 @@ def kick():
         except Exception as e:
             out[wf] = f"{type(e).__name__}: {str(e)[:80]}"
     print("kick:", out, flush=True)
+    return out
 
 
 def data_rev():
@@ -180,7 +181,10 @@ def main(argv=None):
                     push(f"live: published {done}")
                     print(f"published {done}{'' if new_hour else ' (new data)'} ({time.time() - t0:.0f}s)", flush=True)
                 if new_hour:
-                    kick()
+                    m = meta()
+                    m["kick"] = {"at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), **kick()}
+                    with open(META, "w") as f:  # committed with the next push
+                        json.dump(m, f, indent=1, sort_keys=True)
             elif rounds % 2 == 0:
                 push(f"live book: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
             # --autostash: in a round that commits nothing, the new snapshot is still uncommitted, and a plain
