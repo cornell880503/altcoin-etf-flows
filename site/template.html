@@ -2838,8 +2838,10 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hai
     for (var i = 0; i < n; i++) out.d.push(new Date(t0 + i * 36e5).toISOString().slice(0, 13));
     Object.keys(s).forEach(function (k) { if (Array.isArray(s[k])) out[k] = s[k]; });
     out.liveFrom = s.liveFrom;
-    var hb = (CK && CK.hbtc) || {}, off = hb.h0 ? Math.round((t0 - Date.parse(hb.h0 + ':00:00Z')) / 36e5) : 0;
-    out.btc = out.d.map(function (x, j) { var k = j + off; return hb.v && k >= 0 && k < hb.v.length ? hb.v[k] : null; });
+    if (!Array.isArray(s.btc)) { // a card may carry its own closes (CVD); otherwise the shared hourly BTC closes
+      var hb = (CK && CK.hbtc) || {}, off = hb.h0 ? Math.round((t0 - Date.parse(hb.h0 + ':00:00Z')) / 36e5) : 0;
+      out.btc = out.d.map(function (x, j) { var k = j + off; return hb.v && k >= 0 && k < hb.v.length ? hb.v[k] : null; });
+    }
     return out;
   }
   function ckSlice(S, range) {

@@ -1,0 +1,42 @@
+name: okx-history
+# Replays OKX's daily 5000-level order-book files (scripts/okx_book_history.py) into hourly depth, so the
+# live LIQ's map onto Binance's order books can be fitted on days both exist (data/ck/live/okxhist).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["scripts/okx_book_history.py"]
+permissions:
+  contents: write
+concurrency:
+  group: okx-history
+  cancel-in-progress: false
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet numpy
+      - name: Replay OKX's order books
+        run: python scripts/okx_book_history.py --days 9 --workers 4
+        continue-on-error: true
+        timeout-minutes: 140
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data/ck/live/okxhist || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "okx book history: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do
+              if git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main; then break; fi
+              git rebase --abort 2>/dev/null || true
+              sleep 7
+            done
+          fi

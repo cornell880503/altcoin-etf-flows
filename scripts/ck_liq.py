@@ -420,10 +420,15 @@ LIVE_PENDING = ("即時估計：每小時另外抓 OKX、Coinbase、Hyperliquid 
                 "完成校準後，這裡會接上到最近一小時的估計值。")
 
 
+OKX_HIST = os.path.join(ROOT, "data", "ck", "live", "okxhist")
+
+
 def load_live():
-    """Live books (scripts/fetch_book_live.py): {(venue, coin): {hour: log(bidR / askR)}}, {coin: {hour: close}}."""
+    """Live books (scripts/fetch_book_live.py) and OKX's replayed daily books (scripts/okx_book_history.py,
+    which win where both have an hour: 120 samples an hour against 6): {(venue, coin): {hour: log(bidR /
+    askR)}}, {coin: {hour: close}}."""
     feats, px = {}, {}
-    for p in sorted(glob.glob(os.path.join(LIVE, "*.csv.gz"))):
+    for p in sorted(glob.glob(os.path.join(LIVE, "*.csv.gz"))) + sorted(glob.glob(os.path.join(OKX_HIST, "*.csv.gz"))):
         with gzip.open(p, "rt", newline="") as f:
             rd = csv.reader(f)
             next(rd, None)
@@ -518,13 +523,16 @@ def live_extend(D, R, now=None):
         o_live = np.where(den >= 0.5 * total, num / np.where(den > 0, den, 1), np.nan)
     E = copy.copy(D)
     E.n = D.n + k
-    E.close = {}
+    E.close, E.mcap = {}, {}
     for c in COINS:
-        lp = np.full(k, np.nan)
-        for h, v in px.get(c, {}).items():
-            if Tabs < h <= L:
-                lp[h - Tabs - 1] = v
-        E.close[c] = np.concatenate([D.close[c], lp])
+        cl = np.concatenate([D.close[c], np.full(k, np.nan)])
+        for h, v in px.get(c, {}).items():  # OKX swap closes where Binance's candles are not out yet
+            i = h - D.h0
+            if 0 <= i < E.n and not np.isfinite(cl[i]) and h <= L:
+                cl[i] = v
+        E.close[c] = cl
+        fin = np.flatnonzero(np.isfinite(D.mcap[c]))
+        E.mcap[c] = np.concatenate([D.mcap[c], np.full(k, D.mcap[c][fin[-1]] if len(fin) else np.nan)])
     X = {"liq": {c: np.concatenate([R["liq"][c], liq_live.get(c, np.full(k, np.nan))]) for c in COINS},
          "elig": {c: np.concatenate([R["elig"][c], np.full(k, elig_T[c] and c in w) & np.isfinite(liq_live.get(c, np.full(k, np.nan)))])
                   for c in COINS},
@@ -605,6 +613,41 @@ def apply_live(out, D, R, lo, ext, now=None):
                          "tone": "good" if ov > 2 else "bad" if ov < -2 else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
             it["tables"] = [fit_table]
+        elif it["id"] == "liqacc":
+            Bv = X["liq"]["BTC"]
+            acc = np.full(n_e, np.nan)
+            vb = np.isfinite(Bv)
+            c1 = np.concatenate([[0.0], np.cumsum(np.where(vb, Bv, 0.0))])
+            cn = np.concatenate([[0], np.cumsum(vb)])
+            for i in range(23, n_e):
+                if cn[i + 1] - cn[i - 23] >= 20 and vb[i]:
+                    acc[i] = c1[i + 1] - c1[i - 23]
+            with np.errstate(invalid="ignore"):
+                a_up = first_hours(acc >= 60, 24, np.isfinite(acc), lo)
+                a_dn = first_hours(acc <= -60, 24, np.isfinite(acc), lo)
+            la = n_e - 1
+            while la > 0 and not np.isfinite(acc[la]):
+                la -= 1
+            av = acc[la]
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 1) for v in acc[r0:n_e]], "liveFrom": E.hour(live_from)}
+            it["marks"] = ([{"d": E.hour(i), "label": "≥ +60", "tone": "good"} for i in a_up if i >= r0]
+                           + [{"d": E.hour(i), "label": "≤ −60", "tone": "bad"} for i in a_dn if i >= r0])
+            it["now"] = {"d": E.hour(la), "v": _r(av, 1), "state": ("偏多" if av >= 60 else "偏空" if av <= -60 else "中性") + ("（即時估計）" if la > T else ""),
+                         "tone": "good" if av >= 60 else "bad" if av <= -60 else "mid"}
+            it["chartNote"] = CHART_NOTE + " " + note
+        elif it["id"] == "screener":
+            sc = screener_item(lambda **kw: kw, E, X, lo, "")
+            it["now"] = dict(sc["now"], state=sc["now"]["state"] + ("（即時估計）" if hidx(sc["now"]["d"]) - D.h0 > T else ""))
+            if it.get("tables") and sc.get("tables"):
+                it["tables"][0] = sc["tables"][0]
+        elif it["id"] == "ari":
+            a_new, _ = ari_item(lambda **kw: kw, E, X, lo, r0, hrs)
+            for key in ("series", "marks", "now"):
+                it[key] = a_new[key]
+            it["series"]["liveFrom"] = E.hour(live_from)
+            if hidx(it["now"]["d"]) - D.h0 > T:
+                it["now"]["state"] = (it["now"].get("state") or "") + "（即時估計）"
+            it["chartNote"] = CHART_NOTE + " " + note
         elif it["id"] == "resonance":
             W = waves(E, X)
             spans, recent, last, o_now, state, cur = wave_view(E, W, O, r0, live_from)
@@ -631,7 +674,7 @@ def patch_live(ck, item):
                 it["chartNote"] = CHART_NOTE + " " + LIVE_PENDING
         return ck
 
-    if not glob.glob(os.path.join(LIVE, "*.csv.gz")):
+    if not glob.glob(os.path.join(LIVE, "*.csv.gz")) and not glob.glob(os.path.join(OKX_HIST, "*.csv.gz")):
         return pending()
     D = Data()
     if not D.ok or D.first.get("BTC") is None:
@@ -839,7 +882,9 @@ def items(item, D=None, ctx=None):
         with np.errstate(invalid="ignore"):
             up_e, dn_e = first_hours(arr >= thr, 24, ~np.isnan(arr), lo), first_hours(arr <= -thr, 24, ~np.isnan(arr), lo)
         st = [x for x in (ev_stats_h(btc, up_e, H_FWD, lo, f"≥ +{thr:,}"), ev_stats_h(btc, dn_e, H_FWD, lo, f"≤ −{thr:,}")) if x]
-        v = arr[last]
+        fin_ = np.flatnonzero(np.isfinite(arr))
+        lk = int(fin_[-1]) if len(fin_) else last
+        v = arr[lk]
         valid = arr[lo:][~np.isnan(arr[lo:])]
         p_hi = float(np.mean(valid >= thr) * 100) if len(valid) else 0
         p_lo = float(np.mean(valid <= -thr) * 100) if len(valid) else 0
@@ -852,7 +897,7 @@ def items(item, D=None, ctx=None):
                         unit=unit, dec=0, lines=[{"k": "v", "label": zh, "bar": True}],
                         series={"h0": hrs[0], "n": len(hrs), "v": cut(arr, 0)},
                         zones=[{"from": thr, "to": None, "tone": "good", "label": f"≥ {thr:,}"}, {"from": None, "to": -thr, "tone": "bad", "label": f"≤ −{thr:,}"}],
-                        now={"d": D.hour(last), "v": _r(v, 0), "state": "偏多" if v >= thr else "偏空" if v <= -thr else "中性",
+                        now={"d": D.hour(lk), "v": _r(v, 0), "state": "偏多" if v >= thr else "偏空" if v <= -thr else "中性",
                              "tone": "good" if v >= thr else "bad" if v <= -thr else "mid"},
                         stats=st, statsKind="labeled", baseLabel="隨機一小時", src="Binance 合約公開資料（bookDepth）"))
     # CVD: BTC perpetual taker buys minus taker sells (US$), cumulated over the chart window
@@ -1221,7 +1266,7 @@ def screener_item(item, D, R, lo, diff_common):
         return float((x < L[c][i]).mean() * 100 + (x == L[c][i]).mean() * 50)
 
     last = n - 1
-    while last > 0 and np.isnan(R["overall"][last]):
+    while last > 0 and (np.isnan(R["overall"][last]) or np.isnan(rb[last])):  # LIQ and prices both known
         last -= 1
     rows = []
     for c in COINS:

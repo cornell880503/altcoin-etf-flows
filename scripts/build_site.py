@@ -125,6 +125,11 @@ def indicators():
         ck = ck_liq.patch_live(ck, ck_indicators.item)
     except Exception as e:  # numpy missing, or no live data yet
         print("live LIQ hours skipped:", type(e).__name__, e, file=sys.stderr)
+    try:  # the hourly values of the other cards (data/ck/live/extra.json)
+        import ck_live
+        ck = ck_live.patch(ck)
+    except Exception as e:
+        print("live values skipped:", type(e).__name__, e, file=sys.stderr)
     return ck
 
 

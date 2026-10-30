@@ -143,7 +143,7 @@ def okx_closes():
     """The OKX swaps' last confirmed 1-hour candles: {(hour, coin): close}."""
     out = {}
     for c in COINS:
-        j = get(f"https://www.okx.com/api/v5/market/candles?instId={c}-USDT-SWAP&bar=1H&limit=6")
+        j = get(f"https://www.okx.com/api/v5/market/candles?instId={c}-USDT-SWAP&bar=1H&limit=100")
         for r in (j or {}).get("data") or []:
             if len(r) >= 9 and r[8] == "1":  # confirmed (closed) candle
                 h = dt.datetime.fromtimestamp(int(r[0]) / 1000, UTC).strftime("%Y-%m-%dT%H")

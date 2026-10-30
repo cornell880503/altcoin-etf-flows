@@ -1,25 +1,24 @@
 name: liq-live
-# The hourly LIQ: snapshots of live order books (scripts/fetch_book_live.py: OKX swaps, Coinbase spot,
-# Hyperliquid) twice an hour, three each, averaged per UTC hour into data/ck/live/hours/. Binance's own
-# order-book files come the next day (book-data); until then the site's LIQ and resonance cards use these
-# books mapped onto Binance's scale (scripts/ck_liq.py). The site is rebuilt once per completed hour.
+# The hourly layer of the site (scripts/live_loop.py): one job of about three hours that snapshots live
+# order books every 10 minutes, fetches the other live values and rebuilds the site once per completed
+# hour, then dispatches its successor. GitHub's cron fires too seldom and too late for hourly work (on
+# this repo about one scheduled run in five, often hours late), while a workflow_dispatch from the
+# job itself starts within a minute. live-watchdog.yml restarts the chain if it ever breaks.
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["scripts/fetch_book_live.py"]
-  schedule:
-    - cron: "10 * * * *"
-    - cron: "40 * * * *"
+    paths: ["scripts/live_loop.py", "scripts/fetch_book_live.py", "scripts/fetch_live_extras.py", ".github/workflows/liq-live.yml"]
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: liq-live
   cancel-in-progress: false
 jobs:
   live:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 200
     steps:
       - uses: actions/checkout@v5
         with:
@@ -27,68 +26,24 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Order-book snapshots
-        run: python scripts/fetch_book_live.py --rounds 3 --gap 100
-        continue-on-error: true
-        timeout-minutes: 10
-      - name: Commit the snapshots
-        run: |
-          git config user.name "etf-flows-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A data/ck/live || true
-          if git diff --cached --quiet; then echo "no changes"; else
-            git commit -q -m "live book: $(date -u +%Y-%m-%dT%H:%MZ)"
-            ok=0
-            for i in 1 2 3 4 5; do
-              if git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main; then ok=1; break; fi
-              git rebase --abort 2>/dev/null || true
-              sleep 7
-            done
-            if [ "$ok" = 1 ]; then echo "pushed"; else echo "::warning::could not push the live-book commit"; fi
-          fi
-      - name: Is there a newly completed hour?
-        id: due
-        run: |
-          H=$(date -u -d '1 hour ago' +%Y-%m-%dT%H)
-          P=$(python -c "import json; print(json.load(open('data/ck/live/_meta.json')).get('published_hour', ''))" 2>/dev/null || true)
-          if [ "$H" != "$P" ]; then echo "hour=$H" >> "$GITHUB_OUTPUT"; echo "publish for $H"; else echo "$H already published"; fi
-      - name: Build the website
-        if: steps.due.outputs.hour != ''
-        run: |
-          python -m pip install --quiet numpy
-          git pull -q --rebase origin main || true
-          python scripts/build_site.py --out "$RUNNER_TEMP/site"
-      - name: Publish it to the "site" branch
-        if: steps.due.outputs.hour != ''
-        run: |
-          cd "$RUNNER_TEMP/site"
-          git init -q -b site
-          git config user.name "etf-flows-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -q -m "site: $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:site && break; sleep 5; done
+      - run: python -m pip install --quiet numpy
+      - name: Live loop (about three hours)
+        run: python scripts/live_loop.py --minutes 170 --every 10
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Record the published hour
-        if: steps.due.outputs.hour != ''
+        continue-on-error: true
+        timeout-minutes: 185
+      - name: Hand over to the next run
+        if: always()
         run: |
-          python - <<'PY'
-          import json
-          p = "data/ck/live/_meta.json"
-          try:
-              m = json.load(open(p))
-          except Exception:
-              m = {}
-          m["published_hour"] = "${{ steps.due.outputs.hour }}"
-          json.dump(m, open(p, "w"), indent=1, sort_keys=True)
-          PY
-          git add data/ck/live/_meta.json
-          if ! git diff --cached --quiet; then
-            git commit -q -m "live book: published ${{ steps.due.outputs.hour }}"
-            for i in 1 2 3 4 5; do
-              if git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main; then break; fi
-              git rebase --abort 2>/dev/null || true
-              sleep 7
-            done
+          m=$(cat "$RUNNER_TEMP/live_minutes" 2>/dev/null || echo 0)
+          r=$(cat "$RUNNER_TEMP/live_reason" 2>/dev/null || echo error)
+          if [ "$r" = update ] || [ "${m%.*}" -ge 20 ]; then
+            curl -s -o /dev/null -w "dispatch %{http_code}\n" -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/liq-live.yml/dispatches" -d '{"ref":"main"}'
+          else
+            echo "the loop ended after $m minutes ($r): no hand-over (live-watchdog will retry)"
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
