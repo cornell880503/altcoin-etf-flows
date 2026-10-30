@@ -1,0 +1,30 @@
+{
+ "AAVE": {
+  "days": 50,
+  "hours": 1200,
+  "errors": [],
+  "first_5000lv": "2026-01-01",
+  "secs": 100
+ },
+ "NEAR": {
+  "days": 50,
+  "hours": 1200,
+  "errors": [],
+  "first_5000lv": "2026-01-01",
+  "secs": 190
+ },
+ "TON": {
+  "days": 0,
+  "hours": 0,
+  "errors": [],
+  "first_5000lv": "2026-01-01",
+  "secs": 201
+ },
+ "GRAM": {
+  "days": 50,
+  "hours": 1200,
+  "errors": [],
+  "first_5000lv": "2026-07-01",
+  "secs": 248
+ }
+}
