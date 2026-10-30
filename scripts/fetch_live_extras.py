@@ -5,7 +5,7 @@ rank are daily or weekly by nature). Output: data/ck/live/extra.json, read by ck
 
   funding   OKX BTC-USDT-SWAP (current period, 8h) and Hyperliquid BTC (hourly x 8), open-interest weighted
             (Binance's own rate is not reachable live; its monthly file comes after the month)
-  basis     OKX BTC-USD front quarter (14+ days left), annualized x 360 / days against OKX's BTC-USD index
+  basis     OKX BTC-USD front quarterly (14+ days left), annualized x 360 / days against OKX's BTC-USD index
   usdcprem  Binance spot USDCUSDT 1-hour candles (data-api.binance.vision answers runners): the last hour
             and today's mean
   cvd       Binance spot BTCUSDT 1-hour candles: taker buys minus taker sells, the last 60 days
@@ -70,7 +70,9 @@ def funding():
 def basis():
     now_ms = time.time() * 1000
     futs = get("https://www.okx.com/api/v5/public/instruments?instType=FUTURES&instFamily=BTC-USD")["data"]
-    cands = [(int(f["expTime"]), f["instId"]) for f in futs if int(f["expTime"]) - now_ms >= 14 * 86400000]
+    # quarterlies only, like Binance's COIN-M history (OKX also lists weeklies and monthlies)
+    cands = [(int(f["expTime"]), f["instId"]) for f in futs
+             if f.get("alias") in ("quarter", "next_quarter") and int(f["expTime"]) - now_ms >= 14 * 86400000]
     exp, inst = min(cands)
     last = float(get(f"https://www.okx.com/api/v5/market/ticker?instId={inst}")["data"][0]["last"])
     idx = float(get("https://www.okx.com/api/v5/market/index-tickers?instId=BTC-USD")["data"][0]["idxPx"])
