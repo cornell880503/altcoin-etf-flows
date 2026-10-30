@@ -183,7 +183,9 @@ def main(argv=None):
                     kick()
             elif rounds % 2 == 0:
                 push(f"live book: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
-            sh("git pull -q --rebase -X theirs origin main")
+            # --autostash: in a round that commits nothing, the new snapshot is still uncommitted, and a plain
+            # pull would refuse to run (so updates were only seen every other round)
+            sh("git pull -q --rebase --autostash -X theirs origin main")
             if tree() != start_tree:
                 reason = "update"
                 break
