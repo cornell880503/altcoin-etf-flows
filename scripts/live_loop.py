@@ -7,8 +7,9 @@ Every `--every` minutes: a snapshot of the live order books (fetch_book_live.py)
 UTC hour: the other live values (fetch_live_extras.py), then the site is rebuilt and published, so the
 page is at most about an hour behind; then the data workflows in KICK are started (GitHub's own schedule
 fires on this repo about one run in five, often hours late: book-data's two-hourly cron ran once on
-2026-10-29). The site is also rebuilt in any round in which their data arrived on main (anything under
-data/ outside data/ck/live). Data commits go to main, the site to the "site" branch. The loop ends after
+2026-10-29). The site is also rebuilt in any round in which new Binance files from book-data arrived on
+main (the other workflows publish the page themselves). Data commits go to main, the site to the "site"
+branch. The loop ends after
 `--minutes`, or early when the live scripts, the template or the workflow change on main (so a new
 version takes over within one round). It leaves the minutes run and the reason in
 $RUNNER_TEMP/live_minutes and live_reason for the workflow's hand-over step.
@@ -38,7 +39,7 @@ KICK = {
     "indicators.yml": 50,    # the daily sources of the indicator library (stablecoins, CFTC, rates, App Store, ...)
     "book-data.yml": 50,     # Binance's daily order-book and candle files (out about 21-23 hours after the day)
     "radar.yml": 50,         # the leverage radar (Binance's new day, Hyperliquid's midnight snapshot)
-    "okx-history.yml": 1200,  # OKX's replayed books for the days the live loop missed (out a day later)
+    "okx-history.yml": 180,  # OKX's replayed books (out a day later): calibration, and hours the live loop missed
 }
 
 
@@ -127,11 +128,11 @@ def kick():
 
 
 def data_rev():
-    """A fingerprint of the data the page shows other than the live loop's own (the tree hashes under data/
-    without data/ck/live; works in the runner's shallow clone, where commit history would not)."""
-    top = [ln for ln in sh("git ls-tree HEAD data/").stdout.splitlines() if not ln.endswith("\tdata/ck")]
-    ck = [ln for ln in sh("git ls-tree HEAD data/ck/").stdout.splitlines() if not ln.endswith("\tdata/ck/live")]
-    return hashlib.sha1("\n".join(top + ck).encode()).hexdigest()[:16]
+    """A fingerprint of the Binance files book-data adds (the tree hashes under data/ck/book and data/ck/px1h,
+    without their run reports; it works in the runner's shallow clone). That workflow does not publish the
+    page itself, while fetch, indicators and radar do: rebuilding after them too would only add Pages builds."""
+    rows = sh("git ls-tree HEAD data/ck/book/ data/ck/px1h/").stdout.splitlines()
+    return hashlib.sha1("\n".join(ln for ln in rows if not ln.endswith("_meta.json")).encode()).hexdigest()[:16]
 
 
 def meta():
