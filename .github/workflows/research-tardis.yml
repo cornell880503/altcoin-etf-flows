@@ -1,0 +1,46 @@
+name: research-tardis
+# One-off research run: a day of full spot order books from Tardis.dev's free first-of-month sample
+# (research/tardis_spot_day.py), to lay against CoinKarma's charted LIQ. Writes research/spot/.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["research/tardis_spot_day.py"]
+permissions:
+  contents: write
+concurrency:
+  group: research-tardis
+  cancel-in-progress: false
+jobs:
+  day:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        items:
+          - "binance:BTCUSDT,coinbase:BTC-USD"
+          - "binance:ETHUSDT,binance:XRPUSDT,binance:BNBUSDT,binance:SOLUSDT,binance:DOGEUSDT,coinbase:ETH-USD"
+          - "binance:TRXUSDT,binance:ADAUSDT,binance:LINKUSDT,binance:HYPEUSDT,binance:AVAXUSDT,binance:SUIUSDT,binance:BCHUSDT,binance:LTCUSDT,binance:DOTUSDT"
+          - "binance:UNIUSDT,binance:AAVEUSDT,binance:NEARUSDT,binance:TONUSDT,binance:ATOMUSDT,binance:APTUSDT,binance:ARBUSDT,binance:OPUSDT,binance:ZECUSDT"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet numpy
+      - name: Replay the day
+        run: python research/tardis_spot_day.py --date 2026-10-01 --items "${{ matrix.items }}"
+        continue-on-error: true
+        timeout-minutes: 80
+      - name: Commit
+        run: |
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/spot || true
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -q -m "research tardis: $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5 6 7 8 9 10; do git pull --rebase -X theirs -q origin main && git push -q origin HEAD:main && break; git rebase --abort 2>/dev/null || true; sleep $((RANDOM % 20 + 5)); done
+          fi
