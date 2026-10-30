@@ -33,5 +33,5 @@ jobs:
           git add -A research/probe_books_more || true
           if git diff --cached --quiet; then echo "no changes"; else
             git commit -q -m "probe books: $(date -u +%Y-%m-%dT%H:%MZ)"
-            for i in 1 2 3 4 5 6; do git pull --rebase -X theirs -q origin main && git push -q origin HEAD:main && break; git rebase --abort 2>/dev/null; sleep 9; done
+            for i in 1 2 3 4 5 6; do git pull --rebase -X theirs -q origin main && git push -q origin HEAD:main && break; git rebase --abort 2>/dev/null || true; sleep 9; done
           fi

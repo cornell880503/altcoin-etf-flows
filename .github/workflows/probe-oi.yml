@@ -35,5 +35,5 @@ jobs:
             echo "no changes"
           else
             git commit -m "probe-oi: $(date -u +%Y-%m-%dT%H:%MZ)"
-            for i in 1 2 3 4; do git pull --rebase -X theirs && git push && break; git rebase --abort 2>/dev/null; sleep 7; done
+            for i in 1 2 3 4; do git pull --rebase -X theirs && git push && break; git rebase --abort 2>/dev/null || true; sleep 7; done
           fi
