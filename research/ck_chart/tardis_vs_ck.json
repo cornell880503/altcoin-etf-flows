@@ -1,0 +1,50 @@
+{
+ "day": "2026-10-01",
+ "hours": 24,
+ "ck_btc_range": [
+  1.45,
+  2.17
+ ],
+ "btc": {
+  "binance spot 0.25% quantity": 0.068,
+  "binance spot 0.25% US$": 0.067,
+  "binance spot 0.5% quantity": 0.31,
+  "binance spot 0.5% US$": 0.309,
+  "binance spot 1% quantity": 0.781,
+  "binance spot 1% US$": 0.781,
+  "binance spot 2% quantity": 0.862,
+  "binance spot 2% US$": 0.863,
+  "binance spot 3% quantity": 0.828,
+  "binance spot 3% US$": 0.829,
+  "binance spot 5% quantity": 0.881,
+  "binance spot 5% US$": 0.883,
+  "binance spot 10% quantity": 0.603,
+  "binance spot 10% US$": 0.617,
+  "coinbase spot 0.25% quantity": 0.688,
+  "coinbase spot 0.25% US$": 0.688,
+  "coinbase spot 0.5% quantity": 0.762,
+  "coinbase spot 0.5% US$": 0.762,
+  "coinbase spot 1% quantity": 0.85,
+  "coinbase spot 1% US$": 0.85,
+  "coinbase spot 2% quantity": 0.897,
+  "coinbase spot 2% US$": 0.897,
+  "coinbase spot 3% quantity": 0.88,
+  "coinbase spot 3% US$": 0.879,
+  "coinbase spot 5% quantity": 0.847,
+  "coinbase spot 5% US$": 0.845,
+  "coinbase spot 10% quantity": 0.779,
+  "coinbase spot 10% US$": 0.77,
+  "binance perp 5% (ours)": 0.761,
+  "okx spot (~1%)": 0.734
+ },
+ "overall": {
+  "binance spot 0.25% quantity": 0.184,
+  "binance spot 0.5% quantity": 0.383,
+  "binance spot 1% quantity": 0.773,
+  "binance spot 2% quantity": 0.851,
+  "binance spot 3% quantity": 0.863,
+  "binance spot 5% quantity": 0.881,
+  "binance spot 10% quantity": 0.823,
+  "ours (binance perp)": 0.604
+ }
+}
