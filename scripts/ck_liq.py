@@ -17,7 +17,10 @@ mean of its 30-second snapshots (data/ck/book, scripts/fetch_book_binance.py; Bi
 spot depth history), hourly perp candles (data/ck/px1h) and daily market caps (Coin Metrics,
 data/oi/cm). CoinKarma does not publish the standardization: ours is a rolling z-score of
 log(bids / asks); the depth band and window are chosen by matching CoinKarma's published wave
-statistics (calibrate()), and the choice is reported with the items.
+statistics (calibrate()), and the choice is reported with the items. CoinKarma's own source turned out to be
+Binance spot books within about 10 % (research/ck_backtest.py), which we collect from 2026-10-30
+(scripts/binance_spot_ws.py): once they cover the 720-hour window, the family switches to them from that
+hour on (spot_extend), the hours before staying on the perpetuals.
 
     python3 scripts/ck_liq.py            print the calibration grid and the waves
 """
@@ -470,6 +473,128 @@ def load_live():
     return feats, px, difs
 
 
+# ------------------------------------------------------------------ Binance spot books (our own, from 2026-10-30)
+# CoinKarma's LIQ follows Binance spot books within about 10 % of the price (research/ck_chart/backtest.json). Binance
+# keeps no history of them, so scripts/binance_spot_ws.py (binspot.yml) collects them. Once they cover the
+# standardization window (720 hours from the first one) and Binance's perpetual files have reached that hour, the
+# LIQ family takes its values from them from that hour on (spot_extend); the hours before stay on the perpetuals.
+SPOT_BAND = 10        # % of the price
+SPOT_MIN_N = 90       # samples (one every 10 seconds) an hour needs: a quarter of an hour
+SPOT_SWITCH_H = 720   # = PARAMS["window"]
+# a book whose snapshot does not cover the band (BTC, ETH) learns its farther levels as they change: in Tardis's replay of
+# 2026-10-01, BTC's 10 % depth grew by half over the first 6-12 hours, then held. Its hours count from a day on.
+SPOT_WARM_H = 24
+
+
+def load_spot():
+    """Our hourly Binance spot depth within SPOT_BAND % of the price: {"v": {coin: {hour index: (bids, asks in coins, bids,
+    asks in US$)}}, "mid": {coin: {hour index: mean mid}}, "info": {coin: (hours, the last hour's exact range on the bid
+    and ask side in %, its samples)}, "warming": hours left before BTC's book counts (0 once it does, None without
+    data)}. An hour counts with SPOT_MIN_N samples, and when the snapshots cover the band or the book is SPOT_WARM_H
+    old (the first day's files, from inside the hourly loop, record neither and do not count)."""
+    import binance_spot_ws as bws
+    v, mids, info, warming = {}, {}, {}, None
+    k = SPOT_BAND
+    for h, coins in sorted(bws.read_hours().items()):
+        i = hidx(h)
+        for c, r in coins.items():
+            c = ALIAS.get(c, c)
+            if r.get("mid"):
+                mids.setdefault(c, {})[i] = r["mid"]
+            if r.get("n", 0) < SPOT_MIN_N or r.get("age_h") is None or r.get("exact_b") is None or r.get("exact_a") is None:
+                continue
+            if min(r["exact_b"], r["exact_a"]) < k and r["age_h"] < SPOT_WARM_H:
+                if c == "BTC":
+                    warming = max(1, math.ceil(SPOT_WARM_H - r["age_h"]))
+                continue
+            q = tuple(r.get(f"{x}{k}") for x in ("bidq", "askq", "bidn", "askn"))
+            if all(x is not None and x > 0 for x in q):
+                v.setdefault(c, {})[i] = q
+                info[c] = (len(v[c]), r["exact_b"], r["exact_a"], r["n"])
+                if c == "BTC":
+                    warming = 0
+    return {"v": v, "mid": mids, "info": info, "warming": warming}
+
+
+def spot_progress(v):
+    b = v.get("BTC") or {}
+    if not b:
+        return None
+    return {"first": min(b), "last": max(b), "hours": len(b), "due": min(b) + SPOT_SWITCH_H}
+
+
+def spot_extend(D, R, now=None):
+    """The LIQ family on the spot books from the switch hour S (the first spot hour + SPOT_SWITCH_H) to the last
+    complete hour: a coin's LIQ is log(bids / asks) within SPOT_BAND % (quantities), standardized as ours (PARAMS)
+    on the spot hours alone; Overall LIQ weighted the same way; the order-book difference is bids - asks in US$.
+    Before S, Binance's perpetual values. None until S has come and Binance's perpetual files reach S - 1 (so the
+    two meet without a hole); then the same structure as live_extend, with "spot"."""
+    sp = load_spot()
+    pg = spot_progress(sp["v"])
+    if not pg:
+        return None
+    S, T = pg["due"], D.h0 + D.n - 1
+    now = now or dt.datetime.now(dt.timezone.utc)
+    L = min((now.date().toordinal() - EPOCH) * 24 + now.hour - 1, pg["last"])
+    if T < S - 1 or L < S:
+        return None
+    n_e = max(D.n, L - D.h0 + 1)
+    k, iS = n_e - D.n, S - D.h0
+    _, px, _ = load_live()
+    liq, elig, dif, base_e = {}, {}, {}, {}
+    for c in COINS:
+        raw, dd = np.full(n_e, np.nan), np.full(n_e, np.nan)
+        for h, (bq, aq, bn, an) in sp["v"].get(c, {}).items():
+            i = h - D.h0
+            if 0 <= i < n_e:
+                raw[i] = math.log(bq / aq)
+                dd[i] = bn - an
+        z = standardize(raw, PARAMS["norm"], PARAMS["window"])
+        liq[c] = np.concatenate([np.concatenate([R["liq"][c], np.full(k, np.nan)])[:iS], z[iS:]])
+        e = D.eligible(c)
+        base_e[c] = np.concatenate([e, np.full(k, bool(e[-1]))])
+        elig[c] = base_e[c] & np.isfinite(liq[c])
+        with np.errstate(invalid="ignore"):
+            perp = np.concatenate([D.bid[5][c] - D.ask[5][c], np.full(k, np.nan)])
+        dif[c] = np.concatenate([perp[:iS], dd[iS:]])
+    E = copy.copy(D)
+    E.n = n_e
+    E.close, E.mcap = {}, {}
+    for c in COINS:
+        cl = np.concatenate([D.close[c], np.full(k, np.nan)])
+        for src in (px.get(c, {}), sp["mid"].get(c, {})):  # OKX swap closes, else the spot mid, where Binance's candles are not out
+            for h, val in src.items():
+                i = h - D.h0
+                if 0 <= i < n_e and not np.isfinite(cl[i]) and h <= L:
+                    cl[i] = val
+        E.close[c] = cl
+        fin = np.flatnonzero(np.isfinite(D.mcap[c]))
+        E.mcap[c] = np.concatenate([D.mcap[c], np.full(k, D.mcap[c][fin[-1]] if len(fin) else np.nan)])
+    num, den, tot = np.zeros(n_e), np.zeros(n_e), np.zeros(n_e)
+    for c in COINS:  # at least half of the counted market cap must have a value
+        okw = base_e[c] & np.isfinite(E.mcap[c])
+        ok = okw & elig[c]
+        num += np.where(ok, E.mcap[c] * np.nan_to_num(liq[c]), 0.0)
+        den += np.where(ok, np.nan_to_num(E.mcap[c]), 0.0)
+        tot += np.where(okw, np.nan_to_num(E.mcap[c]), 0.0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        o_s = np.where((den > 0) & (den >= 0.5 * tot), num / np.where(den > 0, den, 1), np.nan)
+    overall = np.concatenate([np.concatenate([R["overall"], np.full(k, np.nan)])[:iS], o_s[iS:]])
+    return {"E": E, "R": {"liq": liq, "elig": elig, "overall": overall, "dif": dif}, "fits": {}, "k": k,
+            "spot": {"from": S, "first": pg["first"], "hours": pg["hours"], "info": sp["info"]}}
+
+
+def extend(D, R, now=None):
+    """The hours after Binance's last perpetual file: from our spot books once they are ready, else live estimates."""
+    try:
+        ext = spot_extend(D, R, now)
+        if ext:
+            return ext
+    except Exception as e:
+        print(f"spot books skipped: {type(e).__name__}: {e}", flush=True)
+    return live_extend(D, R, now)
+
+
 def map_venue(c, feats, x, h0, Tabs, L):
     """The live venue whose series best tracks x (Binance's, on the grid from h0) on the hours both have up
     to Tabs, mapped onto x for the hours Tabs+1..L: a + b * live (an offset only until FIT_FULL hours) plus
@@ -610,13 +735,22 @@ def apply_live(out, D, R, lo, ext, now=None):
     if not ext:
         return None
     fits = ext.get("fits") or {}
+    spot = ext.get("spot")
     rows = []
-    for c in COINS:
-        f = fits.get(c)
-        rows.append([c, LIVE_VENUES[f["venue"]] if f else "—", f["kind"] if f else "重疊不足", f["overlap"] if f else 0,
-                     f"{f['r2']:.2f}" if f and f["r2"] is not None else "—"])
-    fit_table = {"title": "即時估計的校準（每個幣選最貼近 Binance 的一家）", "head": ["幣", "即時資料", "方式", "重疊小時", "R²"], "rows": rows, "text": [1, 2]}
-    if not ext.get("k"):
+    if spot:
+        for c in COINS:
+            f = spot["info"].get(c)
+            rows.append([c, f[0] if f else 0, f"{f[1]:.1f}% ／ {f[2]:.1f}%" if f and f[1] is not None and f[2] is not None else "—",
+                         int(f[3]) if f and f[3] else "—"])
+        fit_table = {"title": "Binance 現貨訂單簿（我們自己收集）", "head": ["幣", "有資料的小時", "最近一小時完整掌握的範圍（買／賣）", "最近一小時的抽樣數"],
+                     "rows": rows, "text": [2]}
+    else:
+        for c in COINS:
+            f = fits.get(c)
+            rows.append([c, LIVE_VENUES[f["venue"]] if f else "—", f["kind"] if f else "重疊不足", f["overlap"] if f else 0,
+                         f"{f['r2']:.2f}" if f and f["r2"] is not None else "—"])
+        fit_table = {"title": "即時估計的校準（每個幣選最貼近 Binance 的一家）", "head": ["幣", "即時資料", "方式", "重疊小時", "R²"], "rows": rows, "text": [1, 2]}
+    if not ext.get("k") and not spot:
         for it in out:
             if it["id"] == "liq":
                 it["tables"] = [fit_table]
@@ -632,11 +766,25 @@ def apply_live(out, D, R, lo, ext, now=None):
     r0 = max(lo, n_e - RECENT_H)
     r0c = max(lo, D.n - RECENT_H)
     hrs = [E.hour(i) for i in range(r0, n_e)]
-    live_from = T + 1
     O, B = X["overall"], X["liq"]["BTC"]
-    note = (f"最後 {n_e - 1 - T} 小時（{short(E.label(live_from))} 起，台灣時間）是即時估計：Binance 的訂單簿檔案隔天才公布，"
-            "這段改用 OKX、Coinbase、Hyperliquid 每 10 分鐘抓的訂單簿，換算成 Binance 的尺度（校準見下表）；Binance 檔案到了就換回正式值。"
-            + LIVE_ACCURACY)
+    if spot:  # nothing is estimated: the shading marks where the spot books take over
+        live_from, est, est_mark = n_e, "", ""
+        iS = spot["from"] - D.h0
+        shade = {"liveFrom": E.hour(iS), "liveLabel": "Binance 現貨"} if iS >= r0 else {}
+        first = dt.date.fromordinal(EPOCH + spot["first"] // 24)
+        note = (f"{short(E.label(iS))}（台灣時間）起改用 Binance 現貨訂單簿：±{SPOT_BAND}% 內的買單與賣單數量（我們自己從 "
+                f"{first.month}/{first.day} 起每 10 秒抽樣、每小時平均），一樣取 log(買 ÷ 賣)、除以過去 {PARAMS['window'] // 24} 天的標準差；"
+                f"更早是 Binance 永續合約 ±{PARAMS['depth']}% 的值。CoinKarma 的 LIQ 就是 Binance 現貨的寬範圍訂單簿（回測見說明）。")
+        dif_note = (f"{short(E.label(iS))}（台灣時間）起改用 Binance 現貨訂單簿 ±{SPOT_BAND}% 內的買單減賣單（我們自己收集，每小時平均）；"
+                    f"更早是 Binance 永續合約 ±{PARAMS['depth']}%。")
+    else:
+        live_from = T + 1
+        est, est_mark = "（即時估計）", "（即時）"
+        shade = {"liveFrom": E.hour(live_from)}
+        note = (f"最後 {n_e - 1 - T} 小時（{short(E.label(live_from))} 起，台灣時間）是即時估計：Binance 的訂單簿檔案隔天才公布，"
+                "這段改用 OKX、Coinbase、Hyperliquid 每 10 分鐘抓的訂單簿，換算成 Binance 的尺度（校準見下表）；Binance 檔案到了就換回正式值。"
+                + LIVE_ACCURACY)
+        dif_note = note.replace("（校準見下表）", "（校準方式同 LIQ 卡）").replace(LIVE_ACCURACY, DIF_ACCURACY)
     for it in out:
         if it["id"] == "liq":
             with np.errstate(invalid="ignore"):
@@ -649,10 +797,10 @@ def apply_live(out, D, R, lo, ext, now=None):
             ov, bv = O[last], B[last]
             st = "綠色箭頭" if green[last] else "紅色箭頭" if red[last] else "偏多" if ov > 2 else "偏空" if ov < -2 else "中性"
             it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "b": [_r(v, 2) for v in B[r0:n_e]],
-                            "liveFrom": E.hour(live_from), **({"ck": ck_overlay(ckc, hrs)} if ckc else {})}
-            it["marks"] = ([{"d": E.hour(i), "label": "綠色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "good"} for i in g_ev if i >= r0]
-                           + [{"d": E.hour(i), "label": "紅色箭頭" + ("（即時）" if i >= live_from else ""), "tone": "bad"} for i in r_ev if i >= r0])
-            live_txt = "（即時估計）" if last > T else ""
+                            **shade, **({"ck": ck_overlay(ckc, hrs)} if ckc else {})}
+            it["marks"] = ([{"d": E.hour(i), "label": "綠色箭頭" + (est_mark if i >= live_from else ""), "tone": "good"} for i in g_ev if i >= r0]
+                           + [{"d": E.hour(i), "label": "紅色箭頭" + (est_mark if i >= live_from else ""), "tone": "bad"} for i in r_ev if i >= r0])
+            live_txt = est if last >= live_from else ""
             it["now"] = {"d": E.hour(last), "v": _r(ov, 2), "state": f"{st}，BTC LIQ {bv:+.1f}{live_txt}" if np.isfinite(bv) else st + live_txt,
                          "tone": "good" if ov > 2 else "bad" if ov < -2 else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
@@ -673,10 +821,10 @@ def apply_live(out, D, R, lo, ext, now=None):
             while la > 0 and not np.isfinite(acc[la]):
                 la -= 1
             av = acc[la]
-            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 1) for v in acc[r0:n_e]], "liveFrom": E.hour(live_from)}
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 1) for v in acc[r0:n_e]], **shade}
             it["marks"] = ([{"d": E.hour(i), "label": "≥ +60", "tone": "good"} for i in a_up if i >= r0]
                            + [{"d": E.hour(i), "label": "≤ −60", "tone": "bad"} for i in a_dn if i >= r0])
-            it["now"] = {"d": E.hour(la), "v": _r(av, 1), "state": ("偏多" if av >= 60 else "偏空" if av <= -60 else "中性") + ("（即時估計）" if la > T else ""),
+            it["now"] = {"d": E.hour(la), "v": _r(av, 1), "state": ("偏多" if av >= 60 else "偏空" if av <= -60 else "中性") + (est if la >= live_from else ""),
                          "tone": "good" if av >= 60 else "bad" if av <= -60 else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
         elif it["id"] in ("liqdif", "liqtotal") and "dif" in X:
@@ -696,31 +844,32 @@ def apply_live(out, D, R, lo, ext, now=None):
             if len(fin_):
                 lk = int(fin_[-1])
                 v = float(arr[lk])
-                it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(x, 0) for x in arr[r0:n_e]], "liveFrom": E.hour(live_from)}
+                it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(x, 0) for x in arr[r0:n_e]], **shade}
                 it["now"] = {"d": E.hour(lk), "v": _r(v, 0),
-                             "state": ("偏多" if v >= thr else "偏空" if v <= -thr else "中性") + ("（即時估計）" if lk > T else ""),
+                             "state": ("偏多" if v >= thr else "偏空" if v <= -thr else "中性") + (est if lk >= live_from else ""),
                              "tone": "good" if v >= thr else "bad" if v <= -thr else "mid"}
-                it["chartNote"] = CHART_NOTE + " " + note.replace("（校準見下表）", "（校準方式同 LIQ 卡）").replace(LIVE_ACCURACY, DIF_ACCURACY)
+                it["chartNote"] = CHART_NOTE + " " + dif_note
         elif it["id"] == "screener":
             sc = screener_item(lambda **kw: kw, E, X, lo, "")
-            it["now"] = dict(sc["now"], state=sc["now"]["state"] + ("（即時估計）" if hidx(sc["now"]["d"]) - D.h0 > T else ""))
+            it["now"] = dict(sc["now"], state=sc["now"]["state"] + (est if hidx(sc["now"]["d"]) - D.h0 >= live_from else ""))
             if it.get("tables") and sc.get("tables"):
                 it["tables"][0] = sc["tables"][0]
         elif it["id"] == "ari":
             a_new, _ = ari_item(lambda **kw: kw, E, X, lo, r0, hrs)
             for key in ("series", "marks", "now"):
                 it[key] = a_new[key]
-            it["series"]["liveFrom"] = E.hour(live_from)
-            if hidx(it["now"]["d"]) - D.h0 > T:
-                it["now"]["state"] = (it["now"].get("state") or "") + "（即時估計）"
+            it["series"].pop("liveFrom", None)
+            it["series"].update(shade)
+            if hidx(it["now"]["d"]) - D.h0 >= live_from:
+                it["now"]["state"] = (it["now"].get("state") or "") + est
             it["chartNote"] = CHART_NOTE + " " + note
         elif it["id"] == "resonance":
             W = waves(E, X)
-            spans, recent, last, o_now, state, cur = wave_view(E, W, O, r0, live_from)
-            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], "liveFrom": E.hour(live_from),
+            spans, recent, last, o_now, state, cur = wave_view(E, W, O, r0, None if spot else live_from)
+            it["series"] = {"h0": hrs[0], "n": len(hrs), "v": [_r(v, 2) for v in O[r0:n_e]], **shade,
                             **({"ck": ck_overlay(ckc, hrs)} if ckc else {})}
             it["spans"] = spans
-            live_txt = "（即時估計）" if last > T else ""
+            live_txt = est if last >= live_from else ""
             it["now"] = {"d": E.hour(last), "v": _r(o_now, 2), "state": state + live_txt, "tone": "good" if cur else "mid"}
             it["chartNote"] = CHART_NOTE + " " + note
             for t in it.get("tables", []):
@@ -747,14 +896,14 @@ def patch_live(ck, item):
     if not D.ok or D.first.get("BTC") is None:
         return ck
     R = compute(D, **PARAMS)
-    ext = live_extend(D, R)
+    ext = extend(D, R)
     if not ext:
         return pending()
     lo = D.first["BTC"] + NEED_H
     hb = apply_live(ck.get("items", []), D, R, lo, ext)
     if hb:
         ck["hbtc"] = hb
-    elif not ext.get("k"):
+    elif not (ext.get("k") or ext.get("spot")):
         pending()
     return ck
 
@@ -938,6 +1087,19 @@ def items(item, D=None, ctx=None):
                         "回測他們過去 13 張圖上的 7 個月初（Tardis 免費的 Binance 現貨完整訂單簿）：Binance 現貨 ±10% 跟他們的 Overall LIQ 相關 0.88、"
                         "BTC LIQ 0.86（±5% 的日內形狀更像，0.93／0.88），我們用的合約只有 0.45／0.31（research/ck_chart/backtest.json）。"
                         "所以他們的來源幾乎可以確定是 Binance 現貨的寬範圍訂單簿；Binance 不公布現貨深度的歷史，2026-10-30 起我們自己即時收集。")
+    try:
+        sp = load_spot()
+        pg = spot_progress(sp["v"])
+    except Exception as e:
+        print(f"spot progress skipped: {type(e).__name__}: {e}", flush=True)
+        sp, pg = {}, None
+    if pg:
+        due = dt.date.fromordinal(EPOCH + (pg["due"] + 8) // 24)  # Taiwan date
+        diff_common += (f"現貨訂單簿已收集 {pg['hours']} 小時（BTC，Binance 現貨 ±{SPOT_BAND}%）；收滿 {SPOT_SWITCH_H} 小時（約 {due.month}/{due.day}）、"
+                        f"Binance 合約的檔案也到了那一天之後，LIQ 整族會自動從那個小時起改用現貨，之前的維持合約。")
+    elif sp.get("warming"):
+        diff_common += (f"現貨訂單簿剛開始收集：BTC、ETH 的快照只涵蓋 ±1–5%，更外圈的掛單要邊聽邊累積，"
+                        f"再約 {sp['warming']} 小時才開始算數；之後收滿 {SPOT_SWITCH_H} 小時，LIQ 整族會自動改用現貨。")
     out = []
     # 1) Overall LIQ and BTC LIQ; CoinKarma's arrows: Overall > 2 and BTC LIQ > 3 (green), < -2 and < -3 (red)
     B = L["BTC"]
@@ -1064,11 +1226,17 @@ def items(item, D=None, ctx=None):
         daily["ari"] = to_daily(D, ari, "max")
     hbtc = {"h0": hrs[0], "v": [_r(v, 0) for v in btc[r0:n]]}
     try:  # the hours Binance has not published yet, from the live books
-        ext = live_extend(D, R)
+        ext = extend(D, R)
         hb = apply_live(out, D, R, lo, ext)
         if hb:
             hbtc = hb
-        if not ext or not ext.get("k"):
+        if ext and ext.get("spot"):
+            tag = (f"{short(ck_label(ext['spot']['from']))}（台灣時間）起改用 Binance 現貨訂單簿 ±{SPOT_BAND}%（我們自己收集），更早是合約；"
+                   "訊號的回測統計仍是合約的歷史。")
+            for it in out:
+                if it["id"] in ("liq", "liqacc", "liqdif", "liqtotal", "resonance", "screener", "ari"):
+                    it["ours"] = (it.get("ours") or "") + tag
+        if not ext or not (ext.get("k") or ext.get("spot")):
             for it in out:
                 if it["id"] in ("liq", "resonance"):
                     it["chartNote"] = CHART_NOTE + " " + LIVE_PENDING

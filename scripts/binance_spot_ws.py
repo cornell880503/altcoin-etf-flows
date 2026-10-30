@@ -21,7 +21,7 @@ So a book is never thrown away:
   one, or after a crash) starts from the last saved books, as the deep part behind fresh snapshots.
 
 Every SAMPLE_S seconds, from each book: bids and asks within BANDS % of the mid, as quantity (coins:
-CoinKarma calls LIQ "the ratio of quantities") and as US$; the number of levels; how far the exactly known
+CoinKarma calls LIQ "the ratio of quantities") and as US$; the mid; the number of levels; how far the exactly known
 range reaches (exact_b / exact_a, % from the mid, 100 = the whole side); how long the book has been
 building (age_h) and its gaps. Files: data/ck/live/binspot/YYYY-MM/YYYY-MM-DDTHH.r<run>.csv.gz, a row per
 coin with the hour's means over the job's samples (a file per job and hour, so overlapping jobs never write
@@ -66,7 +66,7 @@ WEIGHT_BUDGET = 3000    # our snapshots' weight in any minute (Binance allows 60
 REFRESH_S = 30 * 60     # a fresh snapshot merged into each live book this often
 BANDS = (0.25, 0.5, 1, 2, 3, 5, 7.5, 10, 15, 20, 30)
 KEEP_PCT = 50           # levels farther than this from the mid are dropped (memory, the saved books)
-VALS = ["levels_b", "levels_a", "exact_b", "exact_a", "age_h", "gaps"] + [f"{s}{k}" for k in BANDS for s in ("bidq", "askq", "bidn", "askn")]
+VALS = ["mid", "levels_b", "levels_a", "exact_b", "exact_a", "age_h", "gaps"] + [f"{s}{k}" for k in BANDS for s in ("bidq", "askq", "bidn", "askn")]
 FIELDS = ["hour", "coin", "n"] + VALS
 SAMPLE_S = 10
 RESYNC_GAP_S = 30       # at most one gap snapshot a symbol in this many seconds
@@ -413,7 +413,7 @@ class Collector:
                 s = bands(bp, bq, ap, aq)
                 if not s:
                     continue
-                mid = s.pop("mid")
+                mid = s["mid"]
                 s["exact_b"] = max(-100.0, min(100.0, (1 - lo / mid) * 100)) if lo > 0 else 100.0
                 s["exact_a"] = max(-100.0, min(100.0, (hi / mid - 1) * 100)) if math.isfinite(hi) else 100.0
                 s["age_h"] = (t - born) / 3600 if born else 0.0
