@@ -5,27 +5,27 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": 285.4,
+      "netFlowUsdM": -202.6,
       "tradingDays": 5,
-      "avgDailyUsdM": 57.1,
+      "avgDailyUsdM": -40.5,
       "positiveDays": 4,
       "negativeDays": 1
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -276.4,
+      "netFlowUsdM": -431.4,
       "tradingDays": 5,
-      "avgDailyUsdM": -55.3,
+      "avgDailyUsdM": -86.3,
       "positiveDays": 0,
       "negativeDays": 5
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -70.7,
+      "netFlowUsdM": -71.4,
       "tradingDays": 5,
-      "avgDailyUsdM": -14.1,
+      "avgDailyUsdM": -14.3,
       "positiveDays": 0,
       "negativeDays": 5
     },
