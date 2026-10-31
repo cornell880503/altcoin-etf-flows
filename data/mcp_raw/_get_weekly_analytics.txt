@@ -32,11 +32,11 @@
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": 4.1,
+      "netFlowUsdM": 5,
       "tradingDays": 5,
-      "avgDailyUsdM": 0.8,
-      "positiveDays": 1,
-      "negativeDays": 2
+      "avgDailyUsdM": 1,
+      "positiveDays": 2,
+      "negativeDays": 1
     },
     {
       "symbol": "HYP",
