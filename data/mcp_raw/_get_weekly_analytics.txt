@@ -5,38 +5,38 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": 440.7,
+      "netFlowUsdM": 415,
       "tradingDays": 5,
-      "avgDailyUsdM": 88.1,
+      "avgDailyUsdM": 83,
       "positiveDays": 4,
-      "negativeDays": 0
+      "negativeDays": 1
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -275.7,
+      "netFlowUsdM": -276.4,
       "tradingDays": 5,
-      "avgDailyUsdM": -55.1,
+      "avgDailyUsdM": -55.3,
       "positiveDays": 0,
-      "negativeDays": 4
+      "negativeDays": 5
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -60.7,
+      "netFlowUsdM": -70.7,
       "tradingDays": 5,
-      "avgDailyUsdM": -12.1,
+      "avgDailyUsdM": -14.1,
       "positiveDays": 0,
-      "negativeDays": 4
+      "negativeDays": 5
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": 3.5,
+      "netFlowUsdM": 2.8,
       "tradingDays": 5,
-      "avgDailyUsdM": 0.7,
+      "avgDailyUsdM": 0.6,
       "positiveDays": 1,
-      "negativeDays": 1
+      "negativeDays": 2
     },
     {
       "symbol": "HYP",
