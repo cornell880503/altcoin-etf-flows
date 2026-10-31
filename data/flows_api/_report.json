@@ -4,9 +4,9 @@
    "first": "2026-09-04",
    "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "107",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "47",
+    "X-RateLimit-Reset": "1793487720"
    },
    "returned": 22,
    "stored": 41,
@@ -14,95 +14,95 @@
   },
   "BNB": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "118",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "58",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 40,
+   "returned": 22,
+   "stored": 41,
    "window_days": 30
   },
   "BTC": {
    "first": "2026-09-04",
-   "last": "2026-10-30",
+   "last": "2026-10-31",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "114",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "54",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 30,
-   "stored": 57,
+   "returned": 31,
+   "stored": 58,
    "window_days": 30
   },
   "DOGE": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "109",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "49",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   },
   "DOT": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "117",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "57",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   },
   "ETH": {
    "first": "2026-09-04",
-   "last": "2026-10-30",
+   "last": "2026-10-31",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "113",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "53",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 30,
-   "stored": 57,
+   "returned": 31,
+   "stored": 58,
    "window_days": 30
   },
   "HBAR": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "106",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "46",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   },
   "HYPE": {
    "first": "2026-09-04",
-   "last": "2026-10-30",
+   "last": "2026-10-31",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "110",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "50",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 30,
-   "stored": 57,
+   "returned": 31,
+   "stored": 58,
    "window_days": 30
   },
   "LINK": {
    "first": "2026-09-04",
    "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "108",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "48",
+    "X-RateLimit-Reset": "1793487720"
    },
    "returned": 22,
    "stored": 40,
@@ -110,23 +110,23 @@
   },
   "LTC": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "119",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "59",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   },
   "NEAR": {
    "first": "2026-09-29",
    "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "115",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "55",
+    "X-RateLimit-Reset": "1793487780"
    },
    "returned": 22,
    "stored": 24,
@@ -134,65 +134,65 @@
   },
   "SOL": {
    "first": "2026-09-04",
-   "last": "2026-10-30",
+   "last": "2026-10-31",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "112",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "52",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 30,
-   "stored": 57,
+   "returned": 31,
+   "stored": 58,
    "window_days": 30
   },
   "SUI": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "116",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "56",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   },
   "TRX": {
    "first": "2026-09-10",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "114",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "54",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 36,
+   "returned": 22,
+   "stored": 37,
    "window_days": 30
   },
   "XRP": {
    "first": "2026-09-04",
-   "last": "2026-10-30",
+   "last": "2026-10-31",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "111",
-    "X-RateLimit-Reset": "1793412120"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "51",
+    "X-RateLimit-Reset": "1793487720"
    },
-   "returned": 30,
-   "stored": 57,
+   "returned": 31,
+   "stored": 58,
    "window_days": 30
   },
   "ZEC": {
    "first": "2026-09-04",
-   "last": "2026-10-29",
+   "last": "2026-10-30",
    "rate_limit": {
-    "X-RateLimit-Limit": "120",
-    "X-RateLimit-Remaining": "113",
-    "X-RateLimit-Reset": "1793412180"
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "53",
+    "X-RateLimit-Reset": "1793487780"
    },
-   "returned": 21,
-   "stored": 39,
+   "returned": 22,
+   "stored": 40,
    "window_days": 30
   }
  },
- "last_success": "2026-10-31T02:01:40Z",
- "run_at": "2026-10-31T02:01:40Z"
+ "last_success": "2026-10-31T23:01:38Z",
+ "run_at": "2026-10-31T23:01:38Z"
 }
