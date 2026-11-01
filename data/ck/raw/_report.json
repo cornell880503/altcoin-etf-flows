@@ -6,14 +6,14 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 4,
-   "secs": 0.6
+   "secs": 0.8
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-10-31",
    "ok": true,
    "rows": 2278,
-   "secs": 5.9
+   "secs": 5.1
   },
   "bitfinex": {
    "complete": {
@@ -28,7 +28,7 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 2131,
-   "secs": 24.4,
+   "secs": 24.7,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,14 +36,14 @@
    "last": "2026-10-27",
    "ok": true,
    "rows": 447,
-   "secs": 0.6
+   "secs": 0.7
   },
   "coinbase": {
    "first": 1609459200,
    "last": 1793512800,
    "ok": true,
    "rows": 51114,
-   "secs": 0.5
+   "secs": 0.6
   },
   "deribit": {
    "first": "2026-10-29",
@@ -53,11 +53,10 @@
    "secs": 0.8
   },
   "fred": {
-   "first": "2019-01-02",
-   "last": "2026-10-30",
-   "ok": true,
-   "rows": 1961,
-   "secs": 3.2
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "ok": false,
+   "secs": 0.3,
+   "trace": "^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py\", line 492, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py\", line 639, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 404: Not Found\n"
   },
   "funding": {
    "binance_est": {
@@ -70,14 +69,14 @@
    "last": "2026-10-31",
    "ok": true,
    "rows": 2496,
-   "secs": 4.4
+   "secs": 4.7
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-01",
    "ok": true,
    "rows": 345,
-   "secs": 0.2
+   "secs": 0.5
   },
   "okx_lending": {
    "first": "2024-07-18",
@@ -91,15 +90,15 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 3260,
-   "secs": 3.4
+   "secs": 3.5
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-10-31",
    "ok": true,
    "rows": 2711,
-   "secs": 1.7
+   "secs": 1.5
   }
  },
- "run_at": "2026-11-01T06:25:20Z"
+ "run_at": "2026-11-01T06:53:18Z"
 }
