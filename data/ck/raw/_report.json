@@ -13,7 +13,7 @@
    "last": "2026-10-31",
    "ok": true,
    "rows": 2278,
-   "secs": 5.3
+   "secs": 4.4
   },
   "bitfinex": {
    "complete": {
@@ -28,7 +28,7 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 2131,
-   "secs": 24.5,
+   "secs": 24.4,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,13 +36,13 @@
    "last": "2026-10-27",
    "ok": true,
    "rows": 447,
-   "secs": 0.4
+   "secs": 0.9
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1793523600,
+   "last": 1793527200,
    "ok": true,
-   "rows": 51117,
+   "rows": 51118,
    "secs": 0.6
   },
   "deribit": {
@@ -50,34 +50,34 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 4,
-   "secs": 0.9
+   "secs": 1.0
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-10-30",
    "ok": true,
    "rows": 1961,
-   "secs": 3.9
+   "secs": 3.8
   },
   "funding": {
    "binance_est": {
-    "asked": 4,
+    "asked": 3,
     "mae_pct8h": 0.000124,
-    "new_days": 1,
+    "new_days": 0,
     "overlap_days": 40
    },
    "first": "2020-01-01",
    "last": "2026-10-31",
    "ok": true,
    "rows": 2496,
-   "secs": 4.3
+   "secs": 3.7
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-01",
    "ok": true,
    "rows": 345,
-   "secs": 0.4
+   "secs": 1.0
   },
   "okx_lending": {
    "first": "2024-07-18",
@@ -91,15 +91,15 @@
    "last": "2026-11-01",
    "ok": true,
    "rows": 3260,
-   "secs": 4.6
+   "secs": 3.1
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-10-31",
    "ok": true,
    "rows": 2711,
-   "secs": 1.6
+   "secs": 0.9
   }
  },
- "run_at": "2026-11-01T09:25:20Z"
+ "run_at": "2026-11-01T10:01:49Z"
 }
