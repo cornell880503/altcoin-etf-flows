@@ -1,8 +1,8 @@
 {
- "run_at": "2026-11-03T12:02:24Z",
+ "run_at": "2026-11-03T13:07:00Z",
  "funds": {
   "XRPC": {
-   "bytes": 1574838,
+   "bytes": 1574849,
    "tables": [
     {
      "n_rows": 4,
@@ -41,14 +41,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-31.94%",
-       "9.78%",
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-31.58%",
+       "-17.12%",
        "40.37%",
        "-",
        "-",
        "-",
-       "-47.32%"
+       "-47.04%"
       ]
      ]
     },
@@ -157,7 +157,7 @@
    "last": "2026-11-02"
   },
   "LTCC": {
-   "bytes": 1573925,
+   "bytes": 1574099,
    "tables": [
     {
      "n_rows": 4,
@@ -312,7 +312,7 @@
    "last": "2026-11-02"
   },
   "HBR": {
-   "bytes": 1576199,
+   "bytes": 1576184,
    "tables": [
     {
      "n_rows": 4,
@@ -467,7 +467,7 @@
    "last": "2026-11-02"
   },
   "SOLC": {
-   "bytes": 1587523,
+   "bytes": 1587508,
    "tables": [
     {
      "n_rows": 4,
@@ -622,7 +622,7 @@
    "last": "2026-11-02"
   },
   "SUIS": {
-   "bytes": 1584185,
+   "bytes": 1584180,
    "tables": [
     {
      "n_rows": 4,
@@ -775,157 +775,7 @@
    "last": "2026-11-02"
   },
   "TRXS": {
-   "bytes": 1582640,
-   "tables": [
-    {
-     "n_rows": 4,
-     "head": [
-      [
-       "",
-       "Quarter",
-       "YTD",
-       "1 Year",
-       "3 Year",
-       "5 Year",
-       "Since Inception*"
-      ],
-      [
-       "Net asset value (NAV) returnAs of 09/30/2026",
-       "-",
-       "-0.24%",
-       "-",
-       "-",
-       "-",
-       "-0.24%"
-      ]
-     ]
-    },
-    {
-     "n_rows": 4,
-     "head": [
-      [
-       "",
-       "YTD",
-       "Monthly",
-       "Quarter",
-       "1 Year",
-       "3 Year",
-       "5 Year",
-       "Since Inception*"
-      ],
-      [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-1.40%",
-       "-",
-       "-",
-       "-",
-       "-",
-       "-",
-       "-1.40%"
-      ]
-     ]
-    },
-    {
-     "n_rows": 4,
-     "head": [
-      [
-       "",
-       "2026",
-       "Q1",
-       "Q2",
-       "Q3",
-       "Q4"
-      ],
-      [
-       "Premium",
-       "26",
-       "0",
-       "0",
-       "16",
-       "10"
-      ]
-     ]
-    },
-    {
-     "n_rows": 1219,
-     "head": [
-      [
-       "Fund Name",
-       "Fund Ticker",
-       "CUSIP",
-       "Net Assets",
-       "Shares Outstanding",
-       "NAV",
-       "NAV Change Dollars",
-       "NAV Change Percentage",
-       "Market Price",
-       "Market Price Change Dollars",
-       "Market Price Change Percentage",
-       "Premium/Discount",
-       "Median 30 Day Spread Percentage",
-       "Rate Date"
-      ],
-      [
-       "Canary XRP ETF",
-       "XRPC",
-       "13,723",
-       "5,250,000.00",
-       "210,000",
-       "25",
-       "",
-       "",
-       "25",
-       "",
-       "",
-       "0.00",
-       "",
-       "11/12/2025"
-      ]
-     ]
-    },
-    {
-     "n_rows": 14,
-     "head": [
-      [
-       "Date",
-       "Account",
-       "Name",
-       "Ticker",
-       "CUSIP",
-       "Quantity",
-       "Quantity -- Original",
-       "Price",
-       "Market Value",
-       "Weightings",
-       "NetAssets",
-       "SharesOutstanding",
-       "CreationUnits",
-       "MoneyMarketFlag"
-      ],
-      [
-       "11/03/2026",
-       "HBR",
-       "HEDERA",
-       "HBARUSD",
-       "HBARUSD",
-       "798,892,593.23",
-       "798,892,593.22500002",
-       "0.07",
-       "55,495,073.99",
-       "100.00%",
-       "55,496,758",
-       "5,890,000",
-       "589",
-       ""
-      ]
-     ]
-    }
-   ],
-   "from": "table",
-   "parsed": 40,
-   "stored": 40,
-   "first": "2026-09-08",
-   "last": "2026-11-02"
+   "error": "TimeoutError: The read operation timed out"
   }
  }
 }
