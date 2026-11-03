@@ -1,5 +1,5 @@
 {
-  "today": "2026-11-02",
+  "today": "2026-11-03",
   "referenceDate": "2026-10-30",
   "referenceIsToday": false,
   "assets": [
@@ -79,7 +79,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "date": "2026-10-30",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -0.3
     },
     {
       "symbol": "NEAR",
@@ -100,6 +100,6 @@
       "netFlowUsdM": -4.6
     }
   ],
-  "totalUsdM": -815.8,
-  "updatedAt": "2026-11-02T22:54:42.141Z"
+  "totalUsdM": -816,
+  "updatedAt": "2026-11-03T00:02:00.716Z"
 }
