@@ -5,10 +5,10 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -488.9,
+      "netFlowUsdM": -482.2,
       "tradingDays": 4,
-      "avgDailyUsdM": -122.2,
-      "positiveDays": 2,
+      "avgDailyUsdM": -120.6,
+      "positiveDays": 3,
       "negativeDays": 1
     },
     {
@@ -41,9 +41,9 @@
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "netFlowUsdM": 2.3,
+      "netFlowUsdM": 0.8,
       "tradingDays": 4,
-      "avgDailyUsdM": 0.6,
+      "avgDailyUsdM": 0.2,
       "positiveDays": 1,
       "negativeDays": 1
     },
@@ -51,7 +51,7 @@
       "symbol": "DOGE",
       "asset": "doge",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
