@@ -1,8 +1,8 @@
 {
- "run_at": "2026-11-03T13:07:00Z",
+ "run_at": "2026-11-03T14:02:36Z",
  "funds": {
   "XRPC": {
-   "bytes": 1574849,
+   "bytes": 1574847,
    "tables": [
     {
      "n_rows": 4,
@@ -157,7 +157,7 @@
    "last": "2026-11-02"
   },
   "LTCC": {
-   "bytes": 1574099,
+   "bytes": 1573930,
    "tables": [
     {
      "n_rows": 4,
@@ -196,14 +196,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-28.41%",
-       "33.80%",
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-29.91%",
+       "-18.96%",
        "55.65%",
-       "-40.19%",
+       "-44.06%",
        "-",
        "-",
-       "-46.48%"
+       "-47.60%"
       ]
      ]
     },
@@ -312,7 +312,7 @@
    "last": "2026-11-02"
   },
   "HBR": {
-   "bytes": 1576184,
+   "bytes": 1576357,
    "tables": [
     {
      "n_rows": 4,
@@ -351,14 +351,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-33.52%",
-       "44.71%",
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-35.17%",
+       "-31.00%",
        "49.13%",
-       "-63.17%",
+       "-64.72%",
        "-",
        "-",
-       "-61.36%"
+       "-62.32%"
       ]
      ]
     },
@@ -467,7 +467,7 @@
    "last": "2026-11-02"
   },
   "SOLC": {
-   "bytes": 1587508,
+   "bytes": 1587510,
    "tables": [
     {
      "n_rows": 4,
@@ -506,14 +506,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-20.25%",
-       "18.33%",
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-22.58%",
+       "-19.85%",
        "54.37%",
        "-",
        "-",
        "-",
-       "-23.44%"
+       "-25.68%"
       ]
      ]
     },
@@ -622,7 +622,7 @@
    "last": "2026-11-02"
   },
   "SUIS": {
-   "bytes": 1584180,
+   "bytes": 1584182,
    "tables": [
     {
      "n_rows": 4,
@@ -661,14 +661,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 10/30/2026",
-       "-8.44%",
-       "59.29%",
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-9.60%",
+       "-24.68%",
        "61.70%",
        "-",
        "-",
        "-",
-       "-8.44%"
+       "-9.60%"
       ]
      ]
     },
@@ -775,7 +775,157 @@
    "last": "2026-11-02"
   },
   "TRXS": {
-   "error": "TimeoutError: The read operation timed out"
+   "bytes": 1582635,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "Quarter",
+       "YTD",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "-",
+       "-0.24%",
+       "-",
+       "-",
+       "-",
+       "-0.24%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/02/2026",
+       "-6.08%",
+       "-0.68%",
+       "-",
+       "-",
+       "-",
+       "-",
+       "-6.08%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "26",
+       "0",
+       "0",
+       "16",
+       "10"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1219,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 14,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/03/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "798,892,593.23",
+       "798,892,593.22500002",
+       "0.07",
+       "55,495,073.99",
+       "100.00%",
+       "55,496,758",
+       "5,890,000",
+       "589",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 40,
+   "stored": 40,
+   "first": "2026-09-08",
+   "last": "2026-11-02"
   }
  }
 }
