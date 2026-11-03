@@ -7,13 +7,13 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-02",
-      "netFlowUsdM": 6.7
+      "netFlowUsdM": -398.6
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-02",
-      "netFlowUsdM": 3.2
+      "netFlowUsdM": -139.7
     },
     {
       "symbol": "SOL",
@@ -105,6 +105,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": 7,
-  "updatedAt": "2026-11-03T04:02:03.577Z"
+  "totalUsdM": -541.2,
+  "updatedAt": "2026-11-03T05:01:57.314Z"
 }
