@@ -41,11 +41,11 @@
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "netFlowUsdM": 3.7,
+      "netFlowUsdM": 2.3,
       "tradingDays": 4,
-      "avgDailyUsdM": 0.9,
+      "avgDailyUsdM": 0.6,
       "positiveDays": 1,
-      "negativeDays": 0
+      "negativeDays": 1
     },
     {
       "symbol": "DOGE",
@@ -105,7 +105,7 @@
       "symbol": "DOT",
       "asset": "dot",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -114,8 +114,8 @@
       "symbol": "SUI",
       "asset": "sui",
       "netFlowUsdM": 1,
-      "tradingDays": 3,
-      "avgDailyUsdM": 0.3,
+      "tradingDays": 4,
+      "avgDailyUsdM": 0.2,
       "positiveDays": 1,
       "negativeDays": 1
     },
