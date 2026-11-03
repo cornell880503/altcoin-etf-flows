@@ -6,14 +6,14 @@
    "last": "2026-11-03",
    "ok": true,
    "rows": 6,
-   "secs": 0.6
+   "secs": 0.8
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-01",
    "ok": true,
    "rows": 2279,
-   "secs": 4.4
+   "secs": 7.5
   },
   "bitfinex": {
    "complete": {
@@ -28,7 +28,7 @@
    "last": "2026-11-03",
    "ok": true,
    "rows": 2133,
-   "secs": 24.3,
+   "secs": 24.4,
    "stats_pages": 4
   },
   "cftc": {
@@ -40,9 +40,9 @@
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1793682000,
+   "last": 1793685600,
    "ok": true,
-   "rows": 51161,
+   "rows": 51162,
    "secs": 0.6
   },
   "deribit": {
@@ -50,14 +50,14 @@
    "last": "2026-11-03",
    "ok": true,
    "rows": 6,
-   "secs": 0.8
+   "secs": 0.9
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-02",
    "ok": true,
    "rows": 1962,
-   "secs": 4.0
+   "secs": 4.3
   },
   "funding": {
    "binance_est": {
@@ -70,35 +70,36 @@
    "last": "2026-11-02",
    "ok": true,
    "rows": 2498,
-   "secs": 5.3
+   "secs": 7.7
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-03",
    "ok": true,
    "rows": 347,
-   "secs": 0.2
+   "secs": 0.5
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-02",
    "ok": true,
    "rows": 838,
-   "secs": 0.4
+   "secs": 0.5
   },
   "stablecoins": {
-   "error": "TimeoutError: The read operation timed out",
-   "ok": false,
-   "secs": 197.1,
-   "trace": "^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/ssl.py\", line 1264, in recv_into\n    return self.read(nbytes, buffer)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/ssl.py\", line 1116, in read\n    return self._sslobj.read(len, buffer)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTimeoutError: The read operation timed out\n"
+   "first": "2017-11-29",
+   "last": "2026-11-03",
+   "ok": true,
+   "rows": 3262,
+   "secs": 3.3
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-02",
    "ok": true,
    "rows": 2713,
-   "secs": 1.7
+   "secs": 2.1
   }
  },
- "run_at": "2026-11-03T05:01:59Z"
+ "run_at": "2026-11-03T06:01:49Z"
 }
