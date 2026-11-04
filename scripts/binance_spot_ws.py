@@ -647,11 +647,11 @@ def push_data(msg, paths="data/ck/live/binspot"):
     if sh("git diff --cached --quiet").returncode == 0:
         return True
     sh(f'git commit -q -m "{msg}"')
-    for _ in range(5):
-        if sh("git pull -q --rebase --autostash origin main").returncode == 0 and sh("git push -q origin HEAD:main").returncode == 0:
+    for _ in range(10):  # main is busy around the hour (the live loop, ck-pulse, the other workflows): keep trying
+        if sh("git pull -q --rebase --autostash -X theirs origin main").returncode == 0 and sh("git push -q origin HEAD:main").returncode == 0:
             return True
         sh("git rebase --abort")
-        time.sleep(7)
+        time.sleep(random.uniform(5, 20))
     print("::warning::could not push", msg, flush=True)
     return False
 
@@ -747,6 +747,7 @@ def run(minutes=340, hard=352):
     next_watch = (time.time() // 3600) * 3600 + WATCH_AT_S
     if next_watch <= time.time() + 60:  # this hour's slot is past (or within a minute): the next hour's
         next_watch += 3600
+    watch_tries = 0
     successor = None
     try:
         while True:
@@ -757,11 +758,16 @@ def run(minutes=340, hard=352):
                 push_data(f"binspot: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
                 print("status:", json.dumps(col.status()), flush=True)
             if now >= next_watch:
-                next_watch = (now // 3600 + 1) * 3600 + WATCH_AT_S
                 try:
-                    liq_watch()
+                    ok = liq_watch()
                 except Exception:
                     traceback.print_exc()
+                    ok = False
+                watch_tries = watch_tries + 1 if not ok else 0
+                # a failed push (main busy) is tried again in three minutes, up to three times, then the next hour
+                next_watch = now + 180 if (not ok and watch_tries < 3) else (now // 3600 + 1) * 3600 + WATCH_AT_S
+                if ok or watch_tries >= 3:
+                    watch_tries = 0
             if now >= next_prune:
                 col.prune()
                 next_prune = now + 3600
