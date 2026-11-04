@@ -1,0 +1,1004 @@
+{
+ "dates": [
+  "2025-02-01",
+  "2025-03-01",
+  "2025-04-01",
+  "2025-05-01",
+  "2025-06-01",
+  "2025-07-01",
+  "2025-08-01",
+  "2025-09-01",
+  "2025-10-01",
+  "2025-11-01",
+  "2025-12-01",
+  "2026-01-01",
+  "2026-02-01",
+  "2026-03-01",
+  "2026-04-01",
+  "2026-05-01",
+  "2026-06-01",
+  "2026-07-01",
+  "2026-08-01",
+  "2026-09-01",
+  "2026-10-01",
+  "2026-11-01"
+ ],
+ "exchanges": [
+  "ascendex",
+  "binance",
+  "binance-us",
+  "bitfinex",
+  "bitget",
+  "bitstamp",
+  "bybit-spot",
+  "coinbase",
+  "crypto-com",
+  "gate-io",
+  "gemini",
+  "huobi",
+  "kraken",
+  "kucoin",
+  "mexc",
+  "okex",
+  "poloniex"
+ ],
+ "results": {
+  "BTC": {
+   "n_points": 63,
+   "depth_within_10pct_coins": {
+    "ascendex": 106.6,
+    "binance": 3493.3,
+    "binance-us": 26.6,
+    "bitfinex": 346.7,
+    "bitget": 262.2,
+    "bitstamp": 258.4,
+    "bybit-spot": 8.6,
+    "coinbase": 1926.7,
+    "crypto-com": 12.8,
+    "gate-io": 46.2,
+    "gemini": 233.7,
+    "huobi": 231.0,
+    "kraken": 778.2,
+    "kucoin": 180.5,
+    "mexc": 246.2,
+    "okex": 121.4,
+    "poloniex": 16.4
+   },
+   "stream_reach_pct": {
+    "ascendex": 50.51,
+    "binance": 79.52,
+    "binance-us": 34.96,
+    "bitfinex": 2.0,
+    "bitget": 0.51,
+    "bitstamp": 100.0,
+    "bybit-spot": 0.03,
+    "coinbase": 100.0,
+    "crypto-com": 0.03,
+    "gate-io": 0.36,
+    "gemini": 100.0,
+    "huobi": 0.52,
+    "kraken": 4.14,
+    "kucoin": 100.0,
+    "mexc": 21.93,
+    "okex": 0.14,
+    "poloniex": 0.1
+   },
+   "by_band": {
+    "deep_2": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "kraken",
+     "kucoin",
+     "mexc"
+    ],
+    "2": {
+     "ascendex alone": {
+      "corr": 0.124,
+      "n": 51,
+      "corr_from15": 0.13,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.456,
+      "n": 63,
+      "corr_from15": 0.428,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.385,
+      "n": 63,
+      "corr_from15": 0.435,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": -0.13,
+      "n": 63,
+      "corr_from15": -0.092,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": -0.055,
+      "n": 21,
+      "corr_from15": -0.168,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": 0.082,
+      "n": 60,
+      "corr_from15": 0.105,
+      "n_from15": 40
+     },
+     "bybit-spot alone": {
+      "corr": -0.088,
+      "n": 63,
+      "corr_from15": -0.093,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.487,
+      "n": 63,
+      "corr_from15": 0.466,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.017,
+      "n": 63,
+      "corr_from15": -0.179,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.177,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.294,
+      "n": 63,
+      "corr_from15": 0.299,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.213,
+      "n": 63,
+      "corr_from15": 0.239,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": 0.227,
+      "n": 63,
+      "corr_from15": 0.303,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.183,
+      "n": 63,
+      "corr_from15": 0.086,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.034,
+      "n": 15,
+      "corr_from15": -0.112,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.045,
+      "n": 63,
+      "corr_from15": 0.079,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.217,
+      "n": 63,
+      "corr_from15": -0.292,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.482,
+      "n": 63,
+      "corr_from15": 0.471,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.477,
+      "n": 63,
+      "corr_from15": 0.468,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.451,
+      "n": 63,
+      "corr_from15": 0.449,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.494,
+      "n": 63,
+      "corr_from15": 0.467,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.568,
+      "n": 63,
+      "corr_from15": 0.553,
+      "n_from15": 42
+     }
+    },
+    "deep_5": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "kucoin",
+     "mexc"
+    ],
+    "5": {
+     "ascendex alone": {
+      "corr": 0.129,
+      "n": 51,
+      "corr_from15": 0.123,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.785,
+      "n": 63,
+      "corr_from15": 0.806,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.53,
+      "n": 63,
+      "corr_from15": 0.574,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": -0.234,
+      "n": 63,
+      "corr_from15": -0.244,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": -0.055,
+      "n": 21,
+      "corr_from15": -0.168,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": 0.206,
+      "n": 60,
+      "corr_from15": 0.225,
+      "n_from15": 40
+     },
+     "bybit-spot alone": {
+      "corr": -0.088,
+      "n": 63,
+      "corr_from15": -0.093,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.698,
+      "n": 63,
+      "corr_from15": 0.678,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.017,
+      "n": 63,
+      "corr_from15": -0.179,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.177,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.426,
+      "n": 63,
+      "corr_from15": 0.423,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.206,
+      "n": 63,
+      "corr_from15": 0.23,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": -0.038,
+      "n": 63,
+      "corr_from15": 0.02,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.473,
+      "n": 63,
+      "corr_from15": 0.392,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.249,
+      "n": 15,
+      "corr_from15": 0.008,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.045,
+      "n": 63,
+      "corr_from15": 0.079,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.217,
+      "n": 63,
+      "corr_from15": -0.292,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.785,
+      "n": 63,
+      "corr_from15": 0.788,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.791,
+      "n": 63,
+      "corr_from15": 0.795,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.677,
+      "n": 63,
+      "corr_from15": 0.654,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.791,
+      "n": 63,
+      "corr_from15": 0.795,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.719,
+      "n": 63,
+      "corr_from15": 0.73,
+      "n_from15": 42
+     }
+    },
+    "deep_10": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "kucoin",
+     "mexc"
+    ],
+    "10": {
+     "ascendex alone": {
+      "corr": 0.133,
+      "n": 51,
+      "corr_from15": 0.129,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.934,
+      "n": 63,
+      "corr_from15": 0.94,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.684,
+      "n": 63,
+      "corr_from15": 0.714,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": -0.234,
+      "n": 63,
+      "corr_from15": -0.245,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": -0.055,
+      "n": 21,
+      "corr_from15": -0.168,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": 0.347,
+      "n": 60,
+      "corr_from15": 0.375,
+      "n_from15": 40
+     },
+     "bybit-spot alone": {
+      "corr": -0.088,
+      "n": 63,
+      "corr_from15": -0.093,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.814,
+      "n": 63,
+      "corr_from15": 0.814,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.017,
+      "n": 63,
+      "corr_from15": -0.179,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.177,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.682,
+      "n": 63,
+      "corr_from15": 0.689,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.206,
+      "n": 63,
+      "corr_from15": 0.23,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": -0.176,
+      "n": 63,
+      "corr_from15": -0.075,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.738,
+      "n": 63,
+      "corr_from15": 0.705,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.546,
+      "n": 15,
+      "corr_from15": 0.454,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.045,
+      "n": 63,
+      "corr_from15": 0.079,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.217,
+      "n": 63,
+      "corr_from15": -0.292,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.917,
+      "n": 63,
+      "corr_from15": 0.92,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.917,
+      "n": 63,
+      "corr_from15": 0.921,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.819,
+      "n": 63,
+      "corr_from15": 0.816,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.917,
+      "n": 63,
+      "corr_from15": 0.921,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.838,
+      "n": 63,
+      "corr_from15": 0.842,
+      "n_from15": 42
+     }
+    }
+   }
+  },
+  "ETH": {
+   "n_points": 63,
+   "depth_within_10pct_coins": {
+    "ascendex": 2308.1,
+    "binance": 43160.2,
+    "binance-us": 386.3,
+    "bitfinex": 4468.6,
+    "bitget": 6976.6,
+    "bitstamp": 2179.1,
+    "bybit-spot": 178.5,
+    "coinbase": 14389.0,
+    "crypto-com": 240.1,
+    "gate-io": 1018.9,
+    "gemini": 1881.4,
+    "huobi": 8676.0,
+    "kraken": 14650.7,
+    "kucoin": 3052.4,
+    "mexc": 5306.1,
+    "okex": 3001.7,
+    "poloniex": 885.9
+   },
+   "stream_reach_pct": {
+    "ascendex": 42.44,
+    "binance": 76.99,
+    "binance-us": 79.59,
+    "bitfinex": 5.4,
+    "bitget": 1.26,
+    "bitstamp": 100.0,
+    "bybit-spot": 0.05,
+    "coinbase": 100.0,
+    "crypto-com": 0.06,
+    "gate-io": 0.68,
+    "gemini": 100.0,
+    "huobi": 3.08,
+    "kraken": 11.31,
+    "kucoin": 100.0,
+    "mexc": 33.82,
+    "okex": 0.28,
+    "poloniex": 0.18
+   },
+   "by_band": {
+    "deep_2": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitfinex",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "huobi",
+     "kraken",
+     "kucoin",
+     "mexc"
+    ],
+    "2": {
+     "ascendex alone": {
+      "corr": 0.11,
+      "n": 51,
+      "corr_from15": 0.017,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.381,
+      "n": 63,
+      "corr_from15": 0.371,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.177,
+      "n": 63,
+      "corr_from15": 0.255,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": 0.185,
+      "n": 63,
+      "corr_from15": 0.206,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": 0.203,
+      "n": 21,
+      "corr_from15": 0.13,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": -0.041,
+      "n": 63,
+      "corr_from15": 0.028,
+      "n_from15": 42
+     },
+     "bybit-spot alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.201,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.103,
+      "n": 63,
+      "corr_from15": 0.07,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.319,
+      "n": 63,
+      "corr_from15": 0.377,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.165,
+      "n": 63,
+      "corr_from15": 0.123,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.071,
+      "n": 63,
+      "corr_from15": 0.011,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.329,
+      "n": 63,
+      "corr_from15": 0.291,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": 0.293,
+      "n": 63,
+      "corr_from15": 0.274,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.221,
+      "n": 63,
+      "corr_from15": 0.249,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.422,
+      "n": 15,
+      "corr_from15": 0.386,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.093,
+      "n": 63,
+      "corr_from15": 0.006,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.329,
+      "n": 63,
+      "corr_from15": -0.328,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.389,
+      "n": 63,
+      "corr_from15": 0.379,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.303,
+      "n": 63,
+      "corr_from15": 0.295,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.358,
+      "n": 63,
+      "corr_from15": 0.332,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.282,
+      "n": 63,
+      "corr_from15": 0.261,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.391,
+      "n": 63,
+      "corr_from15": 0.377,
+      "n_from15": 42
+     }
+    },
+    "deep_5": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitfinex",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "kraken",
+     "kucoin",
+     "mexc"
+    ],
+    "5": {
+     "ascendex alone": {
+      "corr": 0.087,
+      "n": 51,
+      "corr_from15": -0.0,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.684,
+      "n": 63,
+      "corr_from15": 0.675,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.169,
+      "n": 63,
+      "corr_from15": 0.308,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": 0.385,
+      "n": 63,
+      "corr_from15": 0.331,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": 0.204,
+      "n": 21,
+      "corr_from15": 0.13,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": 0.107,
+      "n": 63,
+      "corr_from15": 0.129,
+      "n_from15": 42
+     },
+     "bybit-spot alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.201,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.163,
+      "n": 63,
+      "corr_from15": 0.172,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.319,
+      "n": 63,
+      "corr_from15": 0.377,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.167,
+      "n": 63,
+      "corr_from15": 0.126,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.274,
+      "n": 63,
+      "corr_from15": 0.282,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.349,
+      "n": 63,
+      "corr_from15": 0.308,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": 0.266,
+      "n": 63,
+      "corr_from15": 0.203,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.321,
+      "n": 63,
+      "corr_from15": 0.347,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.371,
+      "n": 15,
+      "corr_from15": 0.202,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.093,
+      "n": 63,
+      "corr_from15": 0.006,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.329,
+      "n": 63,
+      "corr_from15": -0.328,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.591,
+      "n": 63,
+      "corr_from15": 0.573,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.582,
+      "n": 63,
+      "corr_from15": 0.562,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.366,
+      "n": 63,
+      "corr_from15": 0.323,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.588,
+      "n": 63,
+      "corr_from15": 0.574,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.596,
+      "n": 63,
+      "corr_from15": 0.6,
+      "n_from15": 42
+     }
+    },
+    "deep_10": [
+     "ascendex",
+     "binance",
+     "binance-us",
+     "bitstamp",
+     "coinbase",
+     "gemini",
+     "kraken",
+     "kucoin",
+     "mexc"
+    ],
+    "10": {
+     "ascendex alone": {
+      "corr": 0.08,
+      "n": 51,
+      "corr_from15": -0.014,
+      "n_from15": 34
+     },
+     "binance alone": {
+      "corr": 0.876,
+      "n": 63,
+      "corr_from15": 0.874,
+      "n_from15": 42
+     },
+     "binance-us alone": {
+      "corr": 0.347,
+      "n": 63,
+      "corr_from15": 0.459,
+      "n_from15": 42
+     },
+     "bitfinex alone": {
+      "corr": 0.279,
+      "n": 63,
+      "corr_from15": 0.205,
+      "n_from15": 42
+     },
+     "bitget alone": {
+      "corr": 0.204,
+      "n": 21,
+      "corr_from15": 0.13,
+      "n_from15": 14
+     },
+     "bitstamp alone": {
+      "corr": 0.345,
+      "n": 63,
+      "corr_from15": 0.367,
+      "n_from15": 42
+     },
+     "bybit-spot alone": {
+      "corr": 0.174,
+      "n": 63,
+      "corr_from15": 0.201,
+      "n_from15": 42
+     },
+     "coinbase alone": {
+      "corr": 0.588,
+      "n": 63,
+      "corr_from15": 0.622,
+      "n_from15": 42
+     },
+     "crypto-com alone": {
+      "corr": 0.319,
+      "n": 63,
+      "corr_from15": 0.377,
+      "n_from15": 42
+     },
+     "gate-io alone": {
+      "corr": 0.167,
+      "n": 63,
+      "corr_from15": 0.126,
+      "n_from15": 42
+     },
+     "gemini alone": {
+      "corr": 0.477,
+      "n": 63,
+      "corr_from15": 0.512,
+      "n_from15": 42
+     },
+     "huobi alone": {
+      "corr": 0.341,
+      "n": 63,
+      "corr_from15": 0.297,
+      "n_from15": 42
+     },
+     "kraken alone": {
+      "corr": 0.416,
+      "n": 63,
+      "corr_from15": 0.393,
+      "n_from15": 42
+     },
+     "kucoin alone": {
+      "corr": 0.504,
+      "n": 63,
+      "corr_from15": 0.536,
+      "n_from15": 42
+     },
+     "mexc alone": {
+      "corr": 0.525,
+      "n": 15,
+      "corr_from15": 0.459,
+      "n_from15": 10
+     },
+     "okex alone": {
+      "corr": 0.093,
+      "n": 63,
+      "corr_from15": 0.006,
+      "n_from15": 42
+     },
+     "poloniex alone": {
+      "corr": -0.329,
+      "n": 63,
+      "corr_from15": -0.328,
+      "n_from15": 42
+     },
+     "all deep-enough exchanges summed": {
+      "corr": 0.835,
+      "n": 63,
+      "corr_from15": 0.846,
+      "n_from15": 42
+     },
+     "big ones summed (of those)": {
+      "corr": 0.831,
+      "n": 63,
+      "corr_from15": 0.842,
+      "n_from15": 42
+     },
+     "all but Binance summed": {
+      "corr": 0.663,
+      "n": 63,
+      "corr_from15": 0.684,
+      "n_from15": 42
+     },
+     "Binance + Coinbase summed": {
+      "corr": 0.848,
+      "n": 63,
+      "corr_from15": 0.854,
+      "n_from15": 42
+     },
+     "mean of the exchanges' log ratios": {
+      "corr": 0.768,
+      "n": 63,
+      "corr_from15": 0.809,
+      "n_from15": 42
+     }
+    }
+   }
+  }
+ }
+}
