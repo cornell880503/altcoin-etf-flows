@@ -95,6 +95,14 @@ def main():
     v = {k: P["v"][k][j] for k in P["v"]}
     st = {k: P["st"][k][j] for k in P["st"]}
     green = st["overall_liq"] == "Buy" and st["btc_liq"] == "Buy"
+    stat_f = ""
+    try:  # the funding row is not in ck_pulse(): read it from the csv
+        for r in csv.DictReader(open(C.PULSE_CSV, newline="")):
+            u = r.get("update_at") or ""
+            if len(u) >= 13 and u[:13] == C.hstr(U)[:13]:
+                stat_f = r.get("oi_funding_apy_st") or ""
+    except OSError:
+        pass
     prev = {k: P["v"][k][j - 1] for k in P["v"]}
     # a green spell that ended in the last 7 days, and whether the price is below its lows
     spell_js = [k for k in range(j, -1, -1) if hs[j] - hs[k] <= 7 * 24 and P["st"]["overall_liq"][k] == "Buy" and P["st"]["btc_liq"][k] == "Buy"]
@@ -166,6 +174,13 @@ def main():
         verdict = f"反彈條件未成立：Overall LIQ 轉 {st['overall_liq']}，買單在被吃掉；這種狀態歷史上之後 3 天偏弱。"
     elif green and stopped and not failed_below:
         verdict = "反彈條件成立：綠色箭頭亮著、價格也止跌了。歷史上之後 72 小時中位數 +1.2%、62–66% 上漲；一週內再跌 5% 的比例 25–32%。"
+    if green and not overall_bad:
+        strong = []
+        if st["overall_liquidity_btc"] == "Buy":
+            strong.append("全市場掛單 ≥ 3,000 BTC（這組合歷史 72 小時中位數 +2.5%、68% 上漲、一週 +3.0%）")
+        if stat_f == "Buy":
+            strong.append("資金費率年化 ≤ 5%（歷史 72 小時 +1.9%、68% 上漲）")
+        why.append("加分項：" + "；".join(strong) + "。" if strong else "沒有加分項（全市場掛單未達 3,000 BTC、資金費率不低）。")
     elif green and failed_below:
         verdict = "部分成立：綠色箭頭亮著，但這是上一段綠燈失敗、價格跌破那段低點之後再亮。歷史 10 次，72 小時中位數 −1.6%，60% 一週內再跌 5% 以上。"
     elif green:
