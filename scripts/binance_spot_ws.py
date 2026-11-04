@@ -27,6 +27,11 @@ building (age_h) and its gaps. Files: data/ck/live/binspot/YYYY-MM/YYYY-MM-DDTHH
 coin with the hour's means over the job's samples (a file per job and hour, so overlapping jobs never write
 the same file); read_hours() merges them, weighted by the number of samples.
 
+The job also writes the hourly LIQ report: at about :02 each hour (the hour's books and the other venues' data
+are on main by then) it pulls, runs research/liq_watch.py and commits its text as research/liq_watch_latest.txt.
+The scheduled task "LIQ 每小時監看" only relays that file: the cloud session it runs in cannot execute the
+script itself.
+
     python scripts/binance_spot_ws.py --run [--minutes 340]   the job (binspot.yml)
     python scripts/binance_spot_ws.py --listen 60             a short local test: no saved books, no git
 """
@@ -42,6 +47,7 @@ import math
 import os
 import random
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -634,10 +640,10 @@ def save(col, final, to=None):
     return ok
 
 
-def push_data(msg):
+def push_data(msg, paths="data/ck/live/binspot"):
     def sh(cmd):
         return subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True)
-    sh("git add -A data/ck/live/binspot")
+    sh(f"git add -A {paths}")
     if sh("git diff --cached --quiet").returncode == 0:
         return True
     sh(f'git commit -q -m "{msg}"')
@@ -648,6 +654,29 @@ def push_data(msg):
         time.sleep(7)
     print("::warning::could not push", msg, flush=True)
     return False
+
+
+WATCH_TXT = os.path.join(ROOT, "research", "liq_watch_latest.txt")
+WATCH_AT_S = 125  # seconds after the hour: the hour's binspot file, the live loop's closes and any new CoinKarma table are on main
+
+
+def liq_watch():
+    """Pull main, run research/liq_watch.py and commit its report as research/liq_watch_latest.txt (the scheduled
+    task relays that file). A failure is printed and leaves the previous report in place."""
+    subprocess.run("git pull -q --rebase --autostash origin main", shell=True, cwd=ROOT, capture_output=True)
+    try:
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "research", "liq_watch.py")], cwd=ROOT, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired:
+        print("::warning::liq_watch: timed out", flush=True)
+        return False
+    if r.returncode or not r.stdout.strip():
+        print("::warning::liq_watch failed:", (r.stderr or r.stdout)[-800:], flush=True)
+        return False
+    with open(WATCH_TXT, "w") as f:
+        f.write(r.stdout.rstrip("\n") + "\n")
+    ok = push_data(f"liq_watch: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}", paths="research/liq_watch_latest.txt")
+    print(f"liq_watch report written ({len(r.stdout.splitlines())} lines): pushed {ok}", flush=True)
+    return ok
 
 
 def take_over(col, me, t_listen):
@@ -715,6 +744,9 @@ def run(minutes=340, hard=352):
     print("take-over:", json.dumps(rep), flush=True)
     # the first save soon after the take-over (the books are complete again by then), then every CKPT_S
     pushed, next_ckpt, next_prune, next_check, dispatched = col.flushed, time.time() + 600, time.time() + 3600, time.time() + 120, 0.0
+    next_watch = (time.time() // 3600) * 3600 + WATCH_AT_S
+    if next_watch <= time.time() + 60:  # this hour's slot is past (or within a minute): the next hour's
+        next_watch += 3600
     successor = None
     try:
         while True:
@@ -724,6 +756,12 @@ def run(minutes=340, hard=352):
                 pushed = col.flushed
                 push_data(f"binspot: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}")
                 print("status:", json.dumps(col.status()), flush=True)
+            if now >= next_watch:
+                next_watch = (now // 3600 + 1) * 3600 + WATCH_AT_S
+                try:
+                    liq_watch()
+                except Exception:
+                    traceback.print_exc()
             if now >= next_prune:
                 col.prune()
                 next_prune = now + 3600
