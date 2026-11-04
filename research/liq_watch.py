@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """A watch for a BTC rebound from the LIQ angle, printed as a short report in Chinese. The collector job runs it
-every hour (research/liq_watch_latest.txt); the scheduled task "LIQ 監看" reads that file after each of CoinKarma's
-tables (3 a day) and relays the whole report only when the first line says the state changed (the green arrow on
-or off, Overall LIQ into or out of Caution/Sell, Overall Liquidity crossing +-3,000 BTC), else one line. The
-last table's state is kept in research/liq_watch_state.json.
+every hour (research/liq_watch_latest.txt); the scheduled task "LIQ 監看" reads that file every hour and relays the whole report only when the first line says the state changed, else one line. The state is
+our hourly estimate (Binance spot books on CoinKarma's scale, with hysteresis) combined with the published
+Overall LIQ status: the verdict tier, the estimated green arrow on or off, Overall LIQ into or out of
+Caution/Sell, Overall Liquidity crossing +-3,000 BTC. The last hour's state is kept in
+research/liq_watch_state.json.
 
 What it reads (all in the repo, kept current by the workflows):
 - CoinKarma's published tables (data/ck/pulse/pulse.csv, three a day at 00/08/16 UTC): Overall LIQ, BTC LIQ,
@@ -99,7 +100,7 @@ def main():
     U = int(hs[j])
     v = {k: P["v"][k][j] for k in P["v"]}
     st = {k: P["st"][k][j] for k in P["st"]}
-    green = st["overall_liq"] == "Buy" and st["btc_liq"] == "Buy"
+    green = st["overall_liq"] == "Buy" and st["btc_liq"] == "Buy"  # as published
     stat_f = ""
     try:  # the funding row is not in ck_pulse(): read it from the csv
         for r in csv.DictReader(open(C.PULSE_CSV, newline="")):
@@ -170,34 +171,63 @@ def main():
                      f"買單 {bb:.0f}M／賣單 {aa:.0f}M（{rr:.2f} 倍）" + (f"；全市場掛單估 {et:,.0f} BTC（門檻 3,000）" if et is not None else ""))
     if venues:
         lines.append(f"其他交易所 ±5% 買賣比（{tw(hv)} 起這小時）：" + "、".join(venues))
-    # ------------------------------------------------------------ the verdict
+    # ------------------------------------------------------------ the hourly state (our estimates, with hysteresis)
+    # The published table is 8 hours apart; between tables the state follows our Binance spot books mapped onto
+    # CoinKarma's scale. A flag turns on above its threshold and off only below threshold - 10 % (so one noisy hour
+    # does not flip it); a fresh table overrides the flags with the published status.
+    prev = {}
+    try:
+        with open(STATE) as f:
+            prev = json.load(f)
+    except (OSError, ValueError):
+        pass
+    fresh_table = prev.get("table") != int(U)
+    et_now = est[-1][6] if est else None
+    btc_on = bool(prev.get("btc_on", False))
+    if fresh_table:
+        btc_on = st["btc_liq"] == "Buy"
+    if e_now is not None:
+        btc_on = True if e_now >= 3.0 else False if e_now < 2.7 else btc_on
+    ovliq = prev.get("ovliq", "Hold")
+    if fresh_table:
+        ovliq = st["overall_liquidity_btc"] or "Hold"
+    if et_now is not None:
+        ovliq = "Buy" if et_now >= 3000 else "Sell" if et_now <= -3000 else ("Hold" if -2700 < et_now < 2700 else ovliq)
+    overall_pub = st["overall_liq"] or "Hold"
+    overall_bad = overall_pub in ("Caution", "Sell")
+    green_est = overall_pub == "Buy" and btc_on  # the green arrow as our hourly estimate sees it
     stopped = px >= lo24 * 1.01
-    overall_bad = st["overall_liq"] in ("Caution", "Sell")
-    likely = e_now is not None and e_now >= 3 and st["overall_liq"] == "Buy"
-    why = []
     if overall_bad:
-        verdict = f"反彈條件未成立：Overall LIQ 轉 {st['overall_liq']}，買單在被吃掉；這種狀態歷史上之後 3 天偏弱。"
-    elif green and stopped and not failed_below:
-        verdict = "反彈條件成立：綠色箭頭亮著、價格也止跌了。歷史上之後 72 小時中位數 +1.2%、62–66% 上漲；一週內再跌 5% 的比例 25–32%。"
-    if green and not overall_bad:
+        tier = "買單被吃"
+    elif green_est and stopped and not failed_below:
+        tier = "成立"
+    elif green_est:
+        tier = "部分成立"
+    else:
+        tier = "未成立"
+    # ------------------------------------------------------------ the verdict
+    why = []
+    src = "（公布）" if green else "（即時估計，公布值還沒跟上）"
+    if tier == "買單被吃":
+        verdict = f"反彈條件未成立：Overall LIQ 轉 {overall_pub}，買單在被吃掉；這種狀態歷史上之後 3 天偏弱。"
+    elif tier == "成立":
+        verdict = f"反彈條件成立{src}：Overall ≥ 2 且 BTC LIQ ≥ 3，價格也止跌了。歷史上之後 72 小時中位數 +1.2%、62–66% 上漲；一週內再跌 5% 的比例 25–32%。"
+    elif tier == "部分成立" and failed_below:
+        verdict = f"部分成立{src}：綠色箭頭亮著，但這是上一段綠燈失敗、價格跌破那段低點之後再亮。歷史 10 次，72 小時中位數 −1.6%，60% 一週內再跌 5% 以上。"
+    elif tier == "部分成立":
+        verdict = f"部分成立{src}：綠色箭頭亮著，但價格還沒止跌（仍在 24 小時低點 1% 內）。買單厚不等於有人往上推。"
+    else:
+        verdict = (f"反彈條件未成立：Overall {overall_pub}、BTC LIQ {st['btc_liq']}（估 {e_now:.1f}，門檻 3）。"
+                   if e_now is not None else f"反彈條件未成立：Overall {overall_pub}、BTC LIQ {st['btc_liq']}。")
+        if overall_pub == "Buy":
+            why.append("這組「大盤買單厚、BTC 自己不夠厚」歷史上之後 3 天 +0.4%、一週 −1.1%，61% 一週內再跌 5% 以上。")
+    if green_est and not overall_bad:
         strong = []
-        if st["overall_liquidity_btc"] == "Buy":
+        if ovliq == "Buy":
             strong.append("全市場掛單 ≥ 3,000 BTC（這組合歷史 72 小時中位數 +2.5%、68% 上漲、一週 +3.0%）")
         if stat_f == "Buy":
             strong.append("資金費率年化 ≤ 5%（歷史 72 小時 +1.9%、68% 上漲）")
         why.append("加分項：" + "；".join(strong) + "。" if strong else "沒有加分項（全市場掛單未達 3,000 BTC、資金費率不低）。")
-    elif green and failed_below:
-        verdict = "部分成立：綠色箭頭亮著，但這是上一段綠燈失敗、價格跌破那段低點之後再亮。歷史 10 次，72 小時中位數 −1.6%，60% 一週內再跌 5% 以上。"
-    elif green:
-        verdict = "部分成立：綠色箭頭亮著，但價格還沒止跌（仍在 24 小時低點 1% 內）。買單厚不等於有人往上推。"
-    elif likely:
-        verdict = (f"快要成立：公布值還是 Hold，但即時估計 BTC LIQ 已到 {e_now:.1f}（門檻 3），下一張表（{tw_update(U + 8)}）可能亮綠燈。"
-                   + ("不過這會是失敗後再亮，歷史上勝率差（72 小時中位數 −1.6%）。" if failed_below else ""))
-    else:
-        verdict = (f"反彈條件未成立：Overall {st['overall_liq']}、BTC LIQ {st['btc_liq']}（估 {e_now:.1f}，門檻 3）。"
-                   if e_now is not None else f"反彈條件未成立：Overall {st['overall_liq']}、BTC LIQ {st['btc_liq']}。")
-        if st["overall_liq"] == "Buy":
-            why.append("這組「大盤買單厚、BTC 自己不夠厚」歷史上之後 3 天 +0.4%、一週 −1.1%，61% 一週內再跌 5% 以上。")
     if not stopped and not overall_bad:
         why.append(f"價格還在 24 小時低點（{lo24:,.0f}）附近。")
     if e_now is not None and e_prev is not None:
@@ -215,31 +245,29 @@ def main():
         lines.append("注意：" + "；".join(stale) + "。")
     lines.append("歷史統計，不是投資建議。")
     # ------------------------------------------------------------ state changes (the scheduled task relays the report only then)
-    state = {"table": int(U), "green": bool(green), "overall": st["overall_liq"] or "", "ovliq": st["overall_liquidity_btc"] or ""}
-    prev = {}
-    try:
-        with open(STATE) as f:
-            prev = json.load(f)
-    except (OSError, ValueError):
-        pass
+    state = {"table": int(U), "hour": int(hb), "green": bool(green), "btc_on": btc_on, "green_est": green_est, "overall": overall_pub,
+             "ovliq": ovliq, "tier": tier, "stopped": bool(stopped)}
     events = []
-    if prev and prev.get("table") != state["table"]:
+    if prev:
+        if state["tier"] != prev.get("tier"):
+            events.append(f"判斷從「{prev.get('tier')}」變成「{tier}」")
+        if state["green_est"] != prev.get("green_est"):
+            events.append("綠色箭頭（即時估計）" + ("亮起" if green_est else "熄滅"))
         if state["green"] != prev.get("green"):
-            events.append("綠色箭頭" + ("亮起（Overall 與 BTC LIQ 都是 Buy）" if state["green"] else "熄滅"))
-        was_bad, is_bad = prev.get("overall") in ("Caution", "Sell"), state["overall"] in ("Caution", "Sell")
-        if is_bad and (not was_bad or prev.get("overall") != state["overall"]):
-            events.append(f"Overall LIQ 轉 {state['overall']}（買單被吃）")
-        elif was_bad and not is_bad:
-            events.append(f"Overall LIQ 離開 {prev.get('overall')}，回到 {state['overall']}")
-        if state["ovliq"] != prev.get("ovliq") and (state["ovliq"] in ("Buy", "Sell") or prev.get("ovliq") in ("Buy", "Sell")):
-            events.append({"Buy": "全市場掛單 ≥ 3,000 BTC（Buy）", "Sell": "全市場掛單 ≤ −3,000 BTC（Sell）"}.get(state["ovliq"], f"全市場掛單回到 ±3,000 內（{state['ovliq']}）"))
+            events.append("CoinKarma 公布的綠色箭頭" + ("亮起" if green else "熄滅"))
+        was_bad = prev.get("overall") in ("Caution", "Sell")
+        if overall_bad and (not was_bad or prev.get("overall") != overall_pub):
+            events.append(f"Overall LIQ 轉 {overall_pub}（買單被吃）")
+        elif was_bad and not overall_bad:
+            events.append(f"Overall LIQ 離開 {prev.get('overall')}，回到 {overall_pub}")
+        if ovliq != prev.get("ovliq") and (ovliq in ("Buy", "Sell") or prev.get("ovliq") in ("Buy", "Sell")):
+            events.append({"Buy": "全市場掛單 ≥ 3,000 BTC", "Sell": "全市場掛單 ≤ −3,000 BTC"}.get(ovliq, "全市場掛單回到 ±3,000 內"))
     head = "【狀態改變】" + "；".join(events) if events else ("【初始化】" if not prev else "【無變化】")
-    brief = (f"{tw_update(U)} 表：Overall {v['overall_liq']:.2f} {st['overall_liq']}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}、"
-             f"全市場掛單 {v['overall_liquidity_btc']:,.0f} BTC {st['overall_liquidity_btc']}；BTC {px:,.0f}；綠色箭頭{'亮' if green else '沒亮'}")
+    brief = (f"判斷「{tier}」；估 BTC LIQ {e_now:+.1f}" + (f"、全市場掛單 {et_now:,.0f} BTC" if et_now is not None else "")
+             + f"；公布（{tw_update(U)}）Overall {v['overall_liq']:.2f} {overall_pub}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}；BTC {px:,.0f}")
     print("\n".join([head, "摘要：" + brief] + lines))
-    if not prev or prev.get("table") != state["table"]:
-        with open(STATE, "w") as f:
-            json.dump(state, f)
+    with open(STATE, "w") as f:
+        json.dump(state, f)
     return 0
 
 
