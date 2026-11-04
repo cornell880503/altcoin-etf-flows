@@ -94,8 +94,14 @@ def main():
         y = np.array([T[(d, h)][coin] for d, h in pts])
         late = np.array([h >= 15 for d, h in pts])
         res = {}
-        depth = {}
+        depth, reach = {}, {}
+        for e in exchanges:
+            rows = [r for (ee, c, d), rr in B.items() if ee == e and c == coin for r in rr.values()]
+            if rows:
+                depth[e] = float(np.nanmean([float(r["bidq10"]) + float(r["askq10"]) for r in rows]))
+                reach[e] = float(np.nanmedian([float(r["reach"]) for r in rows]))  # % from the mid the stream's book covers
         for band in BANDS:
+            deep = [e for e in exchanges if reach.get(e, 0) >= float(band)]  # exchanges whose stream covers the band
             def ratio_of(exs):
                 xs = []
                 for d, h in pts:
@@ -110,40 +116,41 @@ def main():
             cands = {}
             for e in exchanges:
                 cands[f"{e} alone"] = ratio_of([e])
-                if band == "10":
-                    depth[e] = float(np.nanmean([float(r["bidq10"]) + float(r["askq10"]) for (ee, c, d), rows in B.items() if ee == e and c == coin for r in rows.values()]))
-            avail = [e for e in exchanges if any((e, coin, d) in B for d in dates)]
-            cands["all exchanges summed"] = ratio_of(avail)
-            cands["big six summed"] = ratio_of([e for e in BIG if e in avail])
+            avail = [e for e in deep if any((e, coin, d) in B for d in dates)]
+            cands["all deep-enough exchanges summed"] = ratio_of(avail)
+            cands["big ones summed (of those)"] = ratio_of([e for e in BIG if e in avail])
             cands["all but Binance summed"] = ratio_of([e for e in avail if e != "binance"])
             cands["Binance + Coinbase summed"] = ratio_of([e for e in ("binance", "coinbase") if e in avail])
-            cands["Binance + OKX + Bybit summed"] = ratio_of([e for e in ("binance", "okex", "bybit-spot") if e in avail])
             with np.errstate(invalid="ignore"):
                 single = np.vstack([cands[f"{e} alone"] for e in avail])
                 cands["mean of the exchanges' log ratios"] = np.nanmean(single, axis=0)
+            res[f"deep_{band}"] = avail
             res[band] = {}
             for name, x in cands.items():
                 c_all, n_all = corr(x, y)
                 c_late, n_late = corr(x[late], y[late])
                 res[band][name] = {"corr": None if c_all is None else round(c_all, 3), "n": n_all,
                                    "corr_from15": None if c_late is None else round(c_late, 3), "n_from15": n_late}
-        out["results"][coin] = {"n_points": len(pts), "depth_within_10pct_coins": {e: round(v, 1) for e, v in depth.items()}, "by_band": res}
+        out["results"][coin] = {"n_points": len(pts), "depth_within_10pct_coins": {e: round(v, 1) for e, v in depth.items()},
+                                "stream_reach_pct": {e: round(v, 2) for e, v in reach.items()}, "by_band": res}
     with open(os.path.join(ROOT, "research", "ck_multi_venue.json"), "w") as f:
         json.dump(out, f, indent=1)
     print(f"days {len(dates)}: {dates[0]} .. {dates[-1]}; exchanges {exchanges}")
     for coin in ("BTC", "ETH"):
         r = out["results"][coin]
-        print(f"\n== {coin} LIQ: {r['n_points']} tables; mean depth within 10% (coins): "
-              + ", ".join(f"{e} {v:,.0f}" for e, v in sorted(r["depth_within_10pct_coins"].items(), key=lambda kv: -kv[1])))
-        print(f"{'candidate':40s} " + "  ".join(f"{b + '%':>13s}" for b in BANDS) + "   (corr all / from 15h)")
-        names = list(r["by_band"]["10"].keys())
+        print(f"\n== {coin} LIQ: {r['n_points']} tables; depth within 10% (coins) and how far the stream's book reaches (%): "
+              + ", ".join(f"{e} {v:,.0f} ({r['stream_reach_pct'][e]:.1f}%)" for e, v in sorted(r["depth_within_10pct_coins"].items(), key=lambda kv: -kv[1])))
+        for b in BANDS:
+            print(f"   exchanges whose book covers {b}%: {r['by_band']['deep_' + b]}")
+        print(f"{'candidate':46s} " + "  ".join(f"{b + '%':>13s}" for b in BANDS) + "   (corr all / from 15h)")
+        names = [k for k in r["by_band"]["10"] if not k.startswith("deep_")]
         names.sort(key=lambda nm: -(r["by_band"]["10"][nm]["corr"] or -9))
         for nm in names:
             cells = []
             for b in BANDS:
-                v = r["by_band"][b][nm]
+                v = r["by_band"][b].get(nm) or {"corr": None, "corr_from15": None}
                 cells.append(f"{(v['corr'] if v['corr'] is not None else float('nan')):+.2f}/{(v['corr_from15'] if v['corr_from15'] is not None else float('nan')):+.2f}")
-            print(f"{nm:40s} " + "  ".join(f"{c:>13s}" for c in cells) + f"   n={r['by_band']['10'][nm]['n']}")
+            print(f"{nm:46s} " + "  ".join(f"{c:>13s}" for c in cells) + f"   n={r['by_band']['10'].get(nm, {}).get('n')}")
 
 
 if __name__ == "__main__":
