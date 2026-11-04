@@ -1,7 +1,7 @@
 {
  "assets": {
   "BTC": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -9,20 +9,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1793769660"
+    "X-RateLimit-Reset": "1793772120"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 264,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-03",
-      "blackrock",
-      0.0,
-      -95.0
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-05",
@@ -31,7 +24,7 @@
    "window_days": 30
   },
   "ETH": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -39,20 +32,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1793769660"
+    "X-RateLimit-Reset": "1793772120"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 242,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-03",
-      "blackrock",
-      0.0,
-      -74.4
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-05",
@@ -69,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1793769660"
+    "X-RateLimit-Reset": "1793772120"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -95,7 +81,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1793769660"
+    "X-RateLimit-Reset": "1793772120"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -110,21 +96,19 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": false,
+   "changed": true,
    "days": 22,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-02"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1793769660"
+    "X-RateLimit-Reset": "1793772120"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 109,
+    "compared": 110,
     "differ": 0,
     "examples": []
    },
@@ -135,5 +119,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-04T05:20:33Z"
+ "run_at": "2026-11-04T06:01:49Z"
 }
