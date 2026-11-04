@@ -1,0 +1,269 @@
+{
+ "ascendex": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2021-03-28T00:00:00.000Z",
+   "to": "2026-07-07T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH-USDT",
+   "since": "2021-03-28T00:00:00.000Z",
+   "to": "2026-07-07T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "binance": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2019-03-30T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2019-03-30T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "binance-us": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2019-09-25T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2019-09-25T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "bitfinex": {
+  "BTC": {
+   "id": "BTCUSD",
+   "since": "2019-05-23T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSD",
+   "since": "2019-05-23T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "bitget": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2024-11-08T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2024-11-08T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "bitstamp": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2021-06-15T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2021-06-15T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "bybit-spot": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2021-12-04T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2021-12-04T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "coinbase": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2021-05-04T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH-USDT",
+   "since": "2021-05-04T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "crypto-com": {
+  "BTC": {
+   "id": "BTC_USDT",
+   "since": "2022-06-01T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH_USDT",
+   "since": "2022-06-01T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "gate-io": {
+  "BTC": {
+   "id": "BTC_USDT",
+   "since": "2020-07-01T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH_USDT",
+   "since": "2020-07-01T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "gemini": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2023-01-10T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2023-01-10T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "hitbtc": {
+  "supportsDatasets": null
+ },
+ "huobi": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2019-11-19T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2019-11-19T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "kraken": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2026-07-10T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH-USDT",
+   "since": "2019-12-19T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "kucoin": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2022-08-16T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH-USDT",
+   "since": "2022-08-16T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "mexc": {
+  "BTC": {
+   "id": "BTCUSDT",
+   "since": "2026-06-25T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETHUSDT",
+   "since": "2026-06-25T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "okex": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2019-03-30T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH-USDT",
+   "since": "2019-03-30T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "poloniex": {
+  "BTC": {
+   "id": "BTC_USDT",
+   "since": "2022-08-02T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "ETH": {
+   "id": "ETH_USDT",
+   "since": "2022-08-02T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ },
+ "upbit": {
+  "BTC": {
+   "id": "BTC-USDT",
+   "since": "2024-06-07T00:00:00.000Z",
+   "to": "2026-11-04T00:00:00.000Z",
+   "type": "spot"
+  },
+  "supportsDatasets": null
+ }
+}
