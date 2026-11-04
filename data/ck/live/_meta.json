@@ -1,51 +1,51 @@
 {
  "binspot": {
-  "age_h": 120.9,
-  "at": "2026-11-04T10:57:56Z",
+  "age_h": 121.4,
+  "at": "2026-11-04T11:29:27Z",
   "dead": [],
   "errors": [],
   "exact": {
    "BTC": [
-    4.4,
-    1.2
+    1.5,
+    0.9
    ],
    "ETH": [
-    8.3,
-    4.0
+    4.9,
+    3.7
    ]
   },
-  "final": true,
+  "final": false,
   "gaps": {
    "AAVE": 2,
    "ADA": 2,
    "ARB": 1,
    "ATOM": 1,
    "AVAX": 1,
-   "BNB": 2,
-   "BTC": 2,
+   "BNB": 3,
+   "BTC": 3,
    "DOGE": 1,
-   "ETH": 2,
+   "ETH": 3,
    "LINK": 1,
    "LTC": 1,
    "NEAR": 1,
    "SOL": 1,
    "SUI": 1,
    "UNI": 1,
-   "XRP": 2,
-   "ZEC": 2
+   "XRP": 3,
+   "ZEC": 3
   },
   "levels": {
-   "BTC": 56506,
-   "ETH": 32044
+   "BTC": 56420,
+   "ETH": 32037
   },
   "live": 24,
-  "msgs": 240020,
-  "newest_hour": "2026-11-04T10",
-  "refreshes": 27,
+  "msgs": 82859,
+  "newest_hour": "2026-11-04T11",
+  "refreshes": 0,
   "resyncs": 0,
-  "run": "41813867429",
-  "snaps": 27,
-  "to": 41817330676,
+  "run": "41819719988",
+  "snaps": 24,
+  "to": null,
   "waiting": []
  },
  "books": {
@@ -58,11 +58,11 @@
   "2026-11-04T12"
  ],
  "kick": {
-  "at": "2026-11-04T11:01:55Z",
+  "at": "2026-11-04T12:01:23Z",
   "binspot.yml": "busy",
   "book-data.yml": "started",
   "ck-pulse.yml": "started",
-  "fetch.yml": "recent",
+  "fetch.yml": "started",
   "indicators.yml": "started",
   "okx-history.yml": "recent",
   "radar.yml": "started"
@@ -71,6 +71,6 @@
  "published_hour": "2026-11-04T11",
  "published_rev": "2b7130be1a235438",
  "rounds": 1,
- "run_at": "2026-11-04T12:00:53Z",
- "secs": 33
+ "run_at": "2026-11-04T12:10:53Z",
+ "secs": 34
 }
