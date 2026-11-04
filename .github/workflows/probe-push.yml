@@ -1,0 +1,43 @@
+name: probe-push
+# One-off: reproduce the binspot job's "write the LIQ report and push it" sequence with every git message shown,
+# to see why the push at 11:02 UTC on 2026-11-04 failed five times.
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/probe-push.yml"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet numpy
+      - name: Reproduce
+        run: |
+          set -x
+          git config user.name "etf-flows-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git status --short | head
+          git log --oneline -1
+          git pull --rebase --autostash origin main; echo "pull1 rc=$?"
+          python research/liq_watch.py > /tmp/report.txt; echo "script rc=$?"; head -3 /tmp/report.txt
+          cp /tmp/report.txt research/liq_watch_latest.txt
+          git status --short | head
+          git add -A research/liq_watch_latest.txt research/liq_watch_state.json
+          git diff --cached --stat
+          git commit -q -m "probe: liq_watch $(date -u +%H:%M:%SZ)"; echo "commit rc=$?"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -X theirs origin main; echo "pull rc=$?"
+            git status | head -5
+            git push origin HEAD:main; echo "push rc=$?" && break
+            git rebase --abort; echo "abort rc=$?"
+            sleep 5
+          done
+          git log --oneline -3
