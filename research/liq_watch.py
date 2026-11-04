@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""An hourly watch for a BTC rebound from the LIQ angle, printed as a short report in Chinese (the scheduled task
-"LIQ 每小時監看" runs it after the hour and relays the text).
+"""A watch for a BTC rebound from the LIQ angle, printed as a short report in Chinese. The collector job runs it
+every hour (research/liq_watch_latest.txt); the scheduled task "LIQ 監看" reads that file after each of CoinKarma's
+tables (3 a day) and relays the whole report only when the first line says the state changed (the green arrow on
+or off, Overall LIQ into or out of Caution/Sell, Overall Liquidity crossing +-3,000 BTC), else one line. The
+last table's state is kept in research/liq_watch_state.json.
 
 What it reads (all in the repo, kept current by the workflows):
 - CoinKarma's published tables (data/ck/pulse/pulse.csv, three a day at 00/08/16 UTC): Overall LIQ, BTC LIQ,
@@ -26,6 +29,7 @@ import csv
 import datetime as dt
 import glob
 import gzip
+import json
 import math
 import os
 import sys
@@ -37,6 +41,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import binance_spot_ws as bws  # noqa: E402
 import ck_liq as C  # noqa: E402
 
+STATE = os.path.join(ROOT, "research", "liq_watch_state.json")  # the last table's state, to report changes
 FIT_FROM = C.hidx("2026-10-31T10")  # the collector's BTC book had filled in (a day after it started)
 UTC8 = dt.timedelta(hours=8)
 
@@ -209,7 +214,32 @@ def main():
     if stale:
         lines.append("注意：" + "；".join(stale) + "。")
     lines.append("歷史統計，不是投資建議。")
-    print("\n".join(lines))
+    # ------------------------------------------------------------ state changes (the scheduled task relays the report only then)
+    state = {"table": int(U), "green": bool(green), "overall": st["overall_liq"] or "", "ovliq": st["overall_liquidity_btc"] or ""}
+    prev = {}
+    try:
+        with open(STATE) as f:
+            prev = json.load(f)
+    except (OSError, ValueError):
+        pass
+    events = []
+    if prev and prev.get("table") != state["table"]:
+        if state["green"] != prev.get("green"):
+            events.append("綠色箭頭" + ("亮起（Overall 與 BTC LIQ 都是 Buy）" if state["green"] else "熄滅"))
+        was_bad, is_bad = prev.get("overall") in ("Caution", "Sell"), state["overall"] in ("Caution", "Sell")
+        if is_bad and (not was_bad or prev.get("overall") != state["overall"]):
+            events.append(f"Overall LIQ 轉 {state['overall']}（買單被吃）")
+        elif was_bad and not is_bad:
+            events.append(f"Overall LIQ 離開 {prev.get('overall')}，回到 {state['overall']}")
+        if state["ovliq"] != prev.get("ovliq") and (state["ovliq"] in ("Buy", "Sell") or prev.get("ovliq") in ("Buy", "Sell")):
+            events.append({"Buy": "全市場掛單 ≥ 3,000 BTC（Buy）", "Sell": "全市場掛單 ≤ −3,000 BTC（Sell）"}.get(state["ovliq"], f"全市場掛單回到 ±3,000 內（{state['ovliq']}）"))
+    head = "【狀態改變】" + "；".join(events) if events else ("【初始化】" if not prev else "【無變化】")
+    brief = (f"{tw_update(U)} 表：Overall {v['overall_liq']:.2f} {st['overall_liq']}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}、"
+             f"全市場掛單 {v['overall_liquidity_btc']:,.0f} BTC {st['overall_liquidity_btc']}；BTC {px:,.0f}；綠色箭頭{'亮' if green else '沒亮'}")
+    print("\n".join([head, "摘要：" + brief] + lines))
+    if not prev or prev.get("table") != state["table"]:
+        with open(STATE, "w") as f:
+            json.dump(state, f)
     return 0
 
 

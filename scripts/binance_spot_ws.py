@@ -674,7 +674,7 @@ def liq_watch():
         return False
     with open(WATCH_TXT, "w") as f:
         f.write(r.stdout.rstrip("\n") + "\n")
-    ok = push_data(f"liq_watch: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}", paths="research/liq_watch_latest.txt")
+    ok = push_data(f"liq_watch: {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}", paths="research/liq_watch_latest.txt research/liq_watch_state.json")
     print(f"liq_watch report written ({len(r.stdout.splitlines())} lines): pushed {ok}", flush=True)
     return ok
 
