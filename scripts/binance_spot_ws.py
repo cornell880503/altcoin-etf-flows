@@ -73,7 +73,10 @@ REFRESH_S = 30 * 60     # a fresh snapshot merged into each live book this often
 BANDS = (0.25, 0.5, 1, 2, 3, 5, 7.5, 10, 15, 20, 30)
 KEEP_PCT = 50           # levels farther than this from the mid are dropped (memory, the saved books)
 VALS = ["mid", "levels_b", "levels_a", "exact_b", "exact_a", "age_h", "gaps"] + [f"{s}{k}" for k in BANDS for s in ("bidq", "askq", "bidn", "askn")]
-FIELDS = ["hour", "coin", "n"] + VALS
+# the hour's last sample (CoinKarma's hourly LIQ behaves like a reading at the hour's end, not a mean: at a sharp dip the
+# end-of-hour book is far more bid-heavy than the hour's mean) and the hour's extremes of the 10 % ratio
+LAST = ["mid_last", "bidq10_last", "askq10_last", "bidn10_last", "askn10_last", "ratio10_max", "ratio10_min", "t_last"]
+FIELDS = ["hour", "coin", "n"] + VALS + LAST
 SAMPLE_S = 10
 RESYNC_GAP_S = 30       # at most one gap snapshot a symbol in this many seconds
 BUF_MAX = 20000         # buffered events a symbol (BTC sends at most 10 a second: half an hour)
@@ -428,6 +431,12 @@ class Collector:
                 a["n"] += 1
                 for k, v in s.items():
                     a[k] = a.get(k, 0.0) + v
+                r10 = s["bidq10"] / s["askq10"] if s["askq10"] > 0 else None
+                a["_last"] = {"mid_last": mid, "bidq10_last": s["bidq10"], "askq10_last": s["askq10"], "bidn10_last": s["bidn10"],
+                              "askn10_last": s["askn10"], "t_last": t}
+                if r10 is not None:
+                    a["_rmax"] = max(a.get("_rmax", r10), r10)
+                    a["_rmin"] = min(a.get("_rmin", r10), r10)
             self.stop_ev.wait(max(0.5, SAMPLE_S - (time.time() - t) % SAMPLE_S))
 
     def path(self, hour):
@@ -454,6 +463,14 @@ class Collector:
             for k in VALS:
                 tot = (float(old[k]) * n_old if old and old.get(k) not in (None, "") else 0.0) + new.get(k, 0.0)
                 row[k] = f"{tot / max(1, n):.6g}"
+            last = new.get("_last") or {}
+            old_t = float(old["t_last"]) if old and old.get("t_last") else 0.0
+            for k in LAST:  # the later of the two runs' last samples; the extremes over both
+                if k in ("ratio10_max", "ratio10_min"):
+                    vals = [float(old[k]) for _ in [0] if old and old.get(k) not in (None, "")] + ([new["_rmax" if k == "ratio10_max" else "_rmin"]] if "_rmax" in new else [])
+                    row[k] = f"{(max(vals) if k == 'ratio10_max' else min(vals)):.6g}" if vals else ""
+                else:
+                    row[k] = f"{last[k]:.6g}" if last and last.get("t_last", 0) >= old_t else (old.get(k, "") if old else "")
             have[coin] = row
         buf = io.StringIO()
         w = csv.DictWriter(buf, FIELDS, lineterminator="\n", extrasaction="ignore")
@@ -533,7 +550,7 @@ def read_hours(path=OUT):
             n = int(float(r.get("n") or 0))
             if n <= 0:
                 continue
-            cell = acc.setdefault(r["hour"], {}).setdefault(r["coin"], [0, {}])
+            cell = acc.setdefault(r["hour"], {}).setdefault(r["coin"], [0, {}, {}])
             cell[0] += n
             for k, v in r.items():
                 if k in ("hour", "coin", "n") or v in (None, ""):
@@ -542,10 +559,19 @@ def read_hours(path=OUT):
                     x = float(v)
                 except ValueError:
                     continue
+                if k in LAST:  # not averaged: the latest last sample, the widest extremes
+                    t_new, t_old = float(r.get("t_last") or 0), float(cell[2].get("t_last") or 0)
+                    if k == "ratio10_max":
+                        cell[2][k] = max(cell[2].get(k, x), x)
+                    elif k == "ratio10_min":
+                        cell[2][k] = min(cell[2].get(k, x), x)
+                    elif t_new >= t_old:
+                        cell[2][k] = x
+                    continue
                 s = cell[1].setdefault(k, [0.0, 0])
                 s[0] += x * n
                 s[1] += n
-    return {h: {c: {k: s[0] / s[1] for k, s in cell[1].items()} | {"n": cell[0]} for c, cell in coins.items()}
+    return {h: {c: {k: s[0] / s[1] for k, s in cell[1].items()} | cell[2] | {"n": cell[0]} for c, cell in coins.items()}
             for h, coins in acc.items()}
 
 

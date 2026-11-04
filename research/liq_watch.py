@@ -117,35 +117,50 @@ def main():
         spell_px = [closes[int(hs[k]) - 1] for k in spell_js if int(hs[k]) - 1 in closes]
         failed_below = bool(spell_px) and px < min(spell_px)
     # ------------------------------------------------------------ the estimate from our spot books
-    def xb(h):
+    # CoinKarma's hourly LIQ reads like the book at the hour's END (their 11/4 chart: 3.0-3.4 at the dip hours, where
+    # our hourly MEANS gave 2.6-2.7): the estimate uses the hour's last sample where the files have it (from 2026-11-04
+    # 22:00 UTC+8 on), the mean before that. Both are mapped with a + b x fitted on their tables.
+    def xb(h, last=False):
         r = rows.get(h, {}).get("BTC")
-        return math.log(r["bidq10"] / r["askq10"]) if r and r.get("bidq10") and r.get("askq10") else None
+        if not r:
+            return None
+        bq, aq = (r.get("bidq10_last"), r.get("askq10_last")) if last else (r.get("bidq10"), r.get("askq10"))
+        return math.log(bq / aq) if bq and aq else None
 
-    def xt(h):
+    def xt(h, last=False):
         d = rows.get(h, {})
-        cs = [c for c in C.COINS if c != "ZEC" and c in d and d[c].get("bidn10") is not None and d[c].get("askn10") is not None]
-        m = d.get("BTC", {}).get("mid")
-        return sum(d[c]["bidn10"] - d[c]["askn10"] for c in cs) / m if len(cs) >= 20 and m else None
+        sb, sa = ("bidn10_last", "askn10_last") if last else ("bidn10", "askn10")
+        cs = [c for c in C.COINS if c != "ZEC" and c in d and d[c].get(sb) is not None and d[c].get(sa) is not None]
+        m = d.get("BTC", {}).get("mid_last" if last else "mid")
+        return sum(d[c][sb] - d[c][sa] for c in cs) / m if len(cs) >= 20 and m else None
 
     fits = {}
     for key, fx, ck in (("btc", xb, "btc_liq"), ("tot", xt, "overall_liquidity_btc")):
-        pts = [(fx(int(h) - 1), P["v"][ck][k]) for k, h in enumerate(hs) if int(h) - 1 >= FIT_FROM]
-        pts = [(x, y) for x, y in pts if x is not None and np.isfinite(y)]
-        if len(pts) >= 6:
-            x, y = np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
-            b, a = np.polyfit(x, y, 1)
-            fits[key] = (a, b, float((y - (a + b * x)).std()), len(pts), float(np.corrcoef(x, y)[0, 1]))
+        for last in (True, False):  # the end-of-hour values once at least 10 tables have them, else the means
+            pts = [(fx(int(h) - 1, last), P["v"][ck][k]) for k, h in enumerate(hs) if int(h) - 1 >= FIT_FROM]
+            pts = [(x, y) for x, y in pts if x is not None and np.isfinite(y)]
+            if len(pts) >= (10 if last else 6):
+                x, y = np.array([p[0] for p in pts]), np.array([p[1] for p in pts])
+                b, a = np.polyfit(x, y, 1)
+                fits[key] = (a, b, float((y - (a + b * x)).std()), len(pts), float(np.corrcoef(x, y)[0, 1]), "last" if last else "mean")
+                break
     hb = max(h for h in rows if rows[h].get("BTC"))
     est = []
     for h in range(hb - 2, hb + 1):
         r = rows.get(h, {}).get("BTC")
         if not r or "btc" not in fits:
             continue
-        x = xb(h)
-        e = fits["btc"][0] + fits["btc"][1] * x if x is not None else None
-        t = xt(h)
-        et = fits["tot"][0] + fits["tot"][1] * t if t is not None and "tot" in fits else None
-        est.append((h, r["mid"], r["bidn10"] / 1e6, r["askn10"] / 1e6, math.exp(x) if x is not None else None, e, et))
+        xm, xl = xb(h), xb(h, True)
+        em = fits["btc"][0] + fits["btc"][1] * xm if xm is not None else None
+        el = fits["btc"][0] + fits["btc"][1] * xl if xl is not None else None
+        tm, tl = xt(h), xt(h, True)
+        etm = fits["tot"][0] + fits["tot"][1] * tm if tm is not None and "tot" in fits else None
+        etl = fits["tot"][0] + fits["tot"][1] * tl if tl is not None and "tot" in fits else None
+        rmax = r.get("ratio10_max")
+        emax = fits["btc"][0] + fits["btc"][1] * math.log(rmax) if rmax else None
+        # (hour, mid, bids $M, asks $M, ratio, est: end-of-hour else mean, Overall Liquidity est, mean est, hour max est)
+        est.append((h, r.get("mid_last") or r["mid"], r["bidn10"] / 1e6, r["askn10"] / 1e6, math.exp(xl if xl is not None else xm) if (xl or xm) is not None else None,
+                    el if el is not None else em, etl if etl is not None else etm, em, emax))
     e_now = est[-1][5] if est else None
     e_prev = est[-2][5] if len(est) > 1 else None
     # other venues: the latest hour's ratios against the hour before
@@ -165,9 +180,14 @@ def main():
                  f"全市場掛單 {v['overall_liquidity_btc']:,.0f} BTC {s('overall_liquidity_btc')}、Pulse {v['pulse_index']:.0f} {s('pulse_index')}；"
                  f"綠色箭頭{'亮著' if green else '沒亮'}")
     if est:
-        e_txt = "、".join(f"{tw(h)[-5:]} {e:+.2f}" if e is not None else f"{tw(h)[-5:]} —" for h, _, _, _, _, e, _ in est)
-        h, mid, bb, aa, rr, e, et = est[-1]
-        lines.append(f"即時估計（我們的 Binance 現貨 ±10%）：BTC LIQ 估 {e_txt}（誤差約 ±{fits['btc'][2]:.1f}，門檻 3）；"
+        e_txt = "、".join(f"{tw(h)[-5:]} {e:+.2f}" if e is not None else f"{tw(h)[-5:]} —" for h, _, _, _, _, e, _, _, _ in est)
+        h, mid, bb, aa, rr, e, et, em, emax = est[-1]
+        extra = ""
+        if em is not None and e is not None and abs(em - e) > 0.005:
+            extra += f"；小時平均 {em:+.2f}"
+        if emax is not None:
+            extra += f"、小時內最高 {emax:+.2f}"
+        lines.append(f"即時估計（我們的 Binance 現貨 ±10%，小時末）：BTC LIQ 估 {e_txt}{extra}（誤差約 ±{fits['btc'][2]:.1f}，門檻 3）；"
                      f"買單 {bb:.0f}M／賣單 {aa:.0f}M（{rr:.2f} 倍）" + (f"；全市場掛單估 {et:,.0f} BTC（門檻 3,000）" if et is not None else ""))
     if venues:
         lines.append(f"其他交易所 ±5% 買賣比（{tw(hv)} 起這小時）：" + "、".join(venues))
