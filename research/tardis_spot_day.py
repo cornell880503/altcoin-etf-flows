@@ -19,6 +19,7 @@ import io
 import math
 import os
 import time
+import urllib.parse
 import urllib.request
 
 import numpy as np
@@ -119,8 +120,9 @@ def table(acc):
 
 
 def replay(item, date):
-    exch, sym = item.split(":")
-    url = f"https://datasets.tardis.dev/v1/{exch}/incremental_book_L2/{date[:4]}/{date[5:7]}/{date[8:10]}/{sym}.csv.gz"
+    exch, sym = item.split(":", 1)
+    sym = sym.upper().replace("/", "-").replace(":", "-")  # Tardis's file names: upper case, / and : as -
+    url = f"https://datasets.tardis.dev/v1/{exch}/incremental_book_L2/{date[:4]}/{date[5:7]}/{date[8:10]}/{urllib.parse.quote(sym)}.csv.gz"
     t0 = time.time()
     with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=600) as r:
         rd = csv.reader(io.TextIOWrapper(gzip.GzipFile(fileobj=r), encoding="utf-8"))
