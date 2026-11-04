@@ -12,8 +12,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "research", "spot", "tardis_symbols.json")
 EXCHANGES = ["binance", "coinbase", "okex", "bybit-spot", "kraken", "bitfinex", "bitstamp", "gate-io", "kucoin", "huobi",
              "crypto-com", "gemini", "upbit", "bitget", "mexc", "ascendex", "poloniex", "hitbtc", "whitebit", "binance-us"]
-WANT = {"BTC": (["BTCUSDT", "BTC-USDT", "BTC_USDT", "BTC/USDT"], ["BTCUSD", "BTC-USD", "BTC/USD", "XBTUSD", "XBT/USD", "XBT-USD", "BTCUSDC", "BTC-USDC"]),
+WANT = {"BTC": (["BTCUSDT", "BTC-USDT", "BTC_USDT", "BTC/USDT"], ["XBT/USD", "XBTUSD", "XBT-USD", "BTCUSD", "BTC-USD", "BTC/USD", "BTCUSDC", "BTC-USDC"]),
         "ETH": (["ETHUSDT", "ETH-USDT", "ETH_USDT", "ETH/USDT"], ["ETHUSD", "ETH-USD", "ETH/USD", "ETHUSDC", "ETH-USDC"])}
+PREFER_USD = {"coinbase", "bitstamp", "kraken", "gemini", "bitfinex", "binance-us"}  # their main market quotes in US$
 UA = "Mozilla/5.0 (compatible; altcoin-etf-flows research; +https://github.com/cornell880503/altcoin-etf-flows)"
 
 
@@ -37,7 +38,7 @@ def main():
         rec = {"supportsDatasets": d.get("supportsDatasets")}
         for coin, (usdt, usd) in WANT.items():
             pick = None
-            for cand in usdt + usd:
+            for cand in (usd + usdt if ex in PREFER_USD else usdt + usd):
                 s = syms.get(cand.upper())
                 if s and "incremental_book_L2" in (s.get("dataTypes") or []) and s.get("type", "spot") in ("spot", None):
                     pick = s

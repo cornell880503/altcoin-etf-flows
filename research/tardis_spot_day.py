@@ -123,12 +123,14 @@ def replay(item, date):
     exch, sym = item.split(":", 1)
     sym = sym.upper().replace("/", "-").replace(":", "-")  # Tardis's file names: upper case, / and : as -
     url = f"https://datasets.tardis.dev/v1/{exch}/incremental_book_L2/{date[:4]}/{date[5:7]}/{date[8:10]}/{urllib.parse.quote(sym)}.csv.gz"
+    p = os.path.join(OUT, f"tardis_{exch}_{sym}_{date}.csv")
+    if os.path.exists(p) and sum(1 for _ in open(p)) >= 21:  # replayed before (a rerun does only what is missing)
+        return item, "exists", 0, 0, 0
     t0 = time.time()
     with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=600) as r:
         rd = csv.reader(io.TextIOWrapper(gzip.GzipFile(fileobj=r), encoding="utf-8"))
         acc, rows = replay_rows(rd, keep=exch == "binance")
     out = table(acc)
-    p = os.path.join(OUT, f"tardis_{exch}_{sym}_{date}.csv")
     with open(p, "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(FIELDS)
