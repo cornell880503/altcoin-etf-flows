@@ -60,8 +60,8 @@
       "symbol": "LINK",
       "asset": "link",
       "netFlowUsdM": -1.8,
-      "tradingDays": 3,
-      "avgDailyUsdM": -0.6,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.4,
       "positiveDays": 0,
       "negativeDays": 1
     },
@@ -69,7 +69,7 @@
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": -0.4,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": -0.1,
       "positiveDays": 0,
       "negativeDays": 1
@@ -123,8 +123,8 @@
       "symbol": "NEAR",
       "asset": "near",
       "netFlowUsdM": -3.6,
-      "tradingDays": 3,
-      "avgDailyUsdM": -1.2,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.9,
       "positiveDays": 0,
       "negativeDays": 1
     },
