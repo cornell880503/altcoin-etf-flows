@@ -9,42 +9,18 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1793937720"
+    "X-RateLimit-Reset": "1793941320"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 264,
-    "differ": 5,
+    "differ": 1,
     "examples": [
      [
       "2026-11-05",
-      "twentyOneShares",
+      "blackrock",
       0.0,
-      -18.9
-     ],
-     [
-      "2026-11-05",
-      "fidelity",
-      0.0,
-      -199.9
-     ],
-     [
-      "2026-11-05",
-      "franklin",
-      0.0,
-      -32.9
-     ],
-     [
-      "2026-11-05",
-      "grayscale",
-      0.0,
-      -49.9
-     ],
-     [
-      "2026-11-05",
-      "vanEck",
-      0.0,
-      -23.6
+      -105.0
      ]
     ]
    },
@@ -63,7 +39,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1793937720"
+    "X-RateLimit-Reset": "1793941320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -72,15 +48,15 @@
     "examples": [
      [
       "2026-11-05",
-      "fidelity",
+      "blackrock",
       0.0,
-      -2.2
+      -75.2
      ],
      [
       "2026-11-05",
-      "grayscale",
+      "blackrock2",
       0.0,
-      -0.5
+      -22.0
      ]
     ]
    },
@@ -91,7 +67,7 @@
    "window_days": 30
   },
   "HYPE": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -99,20 +75,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1793937720"
+    "X-RateLimit-Reset": "1793941320"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 66,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-05",
-      "grayscale",
-      0.0,
-      -0.8
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-07",
@@ -121,7 +90,7 @@
    "window_days": 30
   },
   "SOL": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -132,20 +101,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1793937720"
+    "X-RateLimit-Reset": "1793941320"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 195,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-05",
-      "grayscale",
-      0.0,
-      -0.8
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-07",
@@ -154,7 +116,7 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -162,7 +124,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1793937720"
+    "X-RateLimit-Reset": "1793941320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -177,5 +139,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-06T04:01:44Z"
+ "run_at": "2026-11-06T05:01:44Z"
 }
