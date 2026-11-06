@@ -5,29 +5,29 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -439.6,
+      "netFlowUsdM": -764.8,
       "tradingDays": 4,
-      "avgDailyUsdM": -109.9,
+      "avgDailyUsdM": -191.2,
       "positiveDays": 1,
-      "negativeDays": 2
+      "negativeDays": 3
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -172.3,
+      "netFlowUsdM": -175,
       "tradingDays": 4,
-      "avgDailyUsdM": -43.1,
+      "avgDailyUsdM": -43.7,
       "positiveDays": 1,
-      "negativeDays": 2
+      "negativeDays": 3
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -0.1,
+      "netFlowUsdM": -0.9,
       "tradingDays": 4,
-      "avgDailyUsdM": 0,
+      "avgDailyUsdM": -0.2,
       "positiveDays": 0,
-      "negativeDays": 1
+      "negativeDays": 2
     },
     {
       "symbol": "XRP",
@@ -41,9 +41,9 @@
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "netFlowUsdM": -6.8,
+      "netFlowUsdM": -7.6,
       "tradingDays": 4,
-      "avgDailyUsdM": -1.7,
+      "avgDailyUsdM": -1.9,
       "positiveDays": 1,
       "negativeDays": 3
     },
@@ -51,7 +51,7 @@
       "symbol": "DOGE",
       "asset": "doge",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -114,7 +114,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
