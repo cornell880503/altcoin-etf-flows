@@ -1,7 +1,7 @@
 {
  "assets": {
   "BTC": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -9,20 +9,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1793941320"
+    "X-RateLimit-Reset": "1793944920"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 264,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-05",
-      "blackrock",
-      0.0,
-      -105.0
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-07",
@@ -31,7 +24,7 @@
    "window_days": 30
   },
   "ETH": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -39,26 +32,13 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1793941320"
+    "X-RateLimit-Reset": "1793944920"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 242,
-    "differ": 2,
-    "examples": [
-     [
-      "2026-11-05",
-      "blackrock",
-      0.0,
-      -75.2
-     ],
-     [
-      "2026-11-05",
-      "blackrock2",
-      0.0,
-      -22.0
-     ]
-    ]
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-07",
@@ -75,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1793941320"
+    "X-RateLimit-Reset": "1793944920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -101,7 +81,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1793941320"
+    "X-RateLimit-Reset": "1793944920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -124,7 +104,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1793941320"
+    "X-RateLimit-Reset": "1793944920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -139,5 +119,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-06T05:01:44Z"
+ "run_at": "2026-11-06T06:01:44Z"
 }
