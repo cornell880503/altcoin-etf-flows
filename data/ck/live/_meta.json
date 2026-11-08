@@ -40,7 +40,7 @@
   },
   "live": 24,
   "msgs": 1064026,
-  "newest_hour": "2026-11-08T01",
+  "newest_hour": "2026-11-08T02",
   "refreshes": 154,
   "resyncs": 0,
   "run": "42416381898",
@@ -58,9 +58,9 @@
   "2026-11-08T03"
  ],
  "kick": {
-  "at": "2026-11-08T02:01:27Z",
+  "at": "2026-11-08T03:01:29Z",
   "binspot.yml": "busy",
-  "book-data.yml": "HTTPError: HTTP Error 500: Internal Server Error",
+  "book-data.yml": "started",
   "ck-pulse.yml": "started",
   "fetch.yml": "started",
   "indicators.yml": "started",
@@ -71,6 +71,6 @@
  "published_hour": "2026-11-08T02",
  "published_rev": "a7f6ab8eaa49c573",
  "rounds": 1,
- "run_at": "2026-11-08T03:00:53Z",
- "secs": 34
+ "run_at": "2026-11-08T03:20:52Z",
+ "secs": 33
 }
