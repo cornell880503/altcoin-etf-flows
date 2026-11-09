@@ -6,14 +6,14 @@
    "last": "2026-11-09",
    "ok": true,
    "rows": 12,
-   "secs": 1.1
+   "secs": 0.8
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-07",
    "ok": true,
    "rows": 2285,
-   "secs": 5.5
+   "secs": 5.7
   },
   "bitfinex": {
    "complete": {
@@ -21,14 +21,14 @@
     "ethbtc_long": "2026-11-09",
     "fusd_rate": "2026-11-09",
     "fusd_used": "2026-11-09",
-    "fust_rate": "2026-11-08",
+    "fust_rate": "2026-11-09",
     "fust_used": "2026-11-09"
    },
    "first": "2021-01-01",
    "last": "2026-11-09",
    "ok": true,
    "rows": 2139,
-   "secs": 24.5,
+   "secs": 24.4,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,28 +36,28 @@
    "last": "2026-11-03",
    "ok": true,
    "rows": 448,
-   "secs": 0.7
+   "secs": 0.6
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1794186000,
+   "last": 1794189600,
    "ok": true,
-   "rows": 51301,
-   "secs": 0.9
+   "rows": 51302,
+   "secs": 0.6
   },
   "deribit": {
    "first": "2026-10-29",
    "last": "2026-11-09",
    "ok": true,
    "rows": 12,
-   "secs": 1.1
+   "secs": 0.9
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-06",
    "ok": true,
    "rows": 1966,
-   "secs": 3.9
+   "secs": 4.2
   },
   "funding": {
    "binance_est": {
@@ -70,27 +70,27 @@
    "last": "2026-11-08",
    "ok": true,
    "rows": 2504,
-   "secs": 6.5
+   "secs": 5.0
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-09",
    "ok": true,
    "rows": 353,
-   "secs": 0.6
+   "secs": 0.5
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-08",
    "ok": true,
    "rows": 844,
-   "secs": 0.4
+   "secs": 0.5
   },
   "stablecoins": {
    "first": "2017-11-29",
-   "last": "2026-11-08",
+   "last": "2026-11-09",
    "ok": true,
-   "rows": 3267,
+   "rows": 3268,
    "secs": 3.4
   },
   "usdc_usdt": {
@@ -98,8 +98,8 @@
    "last": "2026-11-07",
    "ok": true,
    "rows": 2718,
-   "secs": 1.7
+   "secs": 1.2
   }
  },
- "run_at": "2026-11-09T01:01:52Z"
+ "run_at": "2026-11-09T02:01:46Z"
 }
