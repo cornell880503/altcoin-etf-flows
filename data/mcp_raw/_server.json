@@ -30,7 +30,9 @@
      "annotations": {
       "title": "Latest Crypto ETF Flows",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -74,7 +76,9 @@
      "annotations": {
       "title": "Crypto ETF Flow History",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -118,7 +122,9 @@
      "annotations": {
       "title": "Crypto ETF Flows by Fund",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -159,7 +165,9 @@
      "annotations": {
       "title": "Crypto ETF Fund Directory",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -176,7 +184,9 @@
      "annotations": {
       "title": "CEFI Sentiment Index",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -193,7 +203,9 @@
      "annotations": {
       "title": "Crypto Spot Prices",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -210,7 +222,9 @@
      "annotations": {
       "title": "Weekly ETF Flow Analytics",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -251,7 +265,9 @@
      "annotations": {
       "title": "Crypto Held by ETFs",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -268,7 +284,9 @@
      "annotations": {
       "title": "Bitcoin ETFs vs Miners",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -309,7 +327,9 @@
      "annotations": {
       "title": "Crypto ETF Issuer Fee Revenue",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -350,7 +370,9 @@
      "annotations": {
       "title": "Staking Inside Crypto ETFs",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
@@ -391,7 +413,9 @@
      "annotations": {
       "title": "ETF Holders Average Entry Price",
       "readOnlyHint": true,
-      "openWorldHint": false
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
      },
      "execution": {
       "taskSupport": "forbidden"
