@@ -5,26 +5,17 @@
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-09"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1794281760"
+    "X-RateLimit-Reset": "1794286920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 243,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-09",
-      "twentyOneShares",
-      0.0,
-      -9.9
-     ]
-    ]
+    "compared": 252,
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-12",
@@ -37,24 +28,28 @@
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-09"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1794281760"
+    "X-RateLimit-Reset": "1794286920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 223,
-    "differ": 1,
+    "compared": 231,
+    "differ": 2,
     "examples": [
      [
       "2026-11-09",
-      "twentyOneShares",
+      "grayscaleCrypto",
       0.0,
-      -2.0
+      -25.0
+     ],
+     [
+      "2026-11-09",
+      "fidelity",
+      0.0,
+      -19.1
      ]
     ]
    },
@@ -69,26 +64,17 @@
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-09"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1794281760"
+    "X-RateLimit-Reset": "1794286920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 62,
-    "differ": 1,
-    "examples": [
-     [
-      "2026-11-09",
-      "twentyOneShares",
-      0.0,
-      -3.5
-     ]
-    ]
+    "compared": 63,
+    "differ": 0,
+    "examples": []
    },
    "window": [
     "2026-10-12",
@@ -108,18 +94,30 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1794281760"
+    "X-RateLimit-Reset": "1794286920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 182,
-    "differ": 1,
+    "compared": 186,
+    "differ": 3,
     "examples": [
      [
       "2026-11-09",
-      "twentyOneShares",
+      "franklin",
       0.0,
-      -3.0
+      -0.7
+     ],
+     [
+      "2026-11-09",
+      "vanEck",
+      0.0,
+      -0.3
+     ],
+     [
+      "2026-11-09",
+      "fidelity",
+      0.0,
+      -0.8
      ]
     ]
    },
@@ -134,24 +132,22 @@
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-09"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1794281760"
+    "X-RateLimit-Reset": "1794286920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 102,
+    "compared": 105,
     "differ": 1,
     "examples": [
      [
       "2026-11-09",
-      "twentyOneShares",
+      "canary",
       0.0,
-      -0.2
+      -0.7
      ]
     ]
    },
@@ -162,5 +158,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-10T03:34:59Z"
+ "run_at": "2026-11-10T05:01:43Z"
 }

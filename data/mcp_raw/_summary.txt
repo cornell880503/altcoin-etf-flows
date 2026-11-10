@@ -13,19 +13,19 @@
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-09",
-      "netFlowUsdM": -0.4
+      "netFlowUsdM": -44.5
     },
     {
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-11-09",
-      "netFlowUsdM": -8.8
+      "netFlowUsdM": -10.6
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-11-09",
-      "netFlowUsdM": -9.6
+      "netFlowUsdM": -10.3
     },
     {
       "symbol": "HYP",
@@ -105,6 +105,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -9.3,
-  "updatedAt": "2026-11-10T03:35:11.885Z"
+  "totalUsdM": -55.9,
+  "updatedAt": "2026-11-10T05:01:52.813Z"
 }
