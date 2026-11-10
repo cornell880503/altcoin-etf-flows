@@ -6,14 +6,14 @@
    "last": "2026-11-10",
    "ok": true,
    "rows": 13,
-   "secs": 0.9
+   "secs": 0.4
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-09",
    "ok": true,
    "rows": 2287,
-   "secs": 6.7
+   "secs": 4.3
   },
   "bitfinex": {
    "complete": {
@@ -40,44 +40,43 @@
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1794294000,
+   "last": 1794301200,
    "ok": true,
-   "rows": 51331,
-   "secs": 0.7
+   "rows": 51333,
+   "secs": 0.6
   },
   "deribit": {
-   "first": "2026-10-29",
-   "last": "2026-11-10",
-   "ok": true,
-   "rows": 13,
-   "secs": 1.0
+   "error": "HTTPError: HTTP Error 503: Service Unavailable",
+   "ok": false,
+   "secs": 18.4,
+   "trace": "^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py\", line 492, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py\", line 639, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 503: Service Unavailable\n"
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-09",
    "ok": true,
    "rows": 1967,
-   "secs": 4.4
+   "secs": 3.9
   },
   "funding": {
    "binance_est": {
-    "asked": 1,
+    "asked": 0,
     "mae_pct8h": 0.000125,
-    "new_days": 1,
+    "new_days": 0,
     "overlap_days": 43
    },
    "first": "2020-01-01",
    "last": "2026-11-09",
    "ok": true,
    "rows": 2505,
-   "secs": 4.4
+   "secs": 2.8
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-10",
    "ok": true,
    "rows": 354,
-   "secs": 0.6
+   "secs": 0.4
   },
   "okx_lending": {
    "first": "2024-07-18",
@@ -91,15 +90,15 @@
    "last": "2026-11-10",
    "ok": true,
    "rows": 3269,
-   "secs": 4.8
+   "secs": 4.5
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-09",
    "ok": true,
    "rows": 2720,
-   "secs": 1.8
+   "secs": 0.8
   }
  },
- "run_at": "2026-11-10T07:47:18Z"
+ "run_at": "2026-11-10T09:01:57Z"
 }
