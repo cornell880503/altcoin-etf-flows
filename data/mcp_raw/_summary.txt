@@ -19,19 +19,19 @@
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-11-09",
-      "netFlowUsdM": 0.1
+      "netFlowUsdM": -5.8
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-11-09",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -9.4
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
       "date": "2026-11-09",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 0.8
     },
     {
       "symbol": "DOGE",
@@ -84,8 +84,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "date": "2026-11-09",
-      "lastReportedDate": "2026-11-06",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "NEAR",
@@ -108,6 +107,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": 23.7,
-  "updatedAt": "2026-11-10T02:01:53.710Z"
+  "totalUsdM": 9.3,
+  "updatedAt": "2026-11-10T03:01:49.284Z"
 }
