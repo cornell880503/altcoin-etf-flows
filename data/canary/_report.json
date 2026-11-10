@@ -1,23 +1,931 @@
 {
- "run_at": "2026-11-10T21:19:22Z",
+ "run_at": "2026-11-10T22:02:47Z",
  "funds": {
   "XRPC": {
-   "error": "TimeoutError: The read operation timed out"
+   "bytes": 1608726,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "-18.24%",
+       "40.37%",
+       "-",
+       "-",
+       "-",
+       "-36.72%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-40.10%",
+       "-17.12%",
+       "40.37%",
+       "-",
+       "-",
+       "-",
+       "-53.64%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2025",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "18",
+       "115",
+       "25",
+       "40",
+       "40",
+       "10"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 249,
+   "stored": 249,
+   "first": "2025-11-12",
+   "last": "2026-11-09"
   },
   "LTCC": {
-   "error": "HTTPError: HTTP Error 504: Gateway Timeout"
+   "bytes": 1607604,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "-13.80%",
+       "55.65%",
+       "-",
+       "-",
+       "-",
+       "-35.56%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-32.96%",
+       "-18.96%",
+       "55.65%",
+       "-49.29%",
+       "-",
+       "-",
+       "-49.88%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2025",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "21",
+       "115",
+       "27",
+       "39",
+       "38",
+       "11"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 261,
+   "stored": 261,
+   "first": "2025-10-27",
+   "last": "2026-11-09"
   },
   "HBR": {
-   "error": "HTTPError: HTTP Error 504: Gateway Timeout"
+   "bytes": 1609894,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "0.69%",
+       "49.13%",
+       "-",
+       "-",
+       "-",
+       "-41.48%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-37.23%",
+       "-31.00%",
+       "49.13%",
+       "-62.58%",
+       "-",
+       "-",
+       "-63.52%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2025",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "26",
+       "139",
+       "37",
+       "45",
+       "47",
+       "10"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 261,
+   "stored": 261,
+   "first": "2025-10-27",
+   "last": "2026-11-09"
   },
   "SOLC": {
-   "error": "HTTPError: HTTP Error 504: Gateway Timeout"
+   "bytes": 1621214,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "-0.75%",
+       "54.37%",
+       "-",
+       "-",
+       "-",
+       "-4.72%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-26.63%",
+       "-19.85%",
+       "54.37%",
+       "-",
+       "-",
+       "-",
+       "-29.56%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2025",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "20",
+       "104",
+       "29",
+       "32",
+       "33",
+       "10"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 246,
+   "stored": 246,
+   "first": "2025-11-17",
+   "last": "2026-11-09"
   },
   "SUIS": {
-   "error": "HTTPError: HTTP Error 504: Gateway Timeout"
+   "bytes": 1618089,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "19.72%",
+       "61.70%",
+       "-",
+       "-",
+       "-",
+       "19.72%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-11.96%",
+       "-24.68%",
+       "61.70%",
+       "-",
+       "-",
+       "-",
+       "-11.96%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "96",
+       "14",
+       "40",
+       "30",
+       "12"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 185,
+   "stored": 185,
+   "first": "2026-02-17",
+   "last": "2026-11-09"
   },
   "TRXS": {
-   "error": "HTTPError: HTTP Error 504: Gateway Timeout"
+   "bytes": 1616314,
+   "tables": [
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "Quarter",
+       "YTD",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 09/30/2026",
+       "-",
+       "-0.24%",
+       "-",
+       "-",
+       "-",
+       "-0.24%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "YTD",
+       "Monthly",
+       "Quarter",
+       "1 Year",
+       "3 Year",
+       "5 Year",
+       "Since Inception*"
+      ],
+      [
+       "Net asset value (NAV) returnAs of 11/09/2026",
+       "-6.36%",
+       "-0.68%",
+       "-",
+       "-",
+       "-",
+       "-",
+       "-6.36%"
+      ]
+     ]
+    },
+    {
+     "n_rows": 4,
+     "head": [
+      [
+       "",
+       "2026",
+       "Q1",
+       "Q2",
+       "Q3",
+       "Q4"
+      ],
+      [
+       "Premium",
+       "26",
+       "0",
+       "0",
+       "16",
+       "10"
+      ]
+     ]
+    },
+    {
+     "n_rows": 1253,
+     "head": [
+      [
+       "Fund Name",
+       "Fund Ticker",
+       "CUSIP",
+       "Net Assets",
+       "Shares Outstanding",
+       "NAV",
+       "NAV Change Dollars",
+       "NAV Change Percentage",
+       "Market Price",
+       "Market Price Change Dollars",
+       "Market Price Change Percentage",
+       "Premium/Discount",
+       "Median 30 Day Spread Percentage",
+       "Rate Date"
+      ],
+      [
+       "Canary XRP ETF",
+       "XRPC",
+       "13,723",
+       "5,250,000.00",
+       "210,000",
+       "25",
+       "",
+       "",
+       "25",
+       "",
+       "",
+       "0.00",
+       "",
+       "11/12/2025"
+      ]
+     ]
+    },
+    {
+     "n_rows": 16,
+     "head": [
+      [
+       "Date",
+       "Account",
+       "Name",
+       "Ticker",
+       "CUSIP",
+       "Quantity",
+       "Quantity -- Original",
+       "Price",
+       "Market Value",
+       "Weightings",
+       "NetAssets",
+       "SharesOutstanding",
+       "CreationUnits",
+       "MoneyMarketFlag"
+      ],
+      [
+       "11/10/2026",
+       "HBR",
+       "HEDERA",
+       "HBARUSD",
+       "HBARUSD",
+       "838,074,157.40",
+       "838,074,157.39900005",
+       "0.07",
+       "56,347,915.97",
+       "100.00%",
+       "56,349,240",
+       "6,180,000",
+       "618",
+       ""
+      ]
+     ]
+    }
+   ],
+   "from": "table",
+   "parsed": 45,
+   "stored": 45,
+   "first": "2026-09-08",
+   "last": "2026-11-09"
   }
  }
 }
