@@ -1,105 +1,113 @@
 {
   "today": "2026-11-10",
-  "referenceDate": "2026-11-06",
+  "referenceDate": "2026-11-09",
   "referenceIsToday": false,
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "date": "2026-11-06",
-      "netFlowUsdM": -411.9
+      "date": "2026-11-09",
+      "netFlowUsdM": 22.1
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "date": "2026-11-06",
-      "netFlowUsdM": -93.3
+      "date": "2026-11-09",
+      "netFlowUsdM": 1.6
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "date": "2026-11-06",
-      "netFlowUsdM": -24.3
+      "date": "2026-11-09",
+      "netFlowUsdM": 0.1
     },
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "date": "2026-11-06",
+      "date": "2026-11-09",
       "netFlowUsdM": 0
     },
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "date": "2026-11-06",
-      "netFlowUsdM": -8
+      "date": "2026-11-09",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "LINK",
       "asset": "link",
-      "date": "2026-11-06",
-      "netFlowUsdM": -1.1
+      "date": "2026-11-09",
+      "netFlowUsdM": 0
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
-      "date": "2026-11-06",
+      "date": "2026-11-09",
       "netFlowUsdM": 0
     },
     {
       "symbol": "HBAR",
       "asset": "hbar",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "DOT",
       "asset": "dot",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "SUI",
       "asset": "sui",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "NEAR",
       "asset": "near",
-      "date": "2026-11-06",
+      "date": "2026-11-09",
       "netFlowUsdM": 0
     },
     {
       "symbol": "TRX",
       "asset": "trx",
-      "date": "2026-11-06",
-      "netFlowUsdM": 0
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "date": "2026-11-06",
-      "netFlowUsdM": 1.8
+      "date": "2026-11-09",
+      "lastReportedDate": "2026-11-06",
+      "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -536.8,
-  "updatedAt": "2026-11-10T01:01:47.203Z"
+  "totalUsdM": 23.7,
+  "updatedAt": "2026-11-10T02:01:53.710Z"
 }
