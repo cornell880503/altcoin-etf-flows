@@ -5,18 +5,18 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -1023.2,
+      "netFlowUsdM": -1138.2,
       "tradingDays": 4,
-      "avgDailyUsdM": -255.8,
-      "positiveDays": 1,
-      "negativeDays": 3
+      "avgDailyUsdM": -284.6,
+      "positiveDays": 0,
+      "negativeDays": 4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -380.1,
+      "netFlowUsdM": -379,
       "tradingDays": 4,
-      "avgDailyUsdM": -95,
+      "avgDailyUsdM": -94.7,
       "positiveDays": 0,
       "negativeDays": 4
     },
