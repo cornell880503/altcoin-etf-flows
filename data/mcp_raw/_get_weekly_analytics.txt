@@ -23,11 +23,11 @@
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -36.8,
+      "netFlowUsdM": -45,
       "tradingDays": 4,
-      "avgDailyUsdM": -9.2,
+      "avgDailyUsdM": -11.3,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 4
     },
     {
       "symbol": "XRP",
@@ -114,7 +114,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
