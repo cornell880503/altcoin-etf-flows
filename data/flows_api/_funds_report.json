@@ -11,13 +11,20 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1794448920"
+    "X-RateLimit-Reset": "1794452520"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 252,
-    "differ": 0,
-    "examples": []
+    "compared": 254,
+    "differ": 1,
+    "examples": [
+     [
+      "2026-11-11",
+      "morganStanley",
+      0.0,
+      9.0
+     ]
+    ]
    },
    "window": [
     "2026-10-13",
@@ -36,11 +43,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1794448920"
+    "X-RateLimit-Reset": "1794452520"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 231,
+    "compared": 233,
     "differ": 0,
     "examples": []
    },
@@ -51,54 +58,6 @@
    "window_days": 30
   },
   "HYPE": {
-   "changed": false,
-   "days": 21,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1794448920"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 63,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-13",
-    "2026-11-10"
-   ],
-   "window_days": 30
-  },
-  "SOL": {
-   "changed": false,
-   "days": 21,
-   "gap": false,
-   "ok": true,
-   "partial": [
-    "2026-11-10"
-   ],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1794448920"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 188,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-13",
-    "2026-11-10"
-   ],
-   "window_days": 30
-  },
-  "XRP": {
    "changed": true,
    "days": 22,
    "gap": false,
@@ -108,12 +67,63 @@
    ],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1794448920"
+    "X-RateLimit-Remaining": "55",
+    "X-RateLimit-Reset": "1794452520"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 105,
+    "compared": 63,
+    "differ": 0,
+    "examples": []
+   },
+   "window": [
+    "2026-10-13",
+    "2026-11-11"
+   ],
+   "window_days": 30
+  },
+  "SOL": {
+   "changed": true,
+   "days": 22,
+   "gap": false,
+   "ok": true,
+   "partial": [
+    "2026-11-10",
+    "2026-11-11"
+   ],
+   "rate_limit": {
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "57",
+    "X-RateLimit-Reset": "1794452520"
+   },
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 188,
+    "differ": 0,
+    "examples": []
+   },
+   "window": [
+    "2026-10-13",
+    "2026-11-11"
+   ],
+   "window_days": 30
+  },
+  "XRP": {
+   "changed": false,
+   "days": 22,
+   "gap": false,
+   "ok": true,
+   "partial": [
+    "2026-11-11"
+   ],
+   "rate_limit": {
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "56",
+    "X-RateLimit-Reset": "1794452520"
+   },
+   "unknown_tickers": [],
+   "vs_stored": {
+    "compared": 106,
     "differ": 0,
     "examples": []
    },
@@ -124,5 +134,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-12T02:01:51Z"
+ "run_at": "2026-11-12T03:01:47Z"
 }

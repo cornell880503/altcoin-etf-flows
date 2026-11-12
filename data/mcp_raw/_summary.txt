@@ -7,7 +7,7 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-11",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 9
     },
     {
       "symbol": "ETH",
@@ -19,7 +19,7 @@
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-11-11",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -2.1
     },
     {
       "symbol": "XRP",
@@ -108,6 +108,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -6.1,
-  "updatedAt": "2026-11-12T02:02:24.901Z"
+  "totalUsdM": 0.8,
+  "updatedAt": "2026-11-12T03:01:56.655Z"
 }
