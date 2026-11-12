@@ -14,11 +14,11 @@
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -279,
+      "netFlowUsdM": -283.8,
       "tradingDays": 4,
-      "avgDailyUsdM": -69.8,
+      "avgDailyUsdM": -71,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 4
     },
     {
       "symbol": "SOL",
@@ -60,8 +60,8 @@
       "symbol": "LINK",
       "asset": "link",
       "netFlowUsdM": -1.1,
-      "tradingDays": 3,
-      "avgDailyUsdM": -0.4,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.3,
       "positiveDays": 0,
       "negativeDays": 1
     },
@@ -69,7 +69,7 @@
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -122,11 +122,11 @@
     {
       "symbol": "NEAR",
       "asset": "near",
-      "netFlowUsdM": 0,
-      "tradingDays": 3,
-      "avgDailyUsdM": 0,
+      "netFlowUsdM": -1.4,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.3,
       "positiveDays": 0,
-      "negativeDays": 0
+      "negativeDays": 1
     },
     {
       "symbol": "TRX",
