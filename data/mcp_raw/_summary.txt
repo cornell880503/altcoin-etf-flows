@@ -1,5 +1,5 @@
 {
-  "today": "2026-11-11",
+  "today": "2026-11-12",
   "referenceDate": "2026-11-10",
   "referenceIsToday": false,
   "assets": [
@@ -25,7 +25,7 @@
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-11-10",
-      "netFlowUsdM": -6.9
+      "netFlowUsdM": -7.5
     },
     {
       "symbol": "HYP",
@@ -100,6 +100,6 @@
       "netFlowUsdM": 0
     }
   ],
-  "totalUsdM": -113.9,
-  "updatedAt": "2026-11-11T23:01:44.608Z"
+  "totalUsdM": -114.5,
+  "updatedAt": "2026-11-12T00:01:44.494Z"
 }
