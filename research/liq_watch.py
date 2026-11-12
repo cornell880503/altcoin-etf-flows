@@ -376,9 +376,10 @@ def main():
     lines.append(f"LIQ 監看 {t_tw.month}/{t_tw.day} {t_tw.hour:02d}:{t_tw.minute:02d}（台灣時間）")
     lines.append(f"BTC {px:,.0f}（{tw(hc)} 收盤" + (f"；最新均價 {mid_now:,.0f}" if mid_now else "") + f"）｜24 小時 {chg24:+.1%}｜距 7 天高點 {px / hi7 - 1:+.1%}、距 7 天低點 {px / lo7 - 1:+.1%}")
     s = lambda k: st[k] or "?"  # noqa: E731
-    lines.append(f"CoinKarma 公布（{tw(U)}）：Overall {v['overall_liq']:.2f} {st['overall_liq']}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}"
-                 f"（上一張 {prev_v['overall_liq']:.2f}／{prev_v['btc_liq']:.2f}）、累積 {v['acc_btc_liq']:.0f} {s('acc_btc_liq')}、"
-                 f"全市場掛單 {v['overall_liquidity_btc']:,.0f} BTC {s('overall_liquidity_btc')}、Pulse {v['pulse_index']:.0f} {s('pulse_index')}；"
+    fmt = lambda x, spec: format(x, spec) if x is not None and np.isfinite(x) else "—"  # noqa: E731  (a value the OCR did not read)
+    lines.append(f"CoinKarma 公布（{tw(U)}）：Overall {fmt(v['overall_liq'], '.2f')} {st['overall_liq']}、BTC LIQ {fmt(v['btc_liq'], '.2f')} {st['btc_liq']}"
+                 f"（上一張 {fmt(prev_v['overall_liq'], '.2f')}／{fmt(prev_v['btc_liq'], '.2f')}）、累積 {fmt(v['acc_btc_liq'], '.0f')} {s('acc_btc_liq')}、"
+                 f"全市場掛單 {fmt(v['overall_liquidity_btc'], ',.0f')} BTC {s('overall_liquidity_btc')}、Pulse {fmt(v['pulse_index'], '.0f')} {s('pulse_index')}；"
                  f"綠色箭頭{'亮著' if green else '沒亮'}")
     if fb and e_now is not None:
         e_txt = "、".join(f"{tw(h)[-5:]} {e[h]:+.2f}" if e[h] is not None else f"{tw(h)[-5:]} —" for h in range(hb - 2, hb + 1))
