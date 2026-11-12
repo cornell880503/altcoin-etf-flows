@@ -46,6 +46,7 @@ import json
 import math
 import os
 import random
+import re
 import subprocess
 import sys
 import tempfile
@@ -683,17 +684,47 @@ def push_data(msg, paths="data/ck/live/binspot"):
 
 
 WATCH_TXT = os.path.join(ROOT, "research", "liq_watch_latest.txt")
-WATCH_AT_S = 125  # seconds after the hour: the hour's binspot file, the live loop's closes and any new CoinKarma table are on main
+WATCH_AT_S = 570  # seconds after the hour: the hour's binspot file, the live loop's closes (:01) and the table ck-pulse reads at a
+# table hour (its commit lands at :02-:08, 95 % by :08) are on main; the scheduled task reads the report at :15
+WATCH_LATE_S = 20 * 60  # a slot passed this recently is still run (a hand-over: the old job ended before its slot)
 
 
-def liq_watch():
-    """Pull main, run research/liq_watch.py and commit its report as research/liq_watch_latest.txt (the scheduled
-    task relays that file). A failure is printed and leaves the previous report in place."""
-    subprocess.run("git pull -q --rebase --autostash origin main", shell=True, cwd=ROOT, capture_output=True)
+def report_hour():
+    """The hour (epoch // 3600, UTC) of the report on main, from its own time line "LIQ 監看 M/D HH:MM（台灣時間）"
+    (the checkout is shallow, so the commit time is not reliable); None if unknown."""
     try:
-        r = subprocess.run([sys.executable, os.path.join(ROOT, "research", "liq_watch.py")], cwd=ROOT, capture_output=True, text=True, timeout=600)
+        with open(WATCH_TXT, encoding="utf-8") as f:
+            head = [next(f, "") for _ in range(5)]
+    except OSError:
+        return None
+    for line in head:
+        m = re.match(r"LIQ 監看 (\d{1,2})/(\d{1,2}) (\d{2}):\d{2}", line.strip())
+        if m:
+            now = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=8)
+            year = now.year - (1 if (now.month, now.day) < (int(m[1]), int(m[2])) else 0)  # a report from last year's December in January
+            t = dt.datetime(year, int(m[1]), int(m[2]), int(m[3]), tzinfo=dt.timezone.utc) - dt.timedelta(hours=8)
+            return int(t.timestamp() // 3600)
+    return None
+
+
+def liq_watch(attempt=0):
+    """Pull main, run research/liq_watch.py and commit its report as research/liq_watch_latest.txt (the scheduled
+    task relays that file). A failure is printed and leaves the previous report in place. On the first two
+    attempts of a table hour the script waits for the table (exit 3), which counts as a failure here, so the
+    caller tries again in three minutes; the third attempt reports without it. An attempt that finds this hour's
+    report already on main (the old job ran it before handing over) does nothing."""
+    subprocess.run("git pull -q --rebase --autostash origin main", shell=True, cwd=ROOT, capture_output=True)
+    if report_hour() == int(time.time() // 3600):
+        print("liq_watch: this hour's report is on main already", flush=True)
+        return True
+    cmd = [sys.executable, os.path.join(ROOT, "research", "liq_watch.py")] + (["--table-wait"] if attempt < 2 else [])
+    try:
+        r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired:
         print("::warning::liq_watch: timed out", flush=True)
+        return False
+    if r.returncode == 3:
+        print("liq_watch: waiting for this hour's CoinKarma table:", r.stderr.strip()[-300:], flush=True)
         return False
     if r.returncode or not r.stdout.strip():
         print("::warning::liq_watch failed:", (r.stderr or r.stdout)[-800:], flush=True)
@@ -770,8 +801,10 @@ def run(minutes=340, hard=352):
     print("take-over:", json.dumps(rep), flush=True)
     # the first save soon after the take-over (the books are complete again by then), then every CKPT_S
     pushed, next_ckpt, next_prune, next_check, dispatched = col.flushed, time.time() + 600, time.time() + 3600, time.time() + 120, 0.0
+    # the watch: this hour's slot if it is ahead or passed less than WATCH_LATE_S ago (a hand-over hour: the old job
+    # ended before its slot, and this one reads the repo, not its own books), else the next hour's
     next_watch = (time.time() // 3600) * 3600 + WATCH_AT_S
-    if next_watch <= time.time() + 60:  # this hour's slot is past (or within a minute): the next hour's
+    if time.time() - next_watch > WATCH_LATE_S:
         next_watch += 3600
     watch_tries = 0
     successor = None
@@ -785,12 +818,12 @@ def run(minutes=340, hard=352):
                 print("status:", json.dumps(col.status()), flush=True)
             if now >= next_watch:
                 try:
-                    ok = liq_watch()
+                    ok = liq_watch(watch_tries)
                 except Exception:
                     traceback.print_exc()
                     ok = False
                 watch_tries = watch_tries + 1 if not ok else 0
-                # a failed push (main busy) is tried again in three minutes, up to three times, then the next hour
+                # a failed push (main busy) or a table not read yet is tried again in three minutes, up to three times, then the next hour
                 next_watch = now + 180 if (not ok and watch_tries < 3) else (now // 3600 + 1) * 3600 + WATCH_AT_S
                 if ok or watch_tries >= 3:
                     watch_tries = 0
