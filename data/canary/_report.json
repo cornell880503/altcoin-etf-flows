@@ -1,8 +1,8 @@
 {
- "run_at": "2026-11-13T12:02:40Z",
+ "run_at": "2026-11-13T13:02:49Z",
  "funds": {
   "XRPC": {
-   "bytes": 1562246,
+   "bytes": 1562252,
    "tables": [
     {
      "n_rows": 4,
@@ -41,14 +41,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-41.86%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-43.41%",
        "-17.12%",
        "40.37%",
+       "-56.20%",
        "-",
        "-",
-       "-",
-       "-55.00%"
+       "-56.20%"
       ]
      ]
     },
@@ -157,7 +157,7 @@
    "last": "2026-11-12"
   },
   "LTCC": {
-   "bytes": 1561254,
+   "bytes": 1561265,
    "tables": [
     {
      "n_rows": 4,
@@ -196,14 +196,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-33.71%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-35.05%",
        "-18.96%",
        "55.65%",
-       "-49.35%",
+       "-49.48%",
        "-",
        "-",
-       "-50.44%"
+       "-51.44%"
       ]
      ]
     },
@@ -312,7 +312,7 @@
    "last": "2026-11-12"
   },
   "HBR": {
-   "bytes": 1563720,
+   "bytes": 1563731,
    "tables": [
     {
      "n_rows": 4,
@@ -351,14 +351,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-38.13%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-40.81%",
        "-31.00%",
        "49.13%",
-       "-63.47%",
+       "-64.00%",
        "-",
        "-",
-       "-64.04%"
+       "-65.60%"
       ]
      ]
     },
@@ -467,7 +467,7 @@
    "last": "2026-11-12"
   },
   "SOLC": {
-   "bytes": 1577500,
+   "bytes": 1577498,
    "tables": [
     {
      "n_rows": 4,
@@ -506,14 +506,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-28.08%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-31.04%",
        "-19.85%",
        "54.37%",
        "-",
        "-",
        "-",
-       "-30.96%"
+       "-33.80%"
       ]
      ]
     },
@@ -661,14 +661,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-13.24%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-16.88%",
        "-24.68%",
        "61.70%",
        "-",
        "-",
        "-",
-       "-13.24%"
+       "-16.88%"
       ]
      ]
     },
@@ -775,7 +775,7 @@
    "last": "2026-11-12"
   },
   "TRXS": {
-   "bytes": 1572579,
+   "bytes": 1572577,
    "tables": [
     {
      "n_rows": 4,
@@ -814,14 +814,14 @@
        "Since Inception*"
       ],
       [
-       "Net asset value (NAV) returnAs of 11/11/2026",
-       "-6.20%",
+       "Net asset value (NAV) returnAs of 11/12/2026",
+       "-6.64%",
        "-0.68%",
        "-",
        "-",
        "-",
        "-",
-       "-6.20%"
+       "-6.64%"
       ]
      ]
     },
