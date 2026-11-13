@@ -43,6 +43,16 @@ The verdict applies the historical results of research/ck_pulse_backtest.py (Coi
 - dip with Overall Buy but BTC LIQ not Buy: 72 h +0.4 %, 7 d -1.1 % (41 % up), 61 % fell 5 % or more within a week;
 - Overall LIQ Caution / Sell: the next 3 days weak (Sell: 72 h -0.6 %).
 
+The ETF side (CoinKarma's "BTC ETF 30D Net Flow", their tweet of 2026-11-13; scripts/btc_etf30.py reproduces it):
+the US spot bitcoin ETFs' net flow over the last 30 days in BTC, as of the latest final session (a session counts
+from 09:00 UTC the next day, when BlackRock's figure is in). Zones: net inflow (>= 0), net outflow, red (< -20K BTC,
+their colour); a zone is left only 3K past its threshold, so a value wobbling around 0 does not notify every day.
+A zone change is an event; a flip to net inflow says whether Overall LIQ is Buy at the same time (their
+"resonance"). The verdict quotes research/etf_flow_backtest.json (2024-02 .. now): after entering red BTC fell
+another 16-24 % before bottoming in each of the 4 completed cycles, and the flip back to inflow came 6-14 % above
+the low; CoinKarma's green arrow did well only while the 30D flow was net inflow (newly lit: 14 d +5.2 %, 71 % up)
+and was close to a coin toss while it was negative (in red: 14 d +0.4 %, 53 % up).
+
 Usage: liq_watch.py [--table-wait]   (--table-wait: at a table hour, exit 3 instead of reporting while the
 table due this hour has not been read yet and it is less than 25 minutes past the hour; the collector then
 tries again in three minutes)."""
@@ -61,6 +71,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import binance_spot_ws as bws  # noqa: E402
+import btc_etf30 as E  # noqa: E402
 import ck_liq as C  # noqa: E402
 
 STATE = os.environ.get("LIQ_WATCH_STATE") or os.path.join(ROOT, "research", "liq_watch_state.json")
@@ -71,6 +82,7 @@ ON_TOT, OFF_TOT = 3000.0, 2500.0  # the Overall Liquidity (BTC) flag
 CONFIRM_H = 2  # a flip needs the condition this hour and the hour before
 ANCHOR = 0.5  # the share of the latest table's residual carried forward
 TABLE_WAIT_MIN = 25  # --table-wait: how long after a table hour the table is waited for
+ETF_HIST = os.path.join(ROOT, "research", "etf_flow_backtest.json")
 
 
 def tw(h):
@@ -181,6 +193,96 @@ def skill(rows, P, fx, key, st_key, thr):
     return hits, n, base
 
 
+# ---------------------------------------------------------------- the ETF side: the 30-day net flow
+def md(d):
+    """'2026-11-12' -> '11/12'"""
+    return f"{int(d[5:7])}/{int(d[8:10])}"
+
+
+def etf_view(now):
+    """The 30D net flow as of the latest final session, its zone and what it would take to change; None without data."""
+    try:
+        rows = E.load()
+    except (OSError, ValueError, KeyError):
+        return None
+    final = [r for r in rows if E.settled_at(r[0]) <= now]
+    if len(final) < 40:
+        return None
+    f30 = E.flow30(final)
+    ds = [r[0] for r in final]
+    zs = E.zones(f30, ds)
+    D, zone = zs[-1]
+    k = len(zs) - 1
+    while k > 0 and zs[k - 1][1] == zone:
+        k -= 1
+    since = zs[k][0]
+    v, v1 = f30[D], f30[ds[-2]]
+    start = (dt.date.fromisoformat(D) - dt.timedelta(days=E.WINDOW_D)).isoformat()
+    usd = sum(r[1] for r in final if start <= r[0] <= D)
+    last = final[-1]
+    prelim = rows[-1] if rows[-1][0] > D else None
+    path = [(t, v - lv) for t, lv in E.leaving(final, E.WINDOW_D + 1)]  # the 30D on day t if every later session were 0
+    low_t, low_v = min(path, key=lambda p: p[1])
+    out_red = next((t for t, x in path if x >= E.RED), None) if v < E.RED else None
+    t14 = (dt.date.fromisoformat(D) + dt.timedelta(days=14)).isoformat()
+    n14 = sum(1 for i in range(1, 15) if (dt.date.fromisoformat(D) + dt.timedelta(days=i)).weekday() < 5)
+    need14 = -dict(path)[t14]  # thousand BTC of net inflow needed by then for the 30D to reach 0
+    return {"date": D, "zone": zone, "since": since, "v": v, "v1": v1, "usd": usd, "flow": last[1], "flow_k": last[2], "price": last[3],
+            "prelim": prelim, "low_t": low_t, "low_v": low_v, "out_red": out_red, "need14": need14, "n14": n14, "days": (dt.date.fromisoformat(D) - dt.date.fromisoformat(since)).days}
+
+
+def etf_hist():
+    """The backtest's numbers for the texts (research/etf_flow_backtest.json), None if it is missing."""
+    try:
+        H = json.load(open(ETF_HIST))
+    except (OSError, ValueError):
+        return None
+    cyc, seen = [], set()
+    for c in H.get("cycles", []):  # completed cycles, one per episode (a re-entry into red before the flip is the same one)
+        if "flip_up" in c and c["flip_up"] not in seen:
+            seen.add(c["flip_up"])
+            cyc.append(c)
+    return {"cycles": cyc, "green": H.get("green_by_zone", {}), "zc": H.get("zone_changes", {}),
+            "flip_liq": H.get("events", {}).get("flip_up_liq_buy", {}).get("list", [])}
+
+
+def zc_text(H, key, what):
+    """'過去 n 次<what>，7 天後 x% 上漲（中位數 ..）、14 天 ..' from the zone-change statistics."""
+    s = (H or {}).get("zc", {}).get(key, {}).get("summary") if H else None
+    if not s or "7d" not in s:
+        return ""
+    def one(h, k):
+        up = s[k]["up"]
+        word = "全部下跌" if up == 0 else "全部上漲" if up == 1 else f"{up:.0%} 上漲"
+        return f"{h} 天後{word}（中位數 {s[k]['median']:+.1%}）"
+    parts = [one(h, k) for h, k in (("7", "7d"), ("14", "14d"), ("30", "30d")) if k in s]
+    return f"過去有結果的 {s['7d']['n']} 次{what}，" + "、".join(parts)
+
+
+def etf_event(prev_zone, ev, pub_ov, H):
+    """The notice for a zone change."""
+    z, v = ev["zone"], ev["v"]
+    if z == "in":
+        txt = f"ETF 30 天淨流量翻正（{md(ev['date'])} 收 {v:+.1f}K BTC，{ {'out': '淨流出', 'red': '紅區'}.get(prev_zone, prev_zone)} → 淨流入）"
+        if pub_ov == "Buy":
+            fl = (H or {}).get("flip_liq") or []
+            hist = "、".join(f"{e['date'][:7]} 14 天 {e['14d']:+.0%}" for e in fl if e.get("14d") is not None)
+            txt += "，Overall LIQ 同時 Buy：CoinKarma 說的共振成立" + (f"（2025-02 以來這樣的 {len(fl)} 次：{hist}）" if hist else "")
+        else:
+            txt += f"，Overall LIQ 目前 {pub_ov}，還沒共振"
+        t = zc_text(H, "any>in", "翻正")
+    elif z == "red":
+        txt = f"ETF 30 天淨流出跌破 2 萬 BTC（進紅區，{md(ev['date'])} 收 {v:+.1f}K）"
+        t = zc_text(H, "out>red", "進紅區")
+    elif prev_zone == "red":
+        txt = f"ETF 30 天淨流出回到 1.7 萬 BTC 以內（離開紅區，{md(ev['date'])} 收 {v:+.1f}K）"
+        t = zc_text(H, "red>out", "離開紅區")
+    else:
+        txt = f"ETF 30 天淨流量轉為淨流出（{md(ev['date'])} 收 {v:+.1f}K）"
+        t = zc_text(H, "in>out", "轉淨流出")
+    return txt + (f"；{t}" if t else "")
+
+
 # ---------------------------------------------------------------- the hourly state
 def decide(prev, obs):
     """The state after this hour from the saved one; (state, events). obs: table (update hour of the latest table),
@@ -215,6 +317,11 @@ def decide(prev, obs):
     bad = pub_ov in ("Caution", "Sell")
     state = {"table": int(U), "hour": int(obs["hour"]), "green_pub": green_pub, "btc_on": btc_on, "green_est": green_est,
              "overall": pub_ov, "tot": tot, "e": None if e is None else round(e, 2), "t": None if t is None else round(t)}
+    ev = obs.get("etf")
+    if ev:
+        state.update({"etf_date": ev["date"], "etf_zone": ev["zone"]})
+    elif prev.get("etf_zone"):  # no flow data this run: keep what we had
+        state.update({"etf_date": prev.get("etf_date"), "etf_zone": prev["etf_zone"]})
     events = []
     if prev:
         if fresh:
@@ -236,6 +343,8 @@ def decide(prev, obs):
         if tot != prev.get("tot") and (green_est or green_pub or prev.get("green_est")):
             events.append({1: "全市場掛單 ≥ 3,000 BTC（加分項成立）", -1: "全市場掛單 ≤ −3,000 BTC"}.get(tot, "全市場掛單回到 ±3,000 內（加分項消失）")
                           + ("（公布）" if fresh else "（即時估計）"))
+        if ev and prev.get("etf_zone") and ev["zone"] != prev["etf_zone"]:  # a state from before 2026-11-14 has no zone: set silently
+            events.append(etf_event(prev["etf_zone"], ev, pub_ov, obs.get("etf_hist")))
     return state, events
 
 
@@ -356,8 +465,10 @@ def main():
     if prev and "green_pub" not in prev and "green" in prev:  # a state written before 2026-11-13
         prev["green_pub"] = prev["green"]
         prev["tot"] = {"Buy": 1, "Sell": -1}.get(prev.get("ovliq"), 0)
+    ev = etf_view(now)
+    H = etf_hist()
     obs = {"table": U, "hour": hb, "pub_btc": st["btc_liq"], "pub_btc_v": v["btc_liq"], "pub_overall": st["overall_liq"],
-           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev}
+           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev, "etf": ev, "etf_hist": H}
     state, events = decide(prev, obs)
     btc_on, tot, green_est = state["btc_on"], state["tot"], state["green_est"]
     overall_pub = state["overall"]
@@ -392,6 +503,20 @@ def main():
         lines.append(rd)
     if venues:
         lines.append(f"其他交易所 ±5% 買賣比（{tw(hv)} 起這小時）：" + "、".join(venues))
+    if ev:
+        word = "流入" if ev["flow"] >= 0 else "流出"
+        txt = (f"ETF 資金（CoinKarma 的 BTC ETF 30D Net Flow，同算法）：{md(ev['date'])} 美股 BTC ETF 淨{word} {abs(ev['flow']):,.0f}M 美元（{ev['flow_k']:+.1f}K BTC）；"
+               f"30 天合計 {ev['v']:+.1f}K BTC（前一日 {ev['v1']:+.1f}K，約 {ev['usd'] / 1e3:+.1f}B 美元），{E.ZONE_TW[ev['zone']]}，{md(ev['since'])} 起第 {ev['days'] + 1} 天")
+        if ev["prelim"]:
+            txt += f"（{md(ev['prelim'][0])} 的初步數字 {ev['prelim'][1]:+,.0f}M，BlackRock 等還沒報完，台灣 17:00 後才算）"
+        fut = []
+        if ev["low_v"] < ev["v"] - 1:
+            fut.append(f"之後若每天都是 0，30 天合計會先降到 {ev['low_v']:+.0f}K（{md(ev['low_t'])}，窗口前段的流入先移出）")
+        if ev["out_red"]:
+            fut.append(f"{md(ev['out_red'])} 才回到 −2 萬以上")
+        if ev["zone"] != "in" and ev["need14"] > 0:
+            fut.append(f"兩週內（{ev['n14']} 個交易日）要翻正，平均每天需淨流入約 {ev['need14'] / ev['n14']:.1f}K BTC（約 {ev['need14'] / ev['n14'] * ev['price'] / 1e3:,.0f}M 美元）")
+        lines.append(txt + ("；" + "，".join(fut) if fut else "") + "。")
     # ------------------------------------------------------------ the verdict
     why = []
     if green and btc_on:
@@ -427,6 +552,24 @@ def main():
         why.append("加分項：" + "；".join(strong) + "。" if strong else "沒有加分項（全市場掛單未達 3,000 BTC、資金費率不低）。")
     if not stopped and not overall_bad:
         why.append(f"價格還在 24 小時低點（{lo24:,.0f}）附近。")
+    if ev and H:
+        g, gi = H["green"].get(f"fresh_{ev['zone']}"), H["green"].get("fresh_in")
+        if (green or green_est) and g and gi and "14d" in g and "14d" in gi:
+            if ev["zone"] == "in":
+                why.append(f"ETF 淨流入中亮綠燈：歷史剛亮起 {g['n']} 次，14 天中位數 {g['14d']['median']:+.1%}、{g['14d']['up']:.0%} 上漲，是綠色箭頭最好的環境。")
+            else:
+                why.append(f"但 ETF 30 天是{E.ZONE_TW[ev['zone']]}：這時剛亮起的綠色箭頭歷史 {g['n']} 次，14 天中位數 {g['14d']['median']:+.1%}、{g['14d']['up']:.0%} 上漲"
+                           f"（ETF 淨流入時 {gi['14d']['median']:+.1%}、{gi['14d']['up']:.0%}），買單撐得住的機率明顯較低。")
+        cyc = H["cycles"]
+        if ev["zone"] == "red" and cyc:
+            lows, dl, df, fv = ([c[k] for c in cyc] for k in ("low_pct", "days_to_low", "days_to_flip", "flip_vs_low"))
+            red_h = C.hidx(E.settled_at(ev["since"]).strftime("%Y-%m-%dT%H"))
+            p0 = closes.get(red_h)
+            since_px = [closes[h] for h in closes if h >= red_h]
+            cur = (f"這輪 {md(ev['since'])} 進紅區（{p0:,.0f}），至今最低 {min(since_px):,.0f}（{min(since_px) / p0 - 1:+.1%}），現在 {px / p0 - 1:+.1%}。"
+                   if p0 and since_px else "")
+            why.append(f"ETF 資金面：紅區第 {ev['days'] + 1} 天。過去 {len(cyc)} 輪進紅區後，BTC 從進紅區的價格再跌 {-max(lows):.0%}–{-min(lows):.0%} 才見底"
+                       f"（{min(dl):.0f}–{max(dl):.0f} 天後），翻回淨流入是在進紅區 {min(df):.0f}–{max(df):.0f} 天後、已離低點 {min(fv):.0%}–{max(fv):.0%}。" + cur)
     lines.append("判斷：" + verdict + "".join(why))
     # ------------------------------------------------------------ how good the hourly estimate has been
     sk = skill(rows, P, x_btc, "btc_liq", "btc_liq", ON_BTC)
@@ -447,7 +590,9 @@ def main():
     head = "【狀態改變】" + "；".join(events) if events else ("【初始化】" if not prev else "【無變化】")
     brief = (f"判斷「{tier}」；綠色箭頭 公布{'亮' if green else '熄'}／估{'亮' if green_est else '熄'}；估 BTC LIQ {e_now:+.2f}" if e_now is not None else f"判斷「{tier}」") \
         + (f"、全市場掛單 {t_now:,.0f} BTC" if t_now is not None else "") \
-        + f"；公布（{tw(U)}）Overall {v['overall_liq']:.2f} {overall_pub}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}；BTC {px:,.0f}"
+        + f"；公布（{tw(U)}）Overall {v['overall_liq']:.2f} {overall_pub}、BTC LIQ {v['btc_liq']:.2f} {st['btc_liq']}" \
+        + (f"；ETF 30D {ev['v']:+.1f}K（{ {'in': '淨流入', 'out': '淨流出', 'red': '紅區'}[ev['zone']]}）" if ev else "") \
+        + f"；BTC {px:,.0f}"
     print("\n".join([head, "摘要：" + brief] + lines))
     with open(STATE, "w") as f:
         json.dump(state, f)
