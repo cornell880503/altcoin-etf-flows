@@ -9,7 +9,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1794567600"
+    "X-RateLimit-Reset": "1794571320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -32,7 +32,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1794567600"
+    "X-RateLimit-Reset": "1794571320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -55,7 +55,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1794567600"
+    "X-RateLimit-Reset": "1794571320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -80,7 +80,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1794567600"
+    "X-RateLimit-Reset": "1794571320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -95,7 +95,7 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": false,
+   "changed": true,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -103,13 +103,20 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1794567600"
+    "X-RateLimit-Reset": "1794571320"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 110,
-    "differ": 0,
-    "examples": []
+    "differ": 1,
+    "examples": [
+     [
+      "2026-11-12",
+      "canary",
+      0.0,
+      0.1
+     ]
+    ]
    },
    "window": [
     "2026-10-14",
@@ -118,5 +125,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-13T10:59:30Z"
+ "run_at": "2026-11-13T12:01:45Z"
 }
