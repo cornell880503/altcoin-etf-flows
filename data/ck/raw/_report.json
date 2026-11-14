@@ -6,14 +6,14 @@
    "last": "2026-11-14",
    "ok": true,
    "rows": 17,
-   "secs": 0.8
+   "secs": 0.6
   },
   "basis": {
    "first": "2020-08-01",
-   "last": "2026-11-12",
+   "last": "2026-11-13",
    "ok": true,
-   "rows": 2290,
-   "secs": 5.8
+   "rows": 2291,
+   "secs": 5.2
   },
   "bitfinex": {
    "complete": {
@@ -21,14 +21,14 @@
     "ethbtc_long": "2026-11-14",
     "fusd_rate": "2026-11-13",
     "fusd_used": "2026-11-14",
-    "fust_rate": "2026-11-13",
+    "fust_rate": "2026-11-14",
     "fust_used": "2026-11-14"
    },
    "first": "2021-01-01",
    "last": "2026-11-14",
    "ok": true,
    "rows": 2144,
-   "secs": 24.4,
+   "secs": 24.8,
    "stats_pages": 4
   },
   "cftc": {
@@ -40,9 +40,9 @@
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1794614400,
+   "last": 1794636000,
    "ok": true,
-   "rows": 51420,
+   "rows": 51426,
    "secs": 0.6
   },
   "deribit": {
@@ -50,14 +50,14 @@
    "last": "2026-11-14",
    "ok": true,
    "rows": 17,
-   "secs": 0.9
+   "secs": 1.0
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-13",
    "ok": true,
    "rows": 1971,
-   "secs": 3.9
+   "secs": 3.8
   },
   "funding": {
    "binance_est": {
@@ -70,36 +70,36 @@
    "last": "2026-11-13",
    "ok": true,
    "rows": 2509,
-   "secs": 3.5
+   "secs": 3.4
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-14",
    "ok": true,
    "rows": 358,
-   "secs": 0.4
+   "secs": 0.5
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-13",
    "ok": true,
    "rows": 849,
-   "secs": 0.4
+   "secs": 0.3
   },
   "stablecoins": {
    "first": "2017-11-29",
-   "last": "2026-11-13",
+   "last": "2026-11-14",
    "ok": true,
-   "rows": 3272,
-   "secs": 6.1
+   "rows": 3273,
+   "secs": 3.4
   },
   "usdc_usdt": {
    "first": "2018-12-15",
-   "last": "2026-11-12",
+   "last": "2026-11-13",
    "ok": true,
-   "rows": 2723,
-   "secs": 1.3
+   "rows": 2724,
+   "secs": 1.2
   }
  },
- "run_at": "2026-11-14T00:53:48Z"
+ "run_at": "2026-11-14T06:43:54Z"
 }
