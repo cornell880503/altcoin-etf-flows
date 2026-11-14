@@ -2,132 +2,132 @@
   "prices": {
     "BTC": {
       "symbol": "BTCUSDT",
-      "price": 64421.02,
-      "priceChange": -4002.99,
-      "priceChangePercent": -5.85,
-      "volume": 29025.15304,
-      "quoteVolume": 1926255933.3003685
+      "price": 64096.49,
+      "priceChange": -4235.43,
+      "priceChangePercent": -6.198,
+      "volume": 30647.68453,
+      "quoteVolume": 2028101586.891541
     },
     "ETH": {
       "symbol": "ETHUSDT",
-      "price": 1772.84,
-      "priceChange": -156.01,
-      "priceChangePercent": -8.088,
-      "volume": 422658.4637,
-      "quoteVolume": 784822682.515768
+      "price": 1763.4,
+      "priceChange": -161.57,
+      "priceChangePercent": -8.393,
+      "volume": 443324.4813,
+      "quoteVolume": 820500850.381851
     },
     "SOL": {
       "symbol": "SOLUSDT",
-      "price": 69.92,
-      "priceChange": -8.76,
-      "priceChangePercent": -11.134,
-      "volume": 4486074.235,
-      "quoteVolume": 333673705.82823
+      "price": 69.75,
+      "priceChange": -8.69,
+      "priceChangePercent": -11.079,
+      "volume": 4522539.612,
+      "quoteVolume": 334830994.71262
     },
     "XRP": {
       "symbol": "XRPUSDT",
-      "price": 0.9105,
-      "priceChange": -0.1039,
-      "priceChangePercent": -10.243,
-      "volume": 206843398,
-      "quoteVolume": 199782148.00805
+      "price": 0.9093,
+      "priceChange": -0.1008,
+      "priceChangePercent": -9.979,
+      "volume": 220087004.5,
+      "quoteVolume": 211477437.0277
     },
     "HYP": {
       "symbol": "HYPEUSDT",
-      "price": 62.61,
-      "priceChange": -9.83,
-      "priceChangePercent": -13.57,
-      "volume": 1281589.65,
-      "quoteVolume": 84341515.24136
+      "price": 63.74,
+      "priceChange": -7.97,
+      "priceChangePercent": -11.114,
+      "volume": 1347154.782,
+      "quoteVolume": 88343671.13923
     },
     "DOGE": {
       "symbol": "DOGEUSDT",
-      "price": 0.05657,
-      "priceChange": -0.00813,
-      "priceChangePercent": -12.566,
-      "volume": 1141047207,
-      "quoteVolume": 68932320.94638
+      "price": 0.05675,
+      "priceChange": -0.00763,
+      "priceChangePercent": -11.852,
+      "volume": 1252963939,
+      "quoteVolume": 75117216.38317
     },
     "LINK": {
       "symbol": "LINKUSDT",
-      "price": 8.734,
-      "priceChange": -1.148,
-      "priceChangePercent": -11.617,
-      "volume": 3474883.15,
-      "quoteVolume": 32303921.95443
+      "price": 8.788,
+      "priceChange": -1.003,
+      "priceChangePercent": -10.244,
+      "volume": 3662364.19,
+      "quoteVolume": 33886014.8582
     },
     "AVAX": {
       "symbol": "AVAXUSDT",
-      "price": 7.075,
-      "priceChange": -1.223,
-      "priceChangePercent": -14.738,
-      "volume": 3873870.67,
-      "quoteVolume": 29742042.0271
+      "price": 7.106,
+      "priceChange": -1.119,
+      "priceChangePercent": -13.605,
+      "volume": 3993755.22,
+      "quoteVolume": 30524624.51796
     },
     "HBAR": {
       "symbol": "HBARUSDT",
-      "price": 0.05582,
-      "priceChange": -0.00602,
-      "priceChangePercent": -9.735,
-      "volume": 183997360,
-      "quoteVolume": 10837215.84756
+      "price": 0.05598,
+      "priceChange": -0.00537,
+      "priceChangePercent": -8.753,
+      "volume": 194107238,
+      "quoteVolume": 11382483.06068
     },
     "LTC": {
       "symbol": "LTCUSDT",
-      "price": 44.12,
-      "priceChange": -5.31,
-      "priceChangePercent": -10.742,
-      "volume": 510996.89,
-      "quoteVolume": 23871707.97226
+      "price": 44.31,
+      "priceChange": -4.83,
+      "priceChangePercent": -9.829,
+      "volume": 522995.045,
+      "quoteVolume": 24381203.93515
     },
     "BNB": {
       "symbol": "BNBUSDT",
-      "price": 576.37,
-      "priceChange": -55.61,
-      "priceChangePercent": -8.799,
-      "volume": 250653.277,
-      "quoteVolume": 151030008.57694
+      "price": 578.63,
+      "priceChange": -51.37,
+      "priceChangePercent": -8.154,
+      "volume": 262642.631,
+      "quoteVolume": 157801545.36318
     },
     "DOT": {
       "symbol": "DOTUSDT",
-      "price": 0.701,
-      "priceChange": -0.12,
-      "priceChangePercent": -14.616,
-      "volume": 9048871.01,
-      "quoteVolume": 6817529.09325
+      "price": 0.703,
+      "priceChange": -0.112,
+      "priceChangePercent": -13.742,
+      "volume": 9725244.14,
+      "quoteVolume": 7278094.09421
     },
     "SUI": {
       "symbol": "SUIUSDT",
-      "price": 0.6893,
-      "priceChange": -0.1097,
-      "priceChangePercent": -13.73,
-      "volume": 54656888.6,
-      "quoteVolume": 40550366.38334
+      "price": 0.6929,
+      "priceChange": -0.0994,
+      "priceChangePercent": -12.546,
+      "volume": 57429162,
+      "quoteVolume": 42375643.51245
     },
     "NEAR": {
       "symbol": "NEARUSDT",
-      "price": 2.946,
-      "priceChange": -0.544,
-      "priceChangePercent": -15.587,
-      "volume": 37343501.4,
-      "quoteVolume": 119324685.4877
+      "price": 2.998,
+      "priceChange": -0.432,
+      "priceChangePercent": -12.595,
+      "volume": 37589694.7,
+      "quoteVolume": 119502262.7734
     },
     "TRX": {
       "symbol": "TRXUSDT",
-      "price": 0.3076,
-      "priceChange": -0.0052,
-      "priceChangePercent": -1.662,
-      "volume": 101420028.1,
-      "quoteVolume": 31500447.76803
+      "price": 0.3069,
+      "priceChange": -0.0055,
+      "priceChangePercent": -1.761,
+      "volume": 104730920.6,
+      "quoteVolume": 32510149.93748
     },
     "ZEC": {
       "symbol": "ZECUSDT",
-      "price": 827.8,
-      "priceChange": -111.08,
-      "priceChangePercent": -11.831,
-      "volume": 207291.209,
-      "quoteVolume": 182253207.33805
+      "price": 855.3,
+      "priceChange": -70.06,
+      "priceChangePercent": -7.571,
+      "volume": 211838.261,
+      "quoteVolume": 185590702.65982
     }
   },
-  "updatedAt": "2026-11-14T22:01:51.188Z"
+  "updatedAt": "2026-11-14T22:24:16.644Z"
 }
