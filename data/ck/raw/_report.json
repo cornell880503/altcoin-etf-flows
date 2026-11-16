@@ -6,14 +6,14 @@
    "last": "2026-11-16",
    "ok": true,
    "rows": 19,
-   "secs": 0.8
+   "secs": 1.0
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-14",
    "ok": true,
    "rows": 2292,
-   "secs": 5.2
+   "secs": 5.6
   },
   "bitfinex": {
    "complete": {
@@ -21,14 +21,14 @@
     "ethbtc_long": "2026-11-16",
     "fusd_rate": "2026-11-16",
     "fusd_used": "2026-11-16",
-    "fust_rate": "2026-11-15",
+    "fust_rate": "2026-11-16",
     "fust_used": "2026-11-16"
    },
    "first": "2021-01-01",
    "last": "2026-11-16",
    "ok": true,
    "rows": 2146,
-   "secs": 24.5,
+   "secs": 24.4,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,13 +36,13 @@
    "last": "2026-11-03",
    "ok": true,
    "rows": 448,
-   "secs": 0.8
+   "secs": 3.7
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1794790800,
+   "last": 1794794400,
    "ok": true,
-   "rows": 51469,
+   "rows": 51470,
    "secs": 0.6
   },
   "deribit": {
@@ -50,14 +50,14 @@
    "last": "2026-11-16",
    "ok": true,
    "rows": 19,
-   "secs": 1.1
+   "secs": 1.0
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-13",
    "ok": true,
    "rows": 1971,
-   "secs": 3.9
+   "secs": 4.0
   },
   "funding": {
    "binance_est": {
@@ -70,36 +70,36 @@
    "last": "2026-11-15",
    "ok": true,
    "rows": 2511,
-   "secs": 3.4
+   "secs": 3.5
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-16",
    "ok": true,
    "rows": 360,
-   "secs": 0.5
+   "secs": 0.6
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-15",
    "ok": true,
    "rows": 851,
-   "secs": 0.3
+   "secs": 0.4
   },
   "stablecoins": {
    "first": "2017-11-29",
-   "last": "2026-11-15",
+   "last": "2026-11-16",
    "ok": true,
-   "rows": 3274,
-   "secs": 3.4
+   "rows": 3275,
+   "secs": 5.0
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-14",
    "ok": true,
    "rows": 2725,
-   "secs": 1.5
+   "secs": 1.3
   }
  },
- "run_at": "2026-11-16T01:01:34Z"
+ "run_at": "2026-11-16T02:01:35Z"
 }
