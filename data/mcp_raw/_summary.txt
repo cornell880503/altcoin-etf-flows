@@ -7,19 +7,19 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-16",
-      "netFlowUsdM": -1.5
+      "netFlowUsdM": -68.6
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-16",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -8.4
     },
     {
       "symbol": "SOL",
       "asset": "solana",
       "date": "2026-11-16",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 11.7
     },
     {
       "symbol": "XRP",
@@ -31,14 +31,13 @@
       "symbol": "HYP",
       "asset": "hyp",
       "date": "2026-11-16",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -7.9
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
       "date": "2026-11-16",
-      "lastReportedDate": "2026-11-13",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "LINK",
@@ -79,15 +78,13 @@
       "symbol": "DOT",
       "asset": "dot",
       "date": "2026-11-16",
-      "lastReportedDate": "2026-11-13",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "SUI",
       "asset": "sui",
       "date": "2026-11-16",
-      "lastReportedDate": "2026-11-13",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "NEAR",
@@ -111,6 +108,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -1.5,
-  "updatedAt": "2026-11-17T03:02:07.512Z"
+  "totalUsdM": -73.2,
+  "updatedAt": "2026-11-17T03:55:19.108Z"
 }
