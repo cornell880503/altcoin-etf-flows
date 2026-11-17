@@ -32,7 +32,7 @@
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": -1.4,
+      "netFlowUsdM": -1.2,
       "tradingDays": 4,
       "avgDailyUsdM": -0.3,
       "positiveDays": 1,
@@ -59,17 +59,17 @@
     {
       "symbol": "LINK",
       "asset": "link",
-      "netFlowUsdM": -0.7,
-      "tradingDays": 3,
-      "avgDailyUsdM": -0.2,
+      "netFlowUsdM": -2,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.5,
       "positiveDays": 0,
-      "negativeDays": 1
+      "negativeDays": 2
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0.2,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0.1,
       "positiveDays": 1,
       "negativeDays": 0
@@ -78,7 +78,7 @@
       "symbol": "HBAR",
       "asset": "hbar",
       "netFlowUsdM": -0.3,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": -0.1,
       "positiveDays": 0,
       "negativeDays": 1
@@ -87,7 +87,7 @@
       "symbol": "LTC",
       "asset": "ltc",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -96,7 +96,7 @@
       "symbol": "BNB",
       "asset": "bnb",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -122,17 +122,17 @@
     {
       "symbol": "NEAR",
       "asset": "near",
-      "netFlowUsdM": -1.4,
-      "tradingDays": 3,
+      "netFlowUsdM": -2,
+      "tradingDays": 4,
       "avgDailyUsdM": -0.5,
       "positiveDays": 0,
-      "negativeDays": 1
+      "negativeDays": 2
     },
     {
       "symbol": "TRX",
       "asset": "trx",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -140,11 +140,11 @@
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "netFlowUsdM": -28.6,
-      "tradingDays": 3,
-      "avgDailyUsdM": -9.5,
+      "netFlowUsdM": -37.6,
+      "tradingDays": 4,
+      "avgDailyUsdM": -9.4,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 4
     }
   ]
 }
