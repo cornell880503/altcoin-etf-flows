@@ -5,20 +5,20 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -492.1,
+      "netFlowUsdM": -701.6,
       "tradingDays": 4,
-      "avgDailyUsdM": -123,
+      "avgDailyUsdM": -175.4,
       "positiveDays": 1,
       "negativeDays": 3
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -75.3,
+      "netFlowUsdM": -105.7,
       "tradingDays": 4,
-      "avgDailyUsdM": -18.8,
-      "positiveDays": 2,
-      "negativeDays": 2
+      "avgDailyUsdM": -26.4,
+      "positiveDays": 1,
+      "negativeDays": 3
     },
     {
       "symbol": "SOL",
@@ -59,17 +59,17 @@
     {
       "symbol": "LINK",
       "asset": "link",
-      "netFlowUsdM": -2,
-      "tradingDays": 3,
-      "avgDailyUsdM": -0.7,
+      "netFlowUsdM": -3.4,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.8,
       "positiveDays": 0,
-      "negativeDays": 2
+      "negativeDays": 3
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0.2,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0.1,
       "positiveDays": 1,
       "negativeDays": 0
@@ -78,7 +78,7 @@
       "symbol": "HBAR",
       "asset": "hbar",
       "netFlowUsdM": -0.3,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": -0.1,
       "positiveDays": 0,
       "negativeDays": 1
@@ -87,7 +87,7 @@
       "symbol": "LTC",
       "asset": "ltc",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -96,7 +96,7 @@
       "symbol": "BNB",
       "asset": "bnb",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -123,7 +123,7 @@
       "symbol": "NEAR",
       "asset": "near",
       "netFlowUsdM": -0.7,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": -0.2,
       "positiveDays": 0,
       "negativeDays": 1
@@ -132,7 +132,7 @@
       "symbol": "TRX",
       "asset": "trx",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -141,8 +141,8 @@
       "symbol": "ZEC",
       "asset": "zec",
       "netFlowUsdM": -23,
-      "tradingDays": 3,
-      "avgDailyUsdM": -7.7,
+      "tradingDays": 4,
+      "avgDailyUsdM": -5.7,
       "positiveDays": 0,
       "negativeDays": 3
     }
