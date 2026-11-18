@@ -1,5 +1,5 @@
 {
-  "today": "2026-11-17",
+  "today": "2026-11-18",
   "referenceDate": "2026-11-16",
   "referenceIsToday": false,
   "assets": [
@@ -13,7 +13,7 @@
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-16",
-      "netFlowUsdM": -8.4
+      "netFlowUsdM": -8.3
     },
     {
       "symbol": "SOL",
@@ -79,7 +79,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "date": "2026-11-16",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -0.1
     },
     {
       "symbol": "NEAR",
@@ -101,5 +101,5 @@
     }
   ],
   "totalUsdM": -7.7,
-  "updatedAt": "2026-11-17T22:41:08.330Z"
+  "updatedAt": "2026-11-18T00:01:42.070Z"
 }
