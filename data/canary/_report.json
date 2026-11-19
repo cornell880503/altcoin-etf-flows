@@ -1,8 +1,8 @@
 {
- "run_at": "2026-11-19T11:02:26Z",
+ "run_at": "2026-11-19T11:42:03Z",
  "funds": {
   "XRPC": {
-   "bytes": 1583553,
+   "bytes": 1589845,
    "tables": [
     {
      "n_rows": 4,
@@ -76,7 +76,7 @@
      ]
     },
     {
-     "n_rows": 1295,
+     "n_rows": 1302,
      "head": [
       [
        "Fund Name",
@@ -151,13 +151,13 @@
     }
    ],
    "from": "table",
-   "parsed": 255,
-   "stored": 255,
+   "parsed": 256,
+   "stored": 256,
    "first": "2025-11-12",
-   "last": "2026-11-17"
+   "last": "2026-11-18"
   },
   "LTCC": {
-   "bytes": 1582550,
+   "bytes": 1588822,
    "tables": [
     {
      "n_rows": 4,
@@ -231,7 +231,7 @@
      ]
     },
     {
-     "n_rows": 1295,
+     "n_rows": 1302,
      "head": [
       [
        "Fund Name",
@@ -306,13 +306,13 @@
     }
    ],
    "from": "table",
-   "parsed": 267,
-   "stored": 267,
+   "parsed": 268,
+   "stored": 268,
    "first": "2025-10-27",
-   "last": "2026-11-17"
+   "last": "2026-11-18"
   },
   "HBR": {
-   "bytes": 1585032,
+   "bytes": 1586157,
    "tables": [
     {
      "n_rows": 4,
@@ -467,7 +467,7 @@
    "last": "2026-11-17"
   },
   "SOLC": {
-   "bytes": 1598984,
+   "bytes": 1605104,
    "tables": [
     {
      "n_rows": 4,
@@ -541,7 +541,7 @@
      ]
     },
     {
-     "n_rows": 1295,
+     "n_rows": 1302,
      "head": [
       [
        "Fund Name",
@@ -616,13 +616,13 @@
     }
    ],
    "from": "table",
-   "parsed": 252,
-   "stored": 252,
+   "parsed": 253,
+   "stored": 253,
    "first": "2025-11-17",
-   "last": "2026-11-17"
+   "last": "2026-11-18"
   },
   "SUIS": {
-   "bytes": 1595348,
+   "bytes": 1601638,
    "tables": [
     {
      "n_rows": 4,
@@ -694,7 +694,7 @@
      ]
     },
     {
-     "n_rows": 1295,
+     "n_rows": 1302,
      "head": [
       [
        "Fund Name",
@@ -769,13 +769,13 @@
     }
    ],
    "from": "table",
-   "parsed": 191,
-   "stored": 191,
+   "parsed": 192,
+   "stored": 192,
    "first": "2026-02-17",
-   "last": "2026-11-17"
+   "last": "2026-11-18"
   },
   "TRXS": {
-   "bytes": 1593879,
+   "bytes": 1600163,
    "tables": [
     {
      "n_rows": 4,
@@ -847,7 +847,7 @@
      ]
     },
     {
-     "n_rows": 1295,
+     "n_rows": 1302,
      "head": [
       [
        "Fund Name",
@@ -922,10 +922,10 @@
     }
    ],
    "from": "table",
-   "parsed": 51,
-   "stored": 51,
+   "parsed": 52,
+   "stored": 52,
    "first": "2026-09-08",
-   "last": "2026-11-17"
+   "last": "2026-11-18"
   }
  }
 }
