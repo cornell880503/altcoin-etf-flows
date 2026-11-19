@@ -6,14 +6,14 @@
    "last": "2026-11-19",
    "ok": true,
    "rows": 22,
-   "secs": 0.9
+   "secs": 0.6
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-18",
    "ok": true,
    "rows": 2296,
-   "secs": 6.1
+   "secs": 4.2
   },
   "bitfinex": {
    "complete": {
@@ -36,13 +36,13 @@
    "last": "2026-11-10",
    "ok": true,
    "rows": 449,
-   "secs": 1.9
+   "secs": 5.5
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1795082400,
+   "last": 1795086000,
    "ok": true,
-   "rows": 51550,
+   "rows": 51551,
    "secs": 0.6
   },
   "deribit": {
@@ -57,7 +57,7 @@
    "last": "2026-11-18",
    "ok": true,
    "rows": 1974,
-   "secs": 3.4
+   "secs": 3.2
   },
   "funding": {
    "binance_est": {
@@ -70,36 +70,36 @@
    "last": "2026-11-18",
    "ok": true,
    "rows": 2514,
-   "secs": 2.5
+   "secs": 2.4
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-19",
    "ok": true,
    "rows": 363,
-   "secs": 0.5
+   "secs": 0.3
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-18",
    "ok": true,
    "rows": 854,
-   "secs": 0.3
+   "secs": 0.4
   },
   "stablecoins": {
    "first": "2017-11-29",
    "last": "2026-11-19",
    "ok": true,
    "rows": 3278,
-   "secs": 5.8
+   "secs": 4.1
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-18",
    "ok": true,
    "rows": 2729,
-   "secs": 1.6
+   "secs": 1.0
   }
  },
- "run_at": "2026-11-19T10:30:01Z"
+ "run_at": "2026-11-19T11:01:47Z"
 }
