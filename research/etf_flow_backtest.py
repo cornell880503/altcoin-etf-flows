@@ -14,6 +14,15 @@ Events (a repeat of the same kind within 10 days of the previous one is not coun
 - into red: from >= -20K to < -20K; out of red: back to >= -20K; flip down: from >= 0 to < 0.
 Measured: BTC's return 3 / 7 / 14 / 30 days later, the lowest and highest price within 14 days, against every
 session (entered the same way) as the baseline.
+
+Inside red (added 2026-11-20, when the 30D flow was -55K and BTC 19 % below its into-red price):
+- red_by_liq: CoinKarma's tables while the zone is red, by their BTC LIQ (< 3, 3..5, >= 5, and >= 5 with Overall
+  Liquidity >= 5,000 BTC, the levels seen on every cycle low): the return from the table, and for the last
+  bucket also by episode (the first such table after 5 days without one), since tables 8 hours apart overlap;
+- big_outflow_red: sessions with a net outflow of US$ 500 M or more;
+- price_stop: in each completed red episode (until the flip to net inflow), every time the price stood 5 % above
+  the episode's low with the low at least 48 hours old: did that low hold (no close more than 2 % below it before
+  the flip), and the return from there. 3-10 % and 24-72 h give the same count of held lows (5 of 7).
 Output: research/etf_flow_backtest.json and a printout."""
 import datetime as dt
 import json
@@ -198,8 +207,79 @@ def main():
         for tag in (("all", "fresh") if fresh else ("all",)):
             green.setdefault(f"{tag}_{zone_of[known[-1]]}", []).append(m)
     green_by_zone = {k: summary(v) for k, v in green.items()}
+
+    def low30(h):  # the lowest close in the 30 days after hour h against the close at h; None before 30 days have passed
+        i = h - h0
+        if i + 720 >= len(btc) or not np.isfinite(btc[i]):
+            return None
+        seg = btc[i:i + 721]
+        return float(np.nanmin(seg) / btc[i] - 1)
+
+    def with_low(ms, hs_):
+        s = summary(ms)
+        lows = [x for x in (low30(h) for h in hs_) if x is not None]
+        if lows:
+            s["low30_gt5"] = {"n": len(lows), "share": round(float(np.mean(np.array(lows) <= -0.05)), 3)}
+        return s
+
+    # CoinKarma's tables while the ETF zone is red, by their BTC LIQ
+    buckets = {"lt3": [], "3to5": [], "ge5": [], "extreme": []}
+    for k, U in enumerate(int(h) for h in P["hours"]):
+        known = [q for q in ds if entry_hour(q) <= U]
+        b, o = P["v"]["btc_liq"][k], P["v"]["overall_liquidity_btc"][k]
+        if not known or zone_of[known[-1]] != "red" or not np.isfinite(b):
+            continue
+        m = measure(btc, h0, U)
+        if not m:
+            continue
+        buckets["lt3" if b < 3 else "3to5" if b < E.LIQ_HI else "ge5"].append((U, m))
+        if b >= E.LIQ_HI and np.isfinite(o) and o >= E.OVLIQ_HI:
+            buckets["extreme"].append((U, m))
+    red_by_liq = {k: with_low([m for _, m in v], [u for u, _ in v]) for k, v in buckets.items()}
+    eps_x, last_u = [], None
+    for u, m in buckets["extreme"]:
+        if last_u is None or u - last_u > 120:
+            eps_x.append({"table": L.hstr(u), "price": round(m["price"]), "7d": m["7d"], "14d": m["14d"], "low30": low30(u)})
+        last_u = u
+    done = [e for e in eps_x if e["14d"] is not None]
+    red_by_liq["extreme_episodes"] = {"list": eps_x, "n": len(done), "up14": int(sum(e["14d"] > 0 for e in done)),
+                                      "median14": round(float(np.median([e["14d"] for e in done])), 4) if done else None,
+                                      "low_gt5": int(sum(e["low30"] is not None and e["low30"] <= -0.05 for e in done))}
+    # sessions in red with a heavy outflow
+    flow_usd = {r[0]: r[1] for r in rows}
+    big = [d for d in ds if zone_of[d] == "red" and flow_usd[d] <= E.BIG_OUT]
+    big_ms = [m for m in (measure(btc, h0, entry_hour(d)) for d in big) if m]
+    big_outflow_red = with_low(big_ms, [entry_hour(d) for d in big])
+    big_outflow_red["dates"] = big
+    # the price-stop rule in the completed red episodes
+    eps_r, start = [], None
+    for (d0, z0), (d1, z1) in zip(zs, zs[1:]):
+        if z1 == "red" and z0 != "red" and start is None:
+            start = d1
+        if z1 == "in" and start is not None:
+            eps_r.append((start, d1))
+            start = None
+    stops = []
+    for a, b in eps_r:
+        i0, i1 = entry_hour(a) - h0, min(entry_hour(b) - h0, len(btc) - 1)
+        lo, klo, armed = btc[i0], i0, True
+        for i in range(i0, i1 + 1):
+            px = btc[i]
+            if not np.isfinite(px):
+                continue
+            if px < lo:
+                lo, klo, armed = px, i, True
+            elif armed and px >= lo * (1 + E.STOP_REBOUND) and i - klo >= E.STOP_AGE_H:
+                armed = False
+                m = measure(btc, h0, h0 + i)
+                stops.append({"episode": a, "at": L.hstr(h0 + i), "price": round(float(px)), "low": round(float(lo)),
+                              "held": bool(np.nanmin(btc[i:i1 + 1]) >= lo * 0.98), "7d": m["7d"], "14d": m["14d"]})
+    r14 = [e["14d"] for e in stops if e["14d"] is not None]
+    price_stop = {"rebound": E.STOP_REBOUND, "age_h": E.STOP_AGE_H, "episodes": len(eps_r), "n": len(stops), "held": int(sum(e["held"] for e in stops)),
+                  "up14": int(sum(x > 0 for x in r14)), "median14": round(float(np.median(r14)), 4) if r14 else None, "list": stops}
     out = {"series": "scripts/btc_etf30.py", "sessions": len(ds), "from": ds[0], "to": ds[-1], "cycles": cycles, "flip_up_by_liq": split,
            "zone_changes": zone_changes, "green_by_zone": green_by_zone,
+           "red_by_liq": red_by_liq, "big_outflow_red": big_outflow_red, "price_stop": price_stop,
            "baseline_all": summary(base_all), "baseline_from_2025_02": summary(base_liq),
            "events": {k: {"summary": summary(e), "list": e} for k, e in kinds.items()},
            "now": {"date": ds[-1], "flow30_k": round(float(v[-1]), 2), "min60_k": round(min(f30[q] for q in ds[-45:]), 2)}}
@@ -222,6 +302,18 @@ def main():
     print("\n== CoinKarma's green arrow by ETF zone (tables since 2025-02; returns from the table)")
     for k, s in sorted(green_by_zone.items()):
         print(f"   {k:10s} n {s['n']:3d}  " + "  ".join(f"{h} med {pct(s[h]['median'])} up {s[h]['up']:.0%}" for h in HORIZONS if h in s))
+    print("\n== CoinKarma's tables while the ETF zone is red, by BTC LIQ")
+    for k in ("lt3", "3to5", "ge5", "extreme"):
+        s = red_by_liq[k]
+        print(f"   {k:8s} n {s['n']:3d}  " + "  ".join(f"{h} med {pct(s[h]['median'])} up {s[h]['up']:.0%}" for h in ("7d", "14d") if h in s)
+              + (f"  a further low > 5 % within 30 d: {s['low30_gt5']['share']:.0%}" if "low30_gt5" in s else ""))
+    x = red_by_liq["extreme_episodes"]
+    print(f"   extreme, by episode: {x['n']} with outcomes, 14d up {x['up14']}, median {pct(x['median14'])}, a further low > 5 % in {x['low_gt5']}: "
+          + "; ".join(f"{e['table'][:10]} 14d {pct(e['14d'])} low {pct(e['low30'])}" for e in x["list"]))
+    s = big_outflow_red
+    print(f"== red sessions with an outflow of {-E.BIG_OUT:.0f}M or more: n {s['n']}  " + "  ".join(f"{h} med {pct(s[h]['median'])} up {s[h]['up']:.0%} (n {s[h]['n']})" for h in ("7d", "14d") if h in s))
+    print(f"== price stop ({E.STOP_REBOUND:.0%} above a low {E.STOP_AGE_H} h old) in {price_stop['episodes']} completed red episodes: {price_stop['n']} triggers, the low held in {price_stop['held']}, "
+          f"14d up {price_stop['up14']}, median {pct(price_stop['median14'])}: " + "; ".join(f"{e['at'][:10]} {'held' if e['held'] else 'broke'} {pct(e['14d'])}" for e in stops))
     for kind, evs in kinds.items():
         s = summary(evs)
         print(f"\n== {kind}: {len(evs)} events; " + "  ".join(f"{k} med {pct(s[k]['median'])} up {s[k]['up']:.0%} (n {s[k]['n']})" for k in HORIZONS if k in s)

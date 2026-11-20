@@ -52,6 +52,15 @@ A zone change is an event; a flip to net inflow says whether Overall LIQ is Buy 
 another 16-24 % before bottoming in each of the 4 completed cycles, and the flip back to inflow came 6-14 % above
 the low; CoinKarma's green arrow did well only while the 30D flow was net inflow (newly lit: 14 d +5.2 %, 71 % up)
 and was close to a coin toss while it was negative (in red: 14 d +0.4 %, 53 % up).
+Inside red the verdict goes by the level of their BTC LIQ instead (2026-11-20: the arrow had been lit for eight
+days while BTC fell 14 %, so "newly lit" said nothing): tables with BTC LIQ below 3 were followed by a lower price
+14 days later 73 % of the time, 3-5 by a higher one 63 %, and BTC LIQ >= 5 with Overall Liquidity >= 5,000 BTC (the
+levels on every cycle low) by a higher one in 5 of 7 episodes, 3 of them after a further fall of more than 5 %.
+A heavy outflow day (US$ 500 M or more) in red is flagged: 14 d later 2 of 10 up. And one more event, the only one
+that can fire at a turn while the arrow is already lit and the zone lags by weeks: the price 5 % above the red
+episode's low with that low 48 hours old ("止跌"; once per low; in the 4 completed episodes 7 times, the low held
+in 5, 14 d later 5 up, median +3.1 %), and "止跌失敗" if a low that got such a notice later breaks by more than 2 %.
+A session is final only with BlackRock's figure in (btc_etf30.final_rows).
 
 Usage: liq_watch.py [--table-wait]   (--table-wait: at a table hour, exit 3 instead of reporting while the
 table due this hour has not been read yet and it is less than 25 minutes past the hour; the collector then
@@ -205,7 +214,7 @@ def etf_view(now):
         rows = E.load()
     except (OSError, ValueError, KeyError):
         return None
-    final = [r for r in rows if E.settled_at(r[0]) <= now]
+    final = E.final_rows(rows, now)
     if len(final) < 40:
         return None
     f30 = E.flow30(final)
@@ -220,7 +229,11 @@ def etf_view(now):
     start = (dt.date.fromisoformat(D) - dt.timedelta(days=E.WINDOW_D)).isoformat()
     usd = sum(r[1] for r in final if start <= r[0] <= D)
     last = final[-1]
-    prelim = rows[-1] if rows[-1][0] > D else None
+    prelim = rows[len(final)] if len(rows) > len(final) else None
+    j = len(zs)  # the red episode: from the first entry into red after the last net-inflow spell
+    while j > 0 and zs[j - 1][1] != "in":
+        j -= 1
+    episode = next((d for d, z in zs[j:] if z == "red"), None)
     path = [(t, v - lv) for t, lv in E.leaving(final, E.WINDOW_D + 1)]  # the 30D on day t if every later session were 0
     low_t, low_v = min(path, key=lambda p: p[1])
     out_red = next((t for t, x in path if x >= E.RED), None) if v < E.RED else None
@@ -228,7 +241,8 @@ def etf_view(now):
     n14 = sum(1 for i in range(1, 15) if (dt.date.fromisoformat(D) + dt.timedelta(days=i)).weekday() < 5)
     need14 = -dict(path)[t14]  # thousand BTC of net inflow needed by then for the 30D to reach 0
     return {"date": D, "zone": zone, "since": since, "v": v, "v1": v1, "usd": usd, "flow": last[1], "flow_k": last[2], "price": last[3],
-            "prelim": prelim, "low_t": low_t, "low_v": low_v, "out_red": out_red, "need14": need14, "n14": n14, "days": (dt.date.fromisoformat(D) - dt.date.fromisoformat(since)).days}
+            "prelim": prelim, "low_t": low_t, "low_v": low_v, "out_red": out_red, "need14": need14, "n14": n14, "episode": episode,
+            "days": (dt.date.fromisoformat(D) - dt.date.fromisoformat(since)).days}
 
 
 def etf_hist():
@@ -243,7 +257,23 @@ def etf_hist():
             seen.add(c["flip_up"])
             cyc.append(c)
     return {"cycles": cyc, "green": H.get("green_by_zone", {}), "zc": H.get("zone_changes", {}),
-            "flip_liq": H.get("events", {}).get("flip_up_liq_buy", {}).get("list", [])}
+            "flip_liq": H.get("events", {}).get("flip_up_liq_buy", {}).get("list", []),
+            "red": H.get("red_by_liq") or {}, "big": H.get("big_outflow_red") or {}, "stop": H.get("price_stop") or {}}
+
+
+def price_stop(ev, closes, hc, px):
+    """In a red episode: its low so far, how old it is, and whether the price has stopped falling (5 % above a low
+    that is 48 hours old). None outside an episode."""
+    if not ev or not ev.get("episode"):
+        return None
+    h_ep = C.hidx(E.settled_at(ev["episode"]).strftime("%Y-%m-%dT%H"))
+    seq = [(c, h) for h, c in closes.items() if h >= h_ep]
+    if not seq:
+        return None
+    lo, lo_h = min(seq)
+    age = hc - lo_h
+    return {"p0": closes.get(h_ep), "low": lo, "low_h": lo_h, "age": age, "line": lo * (1 + E.STOP_REBOUND),
+            "on": px >= lo * (1 + E.STOP_REBOUND) and age >= E.STOP_AGE_H}
 
 
 def zc_text(H, key, what):
@@ -345,6 +375,18 @@ def decide(prev, obs):
                           + ("（公布）" if fresh else "（即時估計）"))
         if ev and prev.get("etf_zone") and ev["zone"] != prev["etf_zone"]:  # a state from before 2026-11-14 has no zone: set silently
             events.append(etf_event(prev["etf_zone"], ev, pub_ov, obs.get("etf_hist")))
+    sp = obs.get("stop")  # once per low: the notice is not repeated while the episode's low stays the same
+    state["stop_low"] = prev.get("stop_low") if sp else None
+    if sp and prev.get("stop_low") and sp["low"] < prev["stop_low"] * 0.98:  # the low a notice was given for has broken
+        state["stop_low"] = None
+        events.append(f"止跌失敗：跌破先前守住的低點 {prev['stop_low']:,.0f}，這輪新低 {sp['low']:,.0f}（{tw(sp['low_h'])}）")
+    elif sp and sp["on"] and round(sp["low"]) != prev.get("stop_low"):
+        state["stop_low"] = round(sp["low"])
+        if prev:
+            h = (obs.get("etf_hist") or {}).get("stop") or {}
+            hist = (f"；過去 {h['episodes']} 輪紅區這個條件出現 {h['n']} 次，{h['held']} 次低點守住，14 天後 {h['up14']} 次上漲（中位數 {h['median14']:+.1%}）"
+                    if h.get("n") else "")
+            events.append(f"價格止跌：BTC {obs['px']:,.0f} 比這輪低點 {sp['low']:,.0f}（{tw(sp['low_h'])}）高 {obs['px'] / sp['low'] - 1:.1%}，低點已 {sp['age']} 小時沒破" + hist)
     return state, events
 
 
@@ -467,8 +509,9 @@ def main():
         prev["tot"] = {"Buy": 1, "Sell": -1}.get(prev.get("ovliq"), 0)
     ev = etf_view(now)
     H = etf_hist()
+    sp = price_stop(ev, closes, hc, px)
     obs = {"table": U, "hour": hb, "pub_btc": st["btc_liq"], "pub_btc_v": v["btc_liq"], "pub_overall": st["overall_liq"],
-           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev, "etf": ev, "etf_hist": H}
+           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev, "etf": ev, "etf_hist": H, "stop": sp, "px": px}
     state, events = decide(prev, obs)
     btc_on, tot, green_est = state["btc_on"], state["tot"], state["green_est"]
     overall_pub = state["overall"]
@@ -508,7 +551,7 @@ def main():
         txt = (f"ETF 資金（CoinKarma 的 BTC ETF 30D Net Flow，同算法）：{md(ev['date'])} 美股 BTC ETF 淨{word} {abs(ev['flow']):,.0f}M 美元（{ev['flow_k']:+.1f}K BTC）；"
                f"30 天合計 {ev['v']:+.1f}K BTC（前一日 {ev['v1']:+.1f}K，約 {ev['usd'] / 1e3:+.1f}B 美元），{E.ZONE_TW[ev['zone']]}，{md(ev['since'])} 起第 {ev['days'] + 1} 天")
         if ev["prelim"]:
-            txt += f"（{md(ev['prelim'][0])} 的初步數字 {ev['prelim'][1]:+,.0f}M，BlackRock 等還沒報完，台灣 17:00 後才算）"
+            txt += f"（{md(ev['prelim'][0])} 的初步數字 {ev['prelim'][1]:+,.0f}M 還不算：{'BlackRock 還沒報' if not ev['prelim'][4] else '台灣 17:00 後才定案'}）"
         fut = []
         if ev["low_v"] < ev["v"] - 1:
             fut.append(f"之後若每天都是 0，30 天合計會先降到 {ev['low_v']:+.0f}K（{md(ev['low_t'])}，窗口前段的流入先移出）")
@@ -554,7 +597,23 @@ def main():
         why.append(f"價格還在 24 小時低點（{lo24:,.0f}）附近。")
     if ev and H:
         g, gi = H["green"].get(f"fresh_{ev['zone']}"), H["green"].get("fresh_in")
-        if (green or green_est) and g and gi and "14d" in g and "14d" in gi:
+        b_liq, o_liq, RL = v["btc_liq"], v["overall_liquidity_btc"], H["red"]
+        if ev["zone"] == "red" and RL and np.isfinite(b_liq):  # in red the level of BTC LIQ says more than "newly lit"
+            x = RL.get("extreme_episodes") or {}
+            if b_liq >= E.LIQ_HI and np.isfinite(o_liq) and o_liq >= E.OVLIQ_HI and x.get("n"):
+                why.append(f"ETF 紅區裡 BTC LIQ ≥ {E.LIQ_HI:g} 且全市場掛單 ≥ {E.OVLIQ_HI:,.0f} BTC（歷次週期低點當天都是這個水位，但也常提前出現）：過去 {x['n']} 段，"
+                           f"14 天後 {x['up14']} 段上漲（中位數 {x['median14']:+.1%}），其中 {x['low_gt5']} 段先再跌超過 5%。")
+            else:
+                key, label = ("ge5", f"≥ {E.LIQ_HI:g}") if b_liq >= E.LIQ_HI else ("3to5", f"3–{E.LIQ_HI:g}") if b_liq >= 3 else ("lt3", "< 3")
+                sb = RL.get(key) or {}
+                if "14d" in sb:
+                    why.append(f"ETF 紅區裡 BTC LIQ {label} 的表：14 天後 {sb['14d']['up']:.0%} 上漲（中位數 {sb['14d']['median']:+.1%}，{sb['14d']['n']} 張）"
+                               + (f"，{sb['low30_gt5']['share']:.0%} 在 30 天內再跌超過 5%" if "low30_gt5" in sb else "") + "。")
+            bg = H["big"]
+            if ev["flow"] <= E.BIG_OUT and "14d" in bg:
+                why.append(f"{md(ev['date'])} 單日流出 {abs(ev['flow']):,.0f}M 美元：紅區裡單日流出 ≥ {-E.BIG_OUT / 100:g} 億的日子過去 {bg['14d']['n']} 次，"
+                           f"14 天後只有 {bg['14d']['up']:.0%} 上漲（中位數 {bg['14d']['median']:+.1%}）。")
+        elif (green or green_est) and g and gi and "14d" in g and "14d" in gi:
             if ev["zone"] == "in":
                 why.append(f"ETF 淨流入中亮綠燈：歷史剛亮起 {g['n']} 次，14 天中位數 {g['14d']['median']:+.1%}、{g['14d']['up']:.0%} 上漲，是綠色箭頭最好的環境。")
             else:
@@ -563,11 +622,13 @@ def main():
         cyc = H["cycles"]
         if ev["zone"] == "red" and cyc:
             lows, dl, df, fv = ([c[k] for c in cyc] for k in ("low_pct", "days_to_low", "days_to_flip", "flip_vs_low"))
-            red_h = C.hidx(E.settled_at(ev["since"]).strftime("%Y-%m-%dT%H"))
-            p0 = closes.get(red_h)
-            since_px = [closes[h] for h in closes if h >= red_h]
-            cur = (f"這輪 {md(ev['since'])} 進紅區（{p0:,.0f}），至今最低 {min(since_px):,.0f}（{min(since_px) / p0 - 1:+.1%}），現在 {px / p0 - 1:+.1%}。"
-                   if p0 and since_px else "")
+            cur = ""
+            if sp and sp["p0"]:
+                p0 = sp["p0"]
+                cur = (f"這輪 {md(ev['episode'])} 進紅區（{p0:,.0f}），照前幾輪的跌幅是 {p0 * (1 + min(lows)):,.0f}–{p0 * (1 + max(lows)):,.0f}；"
+                       f"至今最低 {sp['low']:,.0f}（{sp['low'] / p0 - 1:+.1%}，{sp['age']} 小時前），現在 {px / p0 - 1:+.1%}。"
+                       + (f"已止跌：比低點高 {px / sp['low'] - 1:.1%}，低點 {sp['age']} 小時沒破。" if sp["on"] else
+                          f"還沒止跌：要站上 {sp['line']:,.0f}（比低點高 {E.STOP_REBOUND:.0%}）且低點 {E.STOP_AGE_H} 小時不破才算。"))
             why.append(f"ETF 資金面：紅區第 {ev['days'] + 1} 天。過去 {len(cyc)} 輪進紅區後，BTC 從進紅區的價格再跌 {-max(lows):.0%}–{-min(lows):.0%} 才見底"
                        f"（{min(dl):.0f}–{max(dl):.0f} 天後），翻回淨流入是在進紅區 {min(df):.0f}–{max(df):.0f} 天後、已離低點 {min(fv):.0%}–{max(fv):.0%}。" + cur)
     lines.append("判斷：" + verdict + "".join(why))
