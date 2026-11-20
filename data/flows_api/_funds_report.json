@@ -9,7 +9,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1795161720"
+    "X-RateLimit-Reset": "1795165320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -32,7 +32,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1795161720"
+    "X-RateLimit-Reset": "1795165320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -47,27 +47,7 @@
    "window_days": 30
   },
   "HYPE": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1795161720"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 66,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-21",
-    "2026-11-19"
-   ],
-   "window_days": 30
+   "error": "TimeoutError: The read operation timed out"
   },
   "SOL": {
    "changed": false,
@@ -80,7 +60,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1795161720"
+    "X-RateLimit-Reset": "1795165320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -103,7 +83,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1795161720"
+    "X-RateLimit-Reset": "1795165320"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -118,5 +98,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-20T08:01:51Z"
+ "run_at": "2026-11-20T09:01:53Z"
 }
