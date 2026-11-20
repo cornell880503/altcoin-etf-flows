@@ -1,22 +1,20 @@
 {
  "binspot": {
-  "age_h": 504.8,
-  "at": "2026-11-20T10:52:21Z",
+  "age_h": 504.9,
+  "at": "2026-11-20T11:02:35Z",
   "dead": [],
-  "errors": [
-   "10:19:00 stream: Connection to remote host was lost."
-  ],
+  "errors": [],
   "exact": {
    "BTC": [
-    2.2,
-    2.5
+    2.1,
+    2.6
    ],
    "ETH": [
     7.7,
     7.3
    ]
   },
-  "final": true,
+  "final": false,
   "gaps": {
    "AAVE": 2,
    "ADA": 2,
@@ -37,17 +35,17 @@
    "ZEC": 4
   },
   "levels": {
-   "BTC": 129519,
-   "ETH": 49071
+   "BTC": 129567,
+   "ETH": 49082
   },
   "live": 24,
-  "msgs": 2805934,
-  "newest_hour": "2026-11-20T10",
-  "refreshes": 267,
-  "resyncs": 24,
-  "run": "44679238607",
-  "snaps": 291,
-  "to": 44722648178,
+  "msgs": 87673,
+  "newest_hour": "2026-11-20T11",
+  "refreshes": 8,
+  "resyncs": 0,
+  "run": "44722648178",
+  "snaps": 8,
+  "to": null,
   "waiting": []
  },
  "books": {
@@ -60,19 +58,19 @@
   "2026-11-20T12"
  ],
  "kick": {
-  "at": "2026-11-20T11:01:32Z",
+  "at": "2026-11-20T12:01:36Z",
   "binspot.yml": "busy",
   "book-data.yml": "started",
   "ck-pulse.yml": "started",
-  "fetch.yml": "started",
+  "fetch.yml": "recent",
   "indicators.yml": "started",
-  "okx-history.yml": "recent",
+  "okx-history.yml": "started",
   "radar.yml": "started"
  },
  "published_at": "2026-11-20T12:01:34Z",
  "published_hour": "2026-11-20T11",
  "published_rev": "e85b0eada878d880",
  "rounds": 1,
- "run_at": "2026-11-20T12:00:55Z",
- "secs": 36
+ "run_at": "2026-11-20T12:20:54Z",
+ "secs": 35
 }
