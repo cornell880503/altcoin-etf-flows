@@ -7,13 +7,13 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-19",
-      "netFlowUsdM": -41.2
+      "netFlowUsdM": -582.3
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-19",
-      "netFlowUsdM": -5.2
+      "netFlowUsdM": -131.2
     },
     {
       "symbol": "SOL",
@@ -37,42 +37,37 @@
       "symbol": "DOGE",
       "asset": "doge",
       "date": "2026-11-19",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -0.4
     },
     {
       "symbol": "LINK",
       "asset": "link",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": -0.4
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "HBAR",
       "asset": "hbar",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "LTC",
       "asset": "ltc",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "BNB",
       "asset": "bnb",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "DOT",
@@ -90,24 +85,21 @@
       "symbol": "NEAR",
       "asset": "near",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": -0.7
     },
     {
       "symbol": "TRX",
       "asset": "trx",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "ZEC",
       "asset": "zec",
       "date": "2026-11-19",
-      "lastReportedDate": "2026-11-18",
-      "netFlowUsdM": null
+      "netFlowUsdM": -0.7
     }
   ],
-  "totalUsdM": -49.4,
-  "updatedAt": "2026-11-20T05:01:41.855Z"
+  "totalUsdM": -718.7,
+  "updatedAt": "2026-11-20T06:02:00.112Z"
 }
