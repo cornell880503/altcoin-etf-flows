@@ -1,13 +1,13 @@
 {
-  "from": "2026-11-14",
-  "to": "2026-11-20",
+  "from": "2026-11-15",
+  "to": "2026-11-21",
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
       "netFlowUsdM": -1120.7,
-      "tradingDays": 4,
-      "avgDailyUsdM": -280.2,
+      "tradingDays": 5,
+      "avgDailyUsdM": -224.1,
       "positiveDays": 1,
       "negativeDays": 3
     },
@@ -15,8 +15,8 @@
       "symbol": "ETH",
       "asset": "ethereum",
       "netFlowUsdM": -208.4,
-      "tradingDays": 4,
-      "avgDailyUsdM": -52.1,
+      "tradingDays": 5,
+      "avgDailyUsdM": -41.7,
       "positiveDays": 0,
       "negativeDays": 4
     },
@@ -24,8 +24,8 @@
       "symbol": "SOL",
       "asset": "solana",
       "netFlowUsdM": 10.5,
-      "tradingDays": 4,
-      "avgDailyUsdM": 2.6,
+      "tradingDays": 5,
+      "avgDailyUsdM": 2.1,
       "positiveDays": 1,
       "negativeDays": 2
     },
@@ -33,8 +33,8 @@
       "symbol": "XRP",
       "asset": "xrp",
       "netFlowUsdM": -6,
-      "tradingDays": 4,
-      "avgDailyUsdM": -1.5,
+      "tradingDays": 5,
+      "avgDailyUsdM": -1.2,
       "positiveDays": 0,
       "negativeDays": 1
     },
@@ -42,8 +42,8 @@
       "symbol": "HYP",
       "asset": "hyp",
       "netFlowUsdM": -13.5,
-      "tradingDays": 4,
-      "avgDailyUsdM": -3.4,
+      "tradingDays": 5,
+      "avgDailyUsdM": -2.7,
       "positiveDays": 0,
       "negativeDays": 4
     },
