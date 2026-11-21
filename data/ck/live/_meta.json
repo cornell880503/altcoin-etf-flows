@@ -1,17 +1,17 @@
 {
  "binspot": {
-  "age_h": 522.0,
-  "at": "2026-11-21T04:03:54Z",
+  "age_h": 525.0,
+  "at": "2026-11-21T07:04:03Z",
   "dead": [],
   "errors": [],
   "exact": {
    "BTC": [
-    2.2,
-    11.6
+    6.5,
+    8.9
    ],
    "ETH": [
-    10.7,
-    18.9
+    16.0,
+    13.9
    ]
   },
   "final": false,
@@ -37,16 +37,16 @@
    "ZEC": 5
   },
   "levels": {
-   "BTC": 121847,
-   "ETH": 38613
+   "BTC": 120913,
+   "ETH": 38353
   },
   "live": 24,
-  "msgs": 133169,
-  "newest_hour": "2026-11-21T06",
-  "refreshes": 10,
+  "msgs": 2114937,
+  "newest_hour": "2026-11-21T07",
+  "refreshes": 154,
   "resyncs": 0,
   "run": "44863266710",
-  "snaps": 10,
+  "snaps": 154,
   "to": null,
   "waiting": []
  },
@@ -60,19 +60,19 @@
   "2026-11-21T08"
  ],
  "kick": {
-  "at": "2026-11-21T07:01:34Z",
+  "at": "2026-11-21T08:01:42Z",
   "binspot.yml": "busy",
   "book-data.yml": "started",
   "ck-pulse.yml": "started",
   "fetch.yml": "started",
-  "indicators.yml": "started",
-  "okx-history.yml": "started",
+  "indicators.yml": "recent",
+  "okx-history.yml": "recent",
   "radar.yml": "recent"
  },
  "published_at": "2026-11-21T08:01:41Z",
  "published_hour": "2026-11-21T07",
  "published_rev": "e85b0eada878d880",
  "rounds": 1,
- "run_at": "2026-11-21T08:00:54Z",
+ "run_at": "2026-11-21T08:20:54Z",
  "secs": 34
 }
