@@ -42,7 +42,7 @@
   },
   "live": 24,
   "msgs": 94611,
-  "newest_hour": "2026-11-21T09",
+  "newest_hour": "2026-11-21T10",
   "refreshes": 6,
   "resyncs": 0,
   "run": "44890056237",
@@ -60,19 +60,19 @@
   "2026-11-21T11"
  ],
  "kick": {
-  "at": "2026-11-21T10:01:43Z",
+  "at": "2026-11-21T11:01:34Z",
   "binspot.yml": "busy",
   "book-data.yml": "started",
   "ck-pulse.yml": "started",
   "fetch.yml": "started",
-  "indicators.yml": "recent",
-  "okx-history.yml": "started",
+  "indicators.yml": "started",
+  "okx-history.yml": "recent",
   "radar.yml": "started"
  },
  "published_at": "2026-11-21T11:01:33Z",
  "published_hour": "2026-11-21T10",
  "published_rev": "cc6c650dd5e5c958",
  "rounds": 1,
- "run_at": "2026-11-21T11:00:53Z",
+ "run_at": "2026-11-21T11:20:53Z",
  "secs": 33
 }
