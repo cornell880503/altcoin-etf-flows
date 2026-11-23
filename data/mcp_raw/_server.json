@@ -11,7 +11,7 @@
     "name": "cryptoetf",
     "version": "1.0.0"
    },
-   "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All flow values are net USD millions (positive = inflow, negative = outflow)."
+   "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All ETF flow values are net USD millions (positive = inflow, negative = outflow). Also stablecoins and tokenized real-world assets (treasuries, gold, stocks, credit); their amounts are whole US dollars, not millions."
   },
   "jsonrpc": "2.0",
   "id": 1
@@ -431,6 +431,109 @@
      },
      "annotations": {
       "title": "ETF Holders Average Entry Price",
+      "readOnlyHint": true,
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_stablecoins",
+     "title": "Stablecoins: Supply and Flows",
+     "description": "Get stablecoins with circulating supply (on-chain supply minus the issuer\u2019s own stock), USD value at one unit of the peg currency and net change of circulating over 7 and 30 days, in whole US dollars. The 30 largest coins, the totals per chain and the total USD value of all stablecoins per day over the last 30 days. Pass a chain to count one chain only.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "chain": {
+        "description": "Optional chain id: ethereum, tron, solana, base, arbitrum, bnb, \u2026",
+        "type": "string",
+        "pattern": "^[a-z0-9._-]{1,64}$"
+       }
+      }
+     },
+     "annotations": {
+      "title": "Stablecoins: Supply and Flows",
+      "readOnlyHint": true,
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_rwa_overview",
+     "title": "Tokenized RWA Market Overview",
+     "description": "Get the tokenized real-world asset market by segment (treasuries, gold, stocks, credit, real estate, \u2026): USD value and net flow over 1, 7 and 30 days, token counts, the market total, tokenized stocks by exposure, the largest issuers per segment and the products that moved most. Value = circulating \u00d7 the token\u2019s latest USD price; flow = change of circulating at today\u2019s price. Whole US dollars. Stablecoins are not included.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Tokenized RWA Market Overview",
+      "readOnlyHint": true,
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_rwa_flows",
+     "title": "Tokenized RWA Daily Flows",
+     "description": "Get the daily net flow of tokenized real-world assets per UTC day, each day at its own price, split by segment with mint, burn and interest, for up to the last 30 days. Whole US dollars. The current day has status \"preliminary\".",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "days": {
+        "description": "Days to return, 1\u201330, default 14",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 30
+       }
+      }
+     },
+     "annotations": {
+      "title": "Tokenized RWA Daily Flows",
+      "readOnlyHint": true,
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
+     "name": "get_rwa_products",
+     "title": "Largest Tokenized RWA Products",
+     "description": "Get the 25 largest tokenized real-world asset products \u2014 one issuer\u2019s token across every chain \u2014 with USD value, net flow over 1, 7 and 30 days, holders and chains, optionally for one segment and / or issuer, plus the total for that filter. Whole US dollars. `priced: false` means no price was found, so the value is null.",
+     "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+       "segment": {
+        "description": "Optional segment: treasuries, gold, stocks, asset-backed-credit, specialty-finance, corporate-credit, diversified-credit, active-strategies, private-equity, venture-capital, real-estate, non-us-gov-debt, cash, other",
+        "type": "string",
+        "pattern": "^[a-z0-9-]{1,40}$"
+       },
+       "issuer": {
+        "description": "Optional issuer id, e.g. blackrock, ondo-finance, franklin-templeton, tether, paxos",
+        "type": "string",
+        "pattern": "^[a-z0-9._-]{1,64}$"
+       }
+      }
+     },
+     "annotations": {
+      "title": "Largest Tokenized RWA Products",
       "readOnlyHint": true,
       "openWorldHint": false,
       "destructiveHint": false,
