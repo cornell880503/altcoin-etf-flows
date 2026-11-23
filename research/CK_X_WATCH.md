@@ -11,12 +11,16 @@ with no memory of earlier runs: everything it needs is here, in `research/ck_x/s
 
 Two routes, in this order. Use the first that works and say in the report which one was used.
 
-1. **Kevin's own Chrome** (the Claude in Chrome tools), if they are available in the session and X is logged in
-   there: open a new tab at `https://x.com/coinkarma_`, list the posts (link, time, text, whether there is an
-   image), scroll a few screens. For a post with a chart, open the image itself (`pbs.twimg.com/media/...`,
-   `name=large`) and look at it: the panels' names, the levels drawn, the dates marked. Close every tab you opened.
-   On 2026-11-23 that Chrome was **not** logged in to X (the profile shows a login wall and no timeline). Never
-   type a password; if it is still logged out, say so in one line and use route 2.
+1. **Kevin's own browser**, if one is available in the session and X is logged in there: the browser built into
+   the Claude desktop app (tools named `...Claude_Browser__*`; it needs the desktop app open on his computer and
+   the task set to require that computer) or Claude in Chrome (`mcp__claude-in-chrome__*`). Open a new tab at
+   `https://x.com/coinkarma_`, list the posts (link, time, text, whether there is an image), scroll a few screens.
+   For a post with a chart, open the image itself (`pbs.twimg.com/media/...`, `name=large`) and look at it: the
+   panels' names, the levels drawn, the dates marked. Close every tab you opened.
+   On 2026-11-23 Chrome was reachable but **not** logged in to X (a login wall, no timeline), and the built-in
+   browser was not reachable (his computer was not connected); each keeps its own sign-ins, so X has to be
+   signed in once in whichever is used, by him. Never type a password; if it is logged out or absent, say so in
+   one line and use route 2.
 2. **News wires that relay their posts.** ChainCatcher, BlockBeats, BingX flash news, Bloomingbit, BitPush and KuCoin
    news repeat CoinKarma's posts within minutes (2026-11-23: posted about 20:40 UTC+8, on ChainCatcher at 20:47,
    with a link to the post). WebSearch `CoinKarma` with the current month and year, and `CoinKarma 指標`,
