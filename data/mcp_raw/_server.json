@@ -174,6 +174,25 @@
      }
     },
     {
+     "name": "get_wsmi_index",
+     "title": "Wall Street Money Index",
+     "description": "Returns the Wall Street Money Index (WSMI): a 0\u2013100 reading of how institutional money moves into crypto through three channels \u2014 spot crypto ETFs (CEFI, 50%), stablecoins (30%) and tokenized real-world assets (20%). Each channel has its own 0\u2013100 index scored against its past year; when a channel has no reading, the other weights are rescaled. 50 = neutral. Includes the current value, its change, the value a week and a month ago, the three channel indexes and the last 30 days. Zones: 0\u201320 extreme fear, 20\u201340 fear, 40\u201360 neutral, 60\u201380 greed, 80\u2013100 extreme greed.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {}
+     },
+     "annotations": {
+      "title": "Wall Street Money Index",
+      "readOnlyHint": true,
+      "openWorldHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true
+     },
+     "execution": {
+      "taskSupport": "forbidden"
+     }
+    },
+    {
      "name": "get_cefi_index",
      "title": "CEFI Sentiment Index",
      "description": "Returns the composite CEFI (Crypto ETF Flow Index): a 0\u2013100 index of money moving through US spot crypto ETFs on all 16 tracked assets. Net flows of all funds are added up in dollars, and three components are scored against the past year: flow (today's net flow, smoothed, 40%), trend (net flow over 20 trading days, 30%) and breadth (share of funds with inflows, 30%). 50 = zero net flow; a typical inflow day scores about 69, a typical outflow day about 31. Each component is on the same 0\u2013100 scale. Zones: 0\u201320 extreme fear, 20\u201340 fear, 40\u201360 neutral, 60\u201380 greed, 80\u2013100 extreme greed.",
