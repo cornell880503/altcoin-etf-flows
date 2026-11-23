@@ -1,0 +1,15 @@
+{
+ "about": "CoinKarma posts already handled by the daily watch (research/CK_X_WATCH.md). id = the X status id when known.",
+ "posts": [
+  {"id": null, "date": "2026-11-04", "topic": "Overall LIQ / BTC LIQ reading of the dip (green arrow)", "status": "added",
+   "note": "the LIQ family is the hourly watch itself", "files": ["research/liq_watch.py", "research/ck_pulse_backtest.py"]},
+  {"id": null, "date": "2026-11-13", "topic": "BTC ETF 30D Net Flow flipping to inflow with Overall LIQ improving = short-term bottom", "status": "added",
+   "note": "reproduced exactly; into-red is the stronger half; the flip is a late confirmation; their 'resonance' 2 of 4",
+   "files": ["scripts/btc_etf30.py", "research/etf_flow_backtest.py"]},
+  {"id": null, "date": "2026-11-23", "topic": "Bitfinex whale: BTCUSD LONGS +1,000 BTC and Bitfinex Premium extreme below 60K = relative bottom", "status": "added",
+   "note": "facts hold (longs +1,092, premium 0.81, third highest since 2021); 9 earlier cases: 7d 5 up, 14d 6 up, 30d 2 up; rising longs come early",
+   "files": ["scripts/bfx_whale.py", "research/bfx_whale_backtest.py"], "relay": "https://www.chaincatcher.com/en/article/2307318"},
+  {"id": null, "date": "2025-11-23", "topic": "high-volume capitulation: CVD selling for days, spot volume peak at the 11/21 close = typical short-term bottom", "status": "skipped",
+   "note": "a year-old post that a 2026-11-23 search returned as if new (BingX flash news dated 2025-11-23); not researched. If they repeat the claim, test it: spot volume and CVD are in data/ck/raw and data/ck/live/extra.json"}
+ ]
+}
