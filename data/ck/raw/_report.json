@@ -3,32 +3,32 @@
  "parts": {
   "appstore": {
    "first": "2026-10-29",
-   "last": "2026-11-22",
+   "last": "2026-11-23",
    "ok": true,
-   "rows": 25,
-   "secs": 0.8
+   "rows": 26,
+   "secs": 0.9
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-21",
    "ok": true,
    "rows": 2299,
-   "secs": 6.4
+   "secs": 6.0
   },
   "bitfinex": {
    "complete": {
-    "btcusd_long": "2026-11-22",
-    "ethbtc_long": "2026-11-22",
+    "btcusd_long": "2026-11-23",
+    "ethbtc_long": "2026-11-23",
     "fusd_rate": "2026-11-22",
-    "fusd_used": "2026-11-22",
+    "fusd_used": "2026-11-23",
     "fust_rate": "2026-11-22",
-    "fust_used": "2026-11-22"
+    "fust_used": "2026-11-23"
    },
    "first": "2021-01-01",
-   "last": "2026-11-22",
+   "last": "2026-11-23",
    "ok": true,
-   "rows": 2152,
-   "secs": 24.5,
+   "rows": 2153,
+   "secs": 24.6,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,20 +36,20 @@
    "last": "2026-11-17",
    "ok": true,
    "rows": 450,
-   "secs": 0.9
+   "secs": 12.1
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1795388400,
+   "last": 1795392000,
    "ok": true,
-   "rows": 51635,
-   "secs": 0.6
+   "rows": 51636,
+   "secs": 0.7
   },
   "deribit": {
    "first": "2026-10-29",
-   "last": "2026-11-22",
+   "last": "2026-11-23",
    "ok": true,
-   "rows": 25,
+   "rows": 26,
    "secs": 1.0
   },
   "fred": {
@@ -57,33 +57,33 @@
    "last": "2026-11-20",
    "ok": true,
    "rows": 1976,
-   "secs": 3.6
+   "secs": 4.0
   },
   "funding": {
    "binance_est": {
-    "asked": 0,
+    "asked": 1,
     "mae_pct8h": 0.000125,
     "new_days": 0,
     "overlap_days": 43
    },
    "first": "2020-01-01",
-   "last": "2026-11-21",
+   "last": "2026-11-22",
    "ok": true,
-   "rows": 2517,
-   "secs": 2.8
+   "rows": 2518,
+   "secs": 4.1
   },
   "mstr": {
    "first": "1998-07-01",
-   "last": "2026-11-22",
+   "last": "2026-11-23",
    "ok": true,
-   "rows": 366,
+   "rows": 367,
    "secs": 0.5
   },
   "okx_lending": {
    "first": "2024-07-18",
-   "last": "2026-11-21",
+   "last": "2026-11-22",
    "ok": true,
-   "rows": 857,
+   "rows": 858,
    "secs": 0.4
   },
   "stablecoins": {
@@ -91,15 +91,15 @@
    "last": "2026-11-22",
    "ok": true,
    "rows": 3281,
-   "secs": 3.5
+   "secs": 4.9
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-21",
    "ok": true,
    "rows": 2732,
-   "secs": 1.3
+   "secs": 1.5
   }
  },
- "run_at": "2026-11-22T23:01:37Z"
+ "run_at": "2026-11-23T00:01:38Z"
 }
