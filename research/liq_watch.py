@@ -62,6 +62,15 @@ episode's low with that low 48 hours old ("止跌"; once per low; in the 4 compl
 in 5, 14 d later 5 up, median +3.1 %), and "止跌失敗" if a low that got such a notice later breaks by more than 2 %.
 A session is final only with BlackRock's figure in (btc_etf30.final_rows).
 
+The Bitfinex side (CoinKarma's "Bitfinex whale" tweet of 2026-11-23; scripts/bfx_whale.py): Bitfinex's BTC/USD
+margin longs and the Bitfinex premium over Coinbase (their own definitions; the premium reproduces their table,
+r 0.97). A line in every report, and one event: the longs up 1 % or more over a UTC day with the premium reaching
+0.40 % (once per 5 days; 10 times since 2021, 2026-11-21 the latest). The verdict quotes
+research/bfx_whale_backtest.json: after the 9 earlier ones the price was higher a week later in 5, two weeks later
+in 6, a month later in 2, and 4 fell more than 10 % further first, so it is said to mean a bounce of days to two
+weeks more often than not and no proof of a low; and while the longs are still rising (2 % or more in 7 days) the
+months ahead have been weaker than when they are flat (30 days later 46 % up against 58 %): these traders buy early.
+
 Usage: liq_watch.py [--table-wait]   (--table-wait: at a table hour, exit 3 instead of reporting while the
 table due this hour has not been read yet and it is less than 25 minutes past the hour; the collector then
 tries again in three minutes)."""
@@ -80,6 +89,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import binance_spot_ws as bws  # noqa: E402
+import bfx_whale as BW  # noqa: E402
 import btc_etf30 as E  # noqa: E402
 import ck_liq as C  # noqa: E402
 
@@ -92,6 +102,7 @@ CONFIRM_H = 2  # a flip needs the condition this hour and the hour before
 ANCHOR = 0.5  # the share of the latest table's residual carried forward
 TABLE_WAIT_MIN = 25  # --table-wait: how long after a table hour the table is waited for
 ETF_HIST = os.path.join(ROOT, "research", "etf_flow_backtest.json")
+BFX_HIST = os.path.join(ROOT, "research", "bfx_whale_backtest.json")
 
 
 def tw(h):
@@ -261,6 +272,30 @@ def etf_hist():
             "red": H.get("red_by_liq") or {}, "big": H.get("big_outflow_red") or {}, "stop": H.get("price_stop") or {}}
 
 
+def bfx_view(now):
+    """The Bitfinex longs and premium now (bfx_whale.view), None if the files are missing or unreadable."""
+    try:
+        return BW.view(now)
+    except (OSError, ValueError, KeyError, IndexError):
+        return None
+
+
+def bfx_hist():
+    try:
+        H = json.load(open(BFX_HIST))
+    except (OSError, ValueError):
+        return {}
+    return {"ev": H.get("events", {}).get("summary") or {}, "trend": H.get("longs_trend_30d") or {}}
+
+
+def bfx_odds(s):
+    """'9 次：7 天後 5 次上漲（中位數 +2.2%）、14 天 6 次、30 天只有 2 次，4 次先再跌超過 10%' from the events' summary."""
+    if not s or "7d" not in s or "30d" not in s:
+        return ""
+    return (f"{s['7d']['n']} 次：7 天後 {s['7d']['up']} 次上漲（中位數 {s['7d']['median']:+.1%}）、14 天 {s['14d']['up']} 次、"
+            f"30 天只有 {s['30d']['up']} 次，{s['fell10']['count']} 次先再跌超過 10%")
+
+
 def price_stop(ev, closes, hc, px):
     """In a red episode: its low so far, how old it is, and whether the price has stopped falling (5 % above a low
     that is 48 hours old). None outside an episode."""
@@ -375,6 +410,12 @@ def decide(prev, obs):
                           + ("（公布）" if fresh else "（即時估計）"))
         if ev and prev.get("etf_zone") and ev["zone"] != prev["etf_zone"]:  # a state from before 2026-11-14 has no zone: set silently
             events.append(etf_event(prev["etf_zone"], ev, pub_ov, obs.get("etf_hist")))
+    bw = obs.get("bfx")  # the Bitfinex event: once per episode, and only while it is fresh (today's or yesterday's)
+    state["bfx_evt"] = bw["event"] if bw and bw.get("event") else prev.get("bfx_evt")
+    if bw and bw.get("event") and bw["event_age"] <= 1 and bw["event"] != prev.get("bfx_evt"):
+        odds = bfx_odds((obs.get("bfx_hist") or {}).get("ev"))
+        events.append(f"Bitfinex 大戶加倉＋溢價極端（{md(bw['event'])}：槓桿多單 {bw['event_d1']:+,.0f} BTC（{bw['event_r1']:+.1%}），溢價最高 {bw['event_prem']:.2f}%）"
+                      + (f"；2021 以來同樣情況 {odds}" if odds else ""))
     sp = obs.get("stop")  # once per low: the notice is not repeated while the episode's low stays the same
     state["stop_low"] = prev.get("stop_low") if sp else None
     if sp and prev.get("stop_low") and sp["low"] < prev["stop_low"] * 0.98:  # the low a notice was given for has broken
@@ -510,8 +551,10 @@ def main():
     ev = etf_view(now)
     H = etf_hist()
     sp = price_stop(ev, closes, hc, px)
+    bw, BH = bfx_view(now), bfx_hist()
     obs = {"table": U, "hour": hb, "pub_btc": st["btc_liq"], "pub_btc_v": v["btc_liq"], "pub_overall": st["overall_liq"],
-           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev, "etf": ev, "etf_hist": H, "stop": sp, "px": px}
+           "pub_tot": st["overall_liquidity_btc"], "e": e_now, "e1": e_prev, "t": t_now, "t1": t_prev, "etf": ev, "etf_hist": H, "stop": sp, "px": px,
+           "bfx": bw, "bfx_hist": BH}
     state, events = decide(prev, obs)
     btc_on, tot, green_est = state["btc_on"], state["tot"], state["green_est"]
     overall_pub = state["overall"]
@@ -560,6 +603,12 @@ def main():
         if ev["zone"] != "in" and ev["need14"] > 0:
             fut.append(f"兩週內（{ev['n14']} 個交易日）要翻正，平均每天需淨流入約 {ev['need14'] / ev['n14']:.1f}K BTC（約 {ev['need14'] / ev['n14'] * ev['price'] / 1e3:,.0f}M 美元）")
         lines.append(txt + ("；" + "，".join(fut) if fut else "") + "。")
+    if bw:
+        txt = (f"Bitfinex 大戶（CoinKarma 的 BTCUSD LONGS 與 Premium，同算法）：槓桿多單 {bw['longs']:,.0f} BTC（今天 {bw['d1']:+,.0f}、7 天 {bw['r7']:+.1%}、30 天 {bw['r30']:+.1%}）；"
+               f"溢價（對 Coinbase，4 小時均）{bw['prem']:+.2f}%，24 小時最高 {bw['prem24']:+.2f}%（CoinKarma 的線 ±{BW.PREM_CK}）")
+        if bw.get("event") and bw["event_age"] <= 30:
+            txt += (f"；最近一次「加倉＋溢價極端」{md(bw['event'])}（多單 {bw['event_d1']:+,.0f}、溢價 {bw['event_prem']:.2f}，收 {bw['event_px']:,.0f}），至今 {bw['since']:+.1%}")
+        lines.append(txt + "。")
     # ------------------------------------------------------------ the verdict
     why = []
     if green and btc_on:
@@ -631,6 +680,13 @@ def main():
                           f"還沒止跌：要站上 {sp['line']:,.0f}（比低點高 {E.STOP_REBOUND:.0%}）且低點 {E.STOP_AGE_H} 小時不破才算。"))
             why.append(f"ETF 資金面：紅區第 {ev['days'] + 1} 天。過去 {len(cyc)} 輪進紅區後，BTC 從進紅區的價格再跌 {-max(lows):.0%}–{-min(lows):.0%} 才見底"
                        f"（{min(dl):.0f}–{max(dl):.0f} 天後），翻回淨流入是在進紅區 {min(df):.0f}–{max(df):.0f} 天後、已離低點 {min(fv):.0%}–{max(fv):.0%}。" + cur)
+    if bw:
+        odds = bfx_odds(BH.get("ev"))
+        if bw.get("event") and bw["event_age"] <= 14 and odds:
+            why.append(f"Bitfinex 大戶 {md(bw['event'])} 加倉＋溢價極端（至今 {bw['since']:+.1%}）：2021 以來同樣情況 {odds}；多半是幾天到兩週的反彈，不是見底的證明。")
+        tr = BH.get("trend") or {}
+        if bw["r7"] >= BW.TREND_UP and tr.get("up2", {}).get("n") and tr.get("flat", {}).get("n"):
+            why.append(f"Bitfinex 多單 7 天 {bw['r7']:+.1%}，還在加倉：這種時候之後 30 天 {tr['up2']['up']:.0%} 上漲（多單持平時 {tr['flat']['up']:.0%}），他們習慣買在跌勢途中。")
     lines.append("判斷：" + verdict + "".join(why))
     # ------------------------------------------------------------ how good the hourly estimate has been
     sk = skill(rows, P, x_btc, "btc_liq", "btc_liq", ON_BTC)
