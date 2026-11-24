@@ -1,23 +1,40 @@
 {
  "assets": {
   "BTC": {
-   "changed": false,
+   "changed": true,
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-23"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1795489320"
+    "X-RateLimit-Reset": "1795492920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 241,
-    "differ": 0,
-    "examples": []
+    "compared": 252,
+    "differ": 3,
+    "examples": [
+     [
+      "2026-11-23",
+      "fidelity",
+      0.0,
+      13.3
+     ],
+     [
+      "2026-11-23",
+      "bitwise",
+      0.0,
+      -12.6
+     ],
+     [
+      "2026-11-23",
+      "grayscaleBtc",
+      0.0,
+      -61.1
+     ]
+    ]
    },
    "window": [
     "2026-10-26",
@@ -26,23 +43,28 @@
    "window_days": 30
   },
   "ETH": {
-   "changed": false,
+   "changed": true,
    "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [
-    "2026-11-23"
-   ],
+   "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1795489320"
+    "X-RateLimit-Reset": "1795492920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 221,
-    "differ": 0,
-    "examples": []
+    "compared": 231,
+    "differ": 1,
+    "examples": [
+     [
+      "2026-11-23",
+      "fidelity",
+      0.0,
+      5.6
+     ]
+    ]
    },
    "window": [
     "2026-10-26",
@@ -51,15 +73,15 @@
    "window_days": 30
   },
   "HYPE": {
-   "changed": false,
-   "days": 20,
+   "changed": true,
+   "days": 21,
    "gap": false,
    "ok": true,
    "partial": [],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1795489320"
+    "X-RateLimit-Reset": "1795492920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -69,12 +91,12 @@
    },
    "window": [
     "2026-10-26",
-    "2026-11-20"
+    "2026-11-23"
    ],
    "window_days": 30
   },
   "SOL": {
-   "changed": false,
+   "changed": true,
    "days": 21,
    "gap": false,
    "ok": true,
@@ -84,13 +106,26 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1795489320"
+    "X-RateLimit-Reset": "1795492920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 181,
-    "differ": 0,
-    "examples": []
+    "compared": 187,
+    "differ": 2,
+    "examples": [
+     [
+      "2026-11-23",
+      "grayscale",
+      0.0,
+      -1.9
+     ],
+     [
+      "2026-11-23",
+      "vanEck",
+      0.0,
+      -1.9
+     ]
+    ]
    },
    "window": [
     "2026-10-26",
@@ -99,15 +134,17 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": false,
-   "days": 20,
+   "changed": true,
+   "days": 21,
    "gap": false,
    "ok": true,
-   "partial": [],
+   "partial": [
+    "2026-11-23"
+   ],
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1795489320"
+    "X-RateLimit-Reset": "1795492920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -117,10 +154,10 @@
    },
    "window": [
     "2026-10-26",
-    "2026-11-20"
+    "2026-11-23"
    ],
    "window_days": 30
   }
  },
- "run_at": "2026-11-24T03:01:44Z"
+ "run_at": "2026-11-24T04:01:51Z"
 }
