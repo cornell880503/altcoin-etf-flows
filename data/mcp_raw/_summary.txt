@@ -13,7 +13,7 @@
       "symbol": "ETH",
       "asset": "ethereum",
       "date": "2026-11-24",
-      "netFlowUsdM": -64.1
+      "netFlowUsdM": -64
     },
     {
       "symbol": "SOL",
@@ -79,7 +79,7 @@
       "symbol": "SUI",
       "asset": "sui",
       "date": "2026-11-24",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 0.7
     },
     {
       "symbol": "NEAR",
@@ -100,6 +100,6 @@
       "netFlowUsdM": 0
     }
   ],
-  "totalUsdM": -296.5,
-  "updatedAt": "2026-11-25T19:17:56.406Z"
+  "totalUsdM": -295.8,
+  "updatedAt": "2026-11-25T23:22:20.499Z"
 }
