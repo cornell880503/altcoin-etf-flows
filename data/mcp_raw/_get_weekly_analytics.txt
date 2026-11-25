@@ -5,10 +5,10 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -1821.1,
+      "netFlowUsdM": -1818.1,
       "tradingDays": 4,
-      "avgDailyUsdM": -455.3,
-      "positiveDays": 0,
+      "avgDailyUsdM": -454.5,
+      "positiveDays": 1,
       "negativeDays": 3
     },
     {
@@ -23,10 +23,10 @@
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -11.1,
+      "netFlowUsdM": -10.4,
       "tradingDays": 4,
-      "avgDailyUsdM": -2.8,
-      "positiveDays": 0,
+      "avgDailyUsdM": -2.6,
+      "positiveDays": 1,
       "negativeDays": 3
     },
     {
@@ -69,7 +69,7 @@
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -123,8 +123,8 @@
       "symbol": "NEAR",
       "asset": "near",
       "netFlowUsdM": -2,
-      "tradingDays": 3,
-      "avgDailyUsdM": -0.7,
+      "tradingDays": 4,
+      "avgDailyUsdM": -0.5,
       "positiveDays": 0,
       "negativeDays": 3
     },
