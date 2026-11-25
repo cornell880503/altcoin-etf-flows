@@ -7,7 +7,7 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-24",
-      "netFlowUsdM": 3.1
+      "netFlowUsdM": -7.3
     },
     {
       "symbol": "ETH",
@@ -31,7 +31,7 @@
       "symbol": "HYP",
       "asset": "hyp",
       "date": "2026-11-24",
-      "netFlowUsdM": 0
+      "netFlowUsdM": -1.7
     },
     {
       "symbol": "DOGE",
@@ -44,8 +44,7 @@
       "symbol": "LINK",
       "asset": "link",
       "date": "2026-11-24",
-      "lastReportedDate": "2026-11-23",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "AVAX",
@@ -109,6 +108,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": 3.8,
-  "updatedAt": "2026-11-25T02:01:56.906Z"
+  "totalUsdM": -8.2,
+  "updatedAt": "2026-11-25T03:01:47.284Z"
 }
