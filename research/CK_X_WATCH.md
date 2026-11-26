@@ -52,6 +52,7 @@ Already covered (do not redo; extend if they add a rule):
 | BTC ETF 30D Net Flow | `scripts/btc_etf30.py`, `research/etf_flow_backtest.py` | watched; zones, into-red cycles, flip |
 | Bitfinex BTCUSD LONGS, Bitfinex Premium | `scripts/bfx_whale.py`, `research/bfx_whale_backtest.py` | watched; a bounce signal at best, longs rise early |
 | The table's other rows (LSUR Z, ALT Resilient Index, USDC/USDT premium, Binance USDT rate, funding APY, Pulse Index) | `research/ck_pulse_backtest.py`, tests of 2026-11-20 in `research/etf_flow_backtest.py`'s commit | no edge alone; Pulse <= 5 and ARI >= 2 do not mark lows |
+| Karma Index (closed composite, buy < 20, sell > 80) | `research/karma_index_digitize.py`, `research/karma_index_backtest.py`, `research/ck_x/2026-11-26-karma-index.md` | cannot be computed; read off their chart; a months-long state, not a trigger; roughly their Pulse Index held low for weeks; not in the watch |
 | Their other site indicators (funding, basis, CFTC, stablecoins, MSTR, DVOL, lending rates, CVD, ETH/BTC whale) | `scripts/ck_indicators.py`, `scripts/fetch_ck.py`, `data/ck/raw/*.json` | on the dashboard, not in the watch |
 
 ## 3. The research (before asking him)

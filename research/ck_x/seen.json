@@ -10,6 +10,9 @@
    "note": "facts hold (longs +1,092, premium 0.81, third highest since 2021); 9 earlier cases: 7d 5 up, 14d 6 up, 30d 2 up; rising longs come early",
    "files": ["scripts/bfx_whale.py", "research/bfx_whale_backtest.py"], "relay": "https://www.chaincatcher.com/en/article/2307318"},
   {"id": null, "date": "2025-11-23", "topic": "high-volume capitulation: CVD selling for days, spot volume peak at the 11/21 close = typical short-term bottom", "status": "skipped",
-   "note": "a year-old post that a 2026-11-23 search returned as if new (BingX flash news dated 2025-11-23); not researched. If they repeat the claim, test it: spot volume and CVD are in data/ck/raw and data/ck/live/extra.json"}
+   "note": "a year-old post that a 2026-11-23 search returned as if new (BingX flash news dated 2025-11-23); not researched. If they repeat the claim, test it: spot volume and CVD are in data/ck/raw and data/ck/live/extra.json"},
+  {"id": null, "date": "2026-11-26", "topic": "Karma Index (their closed 'cyclical' composite) below 20 = buy signal again", "status": "researched",
+   "note": "Kevin sent the screenshot. Cannot be computed (no formula, not in the Telegram table); read off their chart: 7 buy episodes since 2022, the price went 11 % or more lower after 5 of them, a year later the 2022-23 ones were +30..+130 %, the 2026 ones are under water; a state (141 days below 20 in 2026-02..08), on since about 11-13; roughly their Pulse Index held low for weeks (r 0.84-0.87). Asked whether to add a context line; no notification proposed",
+   "files": ["research/ck_x/2026-11-26-karma-index.md", "research/karma_index_digitize.py", "research/karma_index_backtest.py", "research/ck_x/karma_index_2026-11-26.json", "research/karma_index_backtest.json"]}
  ]
 }
