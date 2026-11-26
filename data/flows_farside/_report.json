@@ -1,114 +1,17 @@
 {
  "assets": {
   "BTC": {
-   "appended": [],
-   "bytes": 289515,
-   "rows": 13,
-   "status": 200,
-   "tickers": [
-    "IBIT",
-    "FBTC",
-    "BITB",
-    "ARKB",
-    "BTCO",
-    "EZBC",
-    "BRRR",
-    "HODL",
-    "BTCW",
-    "MSBT",
-    "GBTC",
-    "BTC"
-   ],
-   "unknown_tickers": [],
-   "vs_stored": {
-    "all_differ": 3,
-    "all_figures": 120,
-    "main_differ": 0,
-    "main_funds": 30
-   },
-   "window": [
-    "2026-11-09",
-    "2026-11-25"
-   ]
+   "skipped": "cryptoetf.today delivered this run"
   },
   "ETH": {
-   "appended": [],
-   "bytes": 210234,
-   "rows": 13,
-   "status": 200,
-   "tickers": [
-    "ETHA",
-    "ETHB",
-    "FETH",
-    "ETHW",
-    "TETH",
-    "ETHV",
-    "QETH",
-    "EZET",
-    "MSSE",
-    "ETHE",
-    "ETH"
-   ],
-   "unknown_tickers": [],
-   "vs_stored": {
-    "all_differ": 0,
-    "all_figures": 110,
-    "main_differ": 0,
-    "main_funds": 30
-   },
-   "window": [
-    "2026-11-09",
-    "2026-11-25"
-   ]
+   "skipped": "cryptoetf.today delivered this run"
   },
   "HYPE": {
-   "appended": [],
-   "bytes": 87077,
-   "rows": 13,
-   "status": 200,
-   "tickers": [
-    "BHYP",
-    "THYP",
-    "HYPG"
-   ],
-   "unknown_tickers": [],
-   "vs_stored": {
-    "all_differ": 0,
-    "all_figures": 30,
-    "main_differ": 0,
-    "main_funds": 30
-   },
-   "window": [
-    "2026-11-09",
-    "2026-11-25"
-   ]
+   "skipped": "cryptoetf.today delivered this run"
   },
   "SOL": {
-   "appended": [],
-   "bytes": 127649,
-   "rows": 13,
-   "status": 200,
-   "tickers": [
-    "BSOL",
-    "VSOL",
-    "FSOL",
-    "TSOL",
-    "SOEZ",
-    "MSOL",
-    "GSOL"
-   ],
-   "unknown_tickers": [],
-   "vs_stored": {
-    "all_differ": 1,
-    "all_figures": 88,
-    "main_differ": 0,
-    "main_funds": 30
-   },
-   "window": [
-    "2026-11-09",
-    "2026-11-25"
-   ]
+   "skipped": "cryptoetf.today delivered this run"
   }
  },
- "run_at": "2026-11-26T10:05:13Z"
+ "run_at": "2026-11-26T11:01:50Z"
 }

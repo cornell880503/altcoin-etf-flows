@@ -32,7 +32,7 @@
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": -3.4,
+      "netFlowUsdM": -3.2,
       "tradingDays": 4,
       "avgDailyUsdM": -0.8,
       "positiveDays": 1,
@@ -114,8 +114,8 @@
       "symbol": "SUI",
       "asset": "sui",
       "netFlowUsdM": 0.5,
-      "tradingDays": 3,
-      "avgDailyUsdM": 0.2,
+      "tradingDays": 4,
+      "avgDailyUsdM": 0.1,
       "positiveDays": 1,
       "negativeDays": 1
     },

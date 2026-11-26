@@ -1,36 +1,20 @@
 {
  "assets": {
   "BTC": {
-   "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!",
-   "reason": "<none>",
-   "status": 522
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "ETH": {
-   "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!",
-   "reason": "<none>",
-   "status": 522
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "HYPE": {
-   "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!",
-   "reason": "<none>",
-   "status": 522
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "SOL": {
-   "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!",
-   "reason": "<none>",
-   "status": 522
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   },
   "XRP": {
-   "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!",
-   "reason": "<none>",
-   "status": 522
+   "skipped": "per-fund window from the API this run (data/flows_api/_funds_report.json)"
   }
  },
- "failures": [
-  "BTC: HTTP 522",
-  "ETH: HTTP 522",
-  "SOL: HTTP 522",
-  "XRP: HTTP 522",
-  "HYPE: HTTP 522"
- ]
+ "failures": []
 }
