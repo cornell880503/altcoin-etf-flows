@@ -6,20 +6,20 @@
    "last": "2026-11-26",
    "ok": true,
    "rows": 29,
-   "secs": 0.1
+   "secs": 1.0
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-24",
    "ok": true,
    "rows": 2302,
-   "secs": 5.4
+   "secs": 5.1
   },
   "bitfinex": {
    "complete": {
     "btcusd_long": "2026-11-26",
     "ethbtc_long": "2026-11-26",
-    "fusd_rate": "2026-11-25",
+    "fusd_rate": "2026-11-26",
     "fusd_used": "2026-11-26",
     "fust_rate": "2026-11-25",
     "fust_used": "2026-11-26"
@@ -36,14 +36,14 @@
    "last": "2026-11-17",
    "ok": true,
    "rows": 450,
-   "secs": 0.6
+   "secs": 0.9
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1795651200,
+   "last": 1795654800,
    "ok": true,
-   "rows": 51708,
-   "secs": 0.5
+   "rows": 51709,
+   "secs": 0.7
   },
   "deribit": {
    "first": "2026-10-29",
@@ -70,36 +70,36 @@
    "last": "2026-11-25",
    "ok": true,
    "rows": 2521,
-   "secs": 3.8
+   "secs": 3.1
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-26",
    "ok": true,
    "rows": 370,
-   "secs": 0.2
+   "secs": 0.4
   },
   "okx_lending": {
    "first": "2024-07-18",
    "last": "2026-11-25",
    "ok": true,
    "rows": 861,
-   "secs": 0.4
+   "secs": 0.3
   },
   "stablecoins": {
    "first": "2017-11-29",
    "last": "2026-11-25",
    "ok": true,
    "rows": 3284,
-   "secs": 3.5
+   "secs": 4.2
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-24",
    "ok": true,
    "rows": 2735,
-   "secs": 1.8
+   "secs": 1.5
   }
  },
- "run_at": "2026-11-26T00:01:41Z"
+ "run_at": "2026-11-26T01:01:43Z"
 }
