@@ -51,8 +51,7 @@
       "symbol": "AVAX",
       "asset": "avax",
       "date": "2026-11-25",
-      "lastReportedDate": "2026-11-24",
-      "netFlowUsdM": null
+      "netFlowUsdM": 0
     },
     {
       "symbol": "HBAR",
@@ -93,8 +92,7 @@
       "symbol": "NEAR",
       "asset": "near",
       "date": "2026-11-25",
-      "lastReportedDate": "2026-11-24",
-      "netFlowUsdM": null
+      "netFlowUsdM": 16.2
     },
     {
       "symbol": "TRX",
@@ -111,6 +109,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -118.6,
-  "updatedAt": "2026-11-26T02:01:49.215Z"
+  "totalUsdM": -102.4,
+  "updatedAt": "2026-11-26T03:02:06.156Z"
 }
