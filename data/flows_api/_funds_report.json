@@ -1,122 +1,20 @@
 {
  "assets": {
   "BTC": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1795680120"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 264,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-27",
-    "2026-11-25"
-   ],
-   "window_days": 30
+   "error": "HTTP 522"
   },
   "ETH": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1795680120"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 242,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-27",
-    "2026-11-25"
-   ],
-   "window_days": 30
+   "error": "HTTP 522"
   },
   "HYPE": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1795680120"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 66,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-27",
-    "2026-11-25"
-   ],
-   "window_days": 30
+   "error": "HTTP 522"
   },
   "SOL": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [
-    "2026-11-25"
-   ],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1795680120"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 196,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-27",
-    "2026-11-25"
-   ],
-   "window_days": 30
+   "error": "HTTP 522"
   },
   "XRP": {
-   "changed": false,
-   "days": 22,
-   "gap": false,
-   "ok": true,
-   "partial": [],
-   "rate_limit": {
-    "X-RateLimit-Limit": "60",
-    "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1795680120"
-   },
-   "unknown_tickers": [],
-   "vs_stored": {
-    "compared": 110,
-    "differ": 0,
-    "examples": []
-   },
-   "window": [
-    "2026-10-27",
-    "2026-11-25"
-   ],
-   "window_days": 30
+   "error": "HTTP 522"
   }
  },
- "run_at": "2026-11-26T08:01:43Z"
+ "run_at": "2026-11-26T09:01:40Z"
 }
