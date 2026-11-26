@@ -1,33 +1,33 @@
 {
-  "from": "2026-11-19",
-  "to": "2026-11-25",
+  "from": "2026-11-20",
+  "to": "2026-11-26",
   "assets": [
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -2052.7,
+      "netFlowUsdM": -1470.5,
       "tradingDays": 4,
-      "avgDailyUsdM": -513.2,
+      "avgDailyUsdM": -367.6,
       "positiveDays": 0,
-      "negativeDays": 4
+      "negativeDays": 3
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -377.6,
+      "netFlowUsdM": -246.3,
       "tradingDays": 4,
-      "avgDailyUsdM": -94.4,
+      "avgDailyUsdM": -61.6,
       "positiveDays": 0,
-      "negativeDays": 4
+      "negativeDays": 3
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -10.4,
+      "netFlowUsdM": -9,
       "tradingDays": 4,
-      "avgDailyUsdM": -2.6,
+      "avgDailyUsdM": -2.2,
       "positiveDays": 1,
-      "negativeDays": 3
+      "negativeDays": 2
     },
     {
       "symbol": "XRP",
@@ -41,35 +41,35 @@
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "netFlowUsdM": -5.4,
+      "netFlowUsdM": -3.5,
       "tradingDays": 4,
-      "avgDailyUsdM": -1.3,
+      "avgDailyUsdM": -0.9,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 2
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
-      "netFlowUsdM": -0.4,
-      "tradingDays": 4,
-      "avgDailyUsdM": -0.1,
+      "netFlowUsdM": 0,
+      "tradingDays": 3,
+      "avgDailyUsdM": 0,
       "positiveDays": 0,
-      "negativeDays": 1
+      "negativeDays": 0
     },
     {
       "symbol": "LINK",
       "asset": "link",
-      "netFlowUsdM": 3,
-      "tradingDays": 4,
-      "avgDailyUsdM": 0.7,
+      "netFlowUsdM": 3.4,
+      "tradingDays": 3,
+      "avgDailyUsdM": 1.1,
       "positiveDays": 1,
-      "negativeDays": 2
+      "negativeDays": 1
     },
     {
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0,
-      "tradingDays": 4,
+      "tradingDays": 3,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -78,7 +78,7 @@
       "symbol": "HBAR",
       "asset": "hbar",
       "netFlowUsdM": -0.3,
-      "tradingDays": 4,
+      "tradingDays": 3,
       "avgDailyUsdM": -0.1,
       "positiveDays": 0,
       "negativeDays": 1
@@ -87,8 +87,8 @@
       "symbol": "LTC",
       "asset": "ltc",
       "netFlowUsdM": -0.2,
-      "tradingDays": 4,
-      "avgDailyUsdM": 0,
+      "tradingDays": 3,
+      "avgDailyUsdM": -0.1,
       "positiveDays": 0,
       "negativeDays": 1
     },
@@ -96,7 +96,7 @@
       "symbol": "BNB",
       "asset": "bnb",
       "netFlowUsdM": 0,
-      "tradingDays": 4,
+      "tradingDays": 3,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -105,7 +105,7 @@
       "symbol": "DOT",
       "asset": "dot",
       "netFlowUsdM": 0,
-      "tradingDays": 4,
+      "tradingDays": 3,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -113,26 +113,26 @@
     {
       "symbol": "SUI",
       "asset": "sui",
-      "netFlowUsdM": 5.9,
-      "tradingDays": 4,
-      "avgDailyUsdM": 1.5,
-      "positiveDays": 2,
+      "netFlowUsdM": 0.5,
+      "tradingDays": 3,
+      "avgDailyUsdM": 0.2,
+      "positiveDays": 1,
       "negativeDays": 1
     },
     {
       "symbol": "NEAR",
       "asset": "near",
-      "netFlowUsdM": -2,
-      "tradingDays": 4,
+      "netFlowUsdM": -1.4,
+      "tradingDays": 3,
       "avgDailyUsdM": -0.5,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 2
     },
     {
       "symbol": "TRX",
       "asset": "trx",
       "netFlowUsdM": 0,
-      "tradingDays": 4,
+      "tradingDays": 3,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -140,11 +140,11 @@
     {
       "symbol": "ZEC",
       "asset": "zec",
-      "netFlowUsdM": -1.9,
-      "tradingDays": 4,
-      "avgDailyUsdM": -0.5,
+      "netFlowUsdM": -1.2,
+      "tradingDays": 3,
+      "avgDailyUsdM": -0.4,
       "positiveDays": 1,
-      "negativeDays": 2
+      "negativeDays": 1
     }
   ]
 }
