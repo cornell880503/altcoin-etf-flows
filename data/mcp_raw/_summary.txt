@@ -7,7 +7,7 @@
       "symbol": "BTC",
       "asset": "bitcoin",
       "date": "2026-11-25",
-      "netFlowUsdM": -116.8
+      "netFlowUsdM": -123.3
     },
     {
       "symbol": "ETH",
@@ -25,7 +25,7 @@
       "symbol": "XRP",
       "asset": "xrp",
       "date": "2026-11-25",
-      "netFlowUsdM": 0
+      "netFlowUsdM": 4.4
     },
     {
       "symbol": "HYP",
@@ -109,6 +109,6 @@
       "netFlowUsdM": null
     }
   ],
-  "totalUsdM": -102.4,
-  "updatedAt": "2026-11-26T03:34:40.432Z"
+  "totalUsdM": -104.5,
+  "updatedAt": "2026-11-26T05:02:00.697Z"
 }
