@@ -9,7 +9,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "59",
-    "X-RateLimit-Reset": "1795669320"
+    "X-RateLimit-Reset": "1795672920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -18,9 +18,9 @@
     "examples": [
      [
       "2026-11-25",
-      "fidelity",
+      "blackrock",
       0.0,
-      -6.5
+      -329.7
      ]
     ]
    },
@@ -31,7 +31,7 @@
    "window_days": 30
   },
   "ETH": {
-   "changed": false,
+   "changed": true,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -39,13 +39,20 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "58",
-    "X-RateLimit-Reset": "1795669320"
+    "X-RateLimit-Reset": "1795672920"
    },
    "unknown_tickers": [],
    "vs_stored": {
     "compared": 242,
-    "differ": 0,
-    "examples": []
+    "differ": 1,
+    "examples": [
+     [
+      "2026-11-25",
+      "blackrock",
+      0.0,
+      -68.5
+     ]
+    ]
    },
    "window": [
     "2026-10-27",
@@ -62,7 +69,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "55",
-    "X-RateLimit-Reset": "1795669320"
+    "X-RateLimit-Reset": "1795672920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -88,7 +95,7 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "57",
-    "X-RateLimit-Reset": "1795669320"
+    "X-RateLimit-Reset": "1795672920"
    },
    "unknown_tickers": [],
    "vs_stored": {
@@ -103,7 +110,7 @@
    "window_days": 30
   },
   "XRP": {
-   "changed": true,
+   "changed": false,
    "days": 22,
    "gap": false,
    "ok": true,
@@ -111,11 +118,11 @@
    "rate_limit": {
     "X-RateLimit-Limit": "60",
     "X-RateLimit-Remaining": "56",
-    "X-RateLimit-Reset": "1795669320"
+    "X-RateLimit-Reset": "1795672920"
    },
    "unknown_tickers": [],
    "vs_stored": {
-    "compared": 105,
+    "compared": 110,
     "differ": 0,
     "examples": []
    },
@@ -126,5 +133,5 @@
    "window_days": 30
   }
  },
- "run_at": "2026-11-26T05:01:49Z"
+ "run_at": "2026-11-26T06:01:36Z"
 }
