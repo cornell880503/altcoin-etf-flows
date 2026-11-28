@@ -5,11 +5,11 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -1254.3,
+      "netFlowUsdM": -1266.6,
       "tradingDays": 5,
-      "avgDailyUsdM": -250.9,
+      "avgDailyUsdM": -253.3,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 4
     },
     {
       "symbol": "ETH",
@@ -32,10 +32,10 @@
     {
       "symbol": "XRP",
       "asset": "xrp",
-      "netFlowUsdM": 1.9,
+      "netFlowUsdM": 7.3,
       "tradingDays": 5,
-      "avgDailyUsdM": 0.4,
-      "positiveDays": 1,
+      "avgDailyUsdM": 1.5,
+      "positiveDays": 2,
       "negativeDays": 1
     },
     {
@@ -69,7 +69,7 @@
       "symbol": "AVAX",
       "asset": "avax",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -123,8 +123,8 @@
       "symbol": "NEAR",
       "asset": "near",
       "netFlowUsdM": 15.6,
-      "tradingDays": 3,
-      "avgDailyUsdM": 5.2,
+      "tradingDays": 4,
+      "avgDailyUsdM": 3.9,
       "positiveDays": 1,
       "negativeDays": 1
     },
