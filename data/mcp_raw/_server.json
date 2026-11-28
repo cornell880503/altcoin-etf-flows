@@ -9,7 +9,25 @@
    },
    "serverInfo": {
     "name": "cryptoetf",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "title": "CryptoETF",
+    "websiteUrl": "https://cryptoetf.today",
+    "icons": [
+     {
+      "src": "https://mcp.cryptoetf.today/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+       "512x512"
+      ]
+     },
+     {
+      "src": "https://mcp.cryptoetf.today/icon-192.png",
+      "mimeType": "image/png",
+      "sizes": [
+       "192x192"
+      ]
+     }
+    ]
    },
    "instructions": "Real-time spot crypto ETF flow data for every US-listed spot crypto ETF complex: BTC, ETH, SOL, XRP, HYP (Hyperliquid), DOGE, LINK, AVAX, HBAR, LTC, BNB, DOT, SUI, NEAR, TRX and ZEC. All ETF flow values are net USD millions (positive = inflow, negative = outflow). Also stablecoins and tokenized real-world assets (treasuries, gold, stocks, credit); their amounts are whole US dollars, not millions."
   },
