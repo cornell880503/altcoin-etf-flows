@@ -6,14 +6,14 @@
    "last": "2026-11-28",
    "ok": true,
    "rows": 31,
-   "secs": 0.9
+   "secs": 0.0
   },
   "basis": {
    "first": "2020-08-01",
    "last": "2026-11-27",
    "ok": true,
    "rows": 2305,
-   "secs": 4.5
+   "secs": 4.0
   },
   "bitfinex": {
    "complete": {
@@ -28,7 +28,7 @@
    "last": "2026-11-28",
    "ok": true,
    "rows": 2158,
-   "secs": 24.4,
+   "secs": 24.6,
    "stats_pages": 4
   },
   "cftc": {
@@ -36,48 +36,41 @@
    "last": "2026-11-17",
    "ok": true,
    "rows": 450,
-   "secs": 4.6
+   "secs": 3.0
   },
   "coinbase": {
    "first": 1609459200,
-   "last": 1795878000,
+   "last": 1795881600,
    "ok": true,
-   "rows": 51771,
-   "secs": 0.7
+   "rows": 51772,
+   "secs": 0.5
   },
   "deribit": {
    "first": "2026-10-29",
    "last": "2026-11-28",
    "ok": true,
    "rows": 31,
-   "secs": 1.0
+   "secs": 0.8
   },
   "fred": {
    "first": "2019-01-02",
    "last": "2026-11-27",
    "ok": true,
    "rows": 1980,
-   "secs": 3.4
+   "secs": 3.9
   },
   "funding": {
-   "binance_est": {
-    "asked": 0,
-    "mae_pct8h": 0.000125,
-    "new_days": 0,
-    "overlap_days": 43
-   },
-   "first": "2020-01-01",
-   "last": "2026-11-27",
-   "ok": true,
-   "rows": 2523,
-   "secs": 2.6
+   "error": "HTTPError: HTTP Error 500: Internal Server Error",
+   "ok": false,
+   "secs": 18.7,
+   "trace": "^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py\", line 492, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py\", line 639, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 500: Internal Server Error\n"
   },
   "mstr": {
    "first": "1998-07-01",
    "last": "2026-11-28",
    "ok": true,
    "rows": 372,
-   "secs": 0.4
+   "secs": 0.1
   },
   "okx_lending": {
    "first": "2024-07-18",
@@ -91,15 +84,15 @@
    "last": "2026-11-28",
    "ok": true,
    "rows": 3287,
-   "secs": 4.2
+   "secs": 3.1
   },
   "usdc_usdt": {
    "first": "2018-12-15",
    "last": "2026-11-27",
    "ok": true,
    "rows": 2738,
-   "secs": 1.1
+   "secs": 0.8
   }
  },
- "run_at": "2026-11-28T15:01:44Z"
+ "run_at": "2026-11-28T16:01:58Z"
 }
