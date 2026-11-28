@@ -5,29 +5,29 @@
     {
       "symbol": "BTC",
       "asset": "bitcoin",
-      "netFlowUsdM": -1266.6,
+      "netFlowUsdM": -1316.2,
       "tradingDays": 5,
-      "avgDailyUsdM": -253.3,
+      "avgDailyUsdM": -263.2,
       "positiveDays": 0,
       "negativeDays": 4
     },
     {
       "symbol": "ETH",
       "asset": "ethereum",
-      "netFlowUsdM": -217.5,
+      "netFlowUsdM": -229.6,
       "tradingDays": 5,
-      "avgDailyUsdM": -43.5,
+      "avgDailyUsdM": -45.9,
       "positiveDays": 0,
-      "negativeDays": 3
+      "negativeDays": 4
     },
     {
       "symbol": "SOL",
       "asset": "solana",
-      "netFlowUsdM": -3.1,
+      "netFlowUsdM": -4,
       "tradingDays": 5,
-      "avgDailyUsdM": -0.6,
+      "avgDailyUsdM": -0.8,
       "positiveDays": 1,
-      "negativeDays": 1
+      "negativeDays": 2
     },
     {
       "symbol": "XRP",
@@ -41,17 +41,17 @@
     {
       "symbol": "HYP",
       "asset": "hyp",
-      "netFlowUsdM": -3.5,
+      "netFlowUsdM": -4.5,
       "tradingDays": 5,
-      "avgDailyUsdM": -0.7,
+      "avgDailyUsdM": -0.9,
       "positiveDays": 0,
-      "negativeDays": 2
+      "negativeDays": 3
     },
     {
       "symbol": "DOGE",
       "asset": "doge",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -60,8 +60,8 @@
       "symbol": "LINK",
       "asset": "link",
       "netFlowUsdM": 3.7,
-      "tradingDays": 3,
-      "avgDailyUsdM": 1.2,
+      "tradingDays": 4,
+      "avgDailyUsdM": 0.9,
       "positiveDays": 1,
       "negativeDays": 0
     },
@@ -105,7 +105,7 @@
       "symbol": "DOT",
       "asset": "dot",
       "netFlowUsdM": 0,
-      "tradingDays": 3,
+      "tradingDays": 4,
       "avgDailyUsdM": 0,
       "positiveDays": 0,
       "negativeDays": 0
@@ -114,8 +114,8 @@
       "symbol": "SUI",
       "asset": "sui",
       "netFlowUsdM": 0.5,
-      "tradingDays": 3,
-      "avgDailyUsdM": 0.2,
+      "tradingDays": 4,
+      "avgDailyUsdM": 0.1,
       "positiveDays": 1,
       "negativeDays": 1
     },
